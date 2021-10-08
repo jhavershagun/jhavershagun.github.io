@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+
+    <meta name="author" content="Andrew Heiss">
+    <meta name="description" content="Use the future R package to run computationally intensive R commands on a cluster of remote computers">
+    <meta name="keywords" content="r, docker, tidyverse, future, digitalocean, docker">
+    <meta name="generator" content="Hugo 0.88.1" />
+
+    <title>
+  Create a cheap, disposable supercomputer with R, DigitalOcean, and future | Andrew Heiss
+</title>
+
+    <link rel="canonical" href="https://www.andrewheiss.com/blog/2018/07/30/disposable-supercomputer-future/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+
+    <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
+    <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png?v=1"/>
+    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:title" content="Create a cheap, disposable supercomputer with R, DigitalOcean, and future"/>
+    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:description" content="Use the future R package to run computationally intensive R commands on a cluster of remote computers"/>
+
+
+    <meta property="og:title" content="Create a cheap, disposable supercomputer with R, DigitalOcean, and future" />
+<meta property="og:description" content="Use the future R package to run computationally intensive R commands on a cluster of remote computers" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.andrewheiss.com/blog/2018/07/30/disposable-supercomputer-future/" />
+<meta property="og:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta property="article:published_time" content="2018-07-30T00:00:00+00:00" />
+<meta property="article:modified_time" content="2018-07-30T00:00:00+00:00" />
+
+<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:section" content="blog" />
+<meta property="article:tag" content="r" />
+<meta property="article:tag" content="docker" />
+<meta property="article:tag" content="tidyverse" />
+<meta property="article:tag" content="future" />
+<meta property="article:tag" content="digitalocean" />
+<meta property="article:tag" content="docker" />
+
+
+    <meta itemprop="name" content="Create a cheap, disposable supercomputer with R, DigitalOcean, and future">
+<meta itemprop="description" content="Use the future R package to run computationally intensive R commands on a cluster of remote computers"><meta itemprop="datePublished" content="2018-07-30T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2018-07-30T00:00:00+00:00" />
+<meta itemprop="wordCount" content="3262"><meta itemprop="image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta itemprop="keywords" content="r,docker,tidyverse,future,digitalocean,docker," />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/pure-and-grids-responsive.min.css">
+    <link rel="stylesheet" href="/css/ath-hugo.min.c5619237d890aa972042ca0497d2594d6f3f34b1746c377f560f5096573fb6e3.css" integrity="sha256-xWGSN9iQqpcgQsoEl9JZTW8/NLF0bDd/Vg9Qllc/tuM=" crossorigin="anonymous" media="screen" />
+
+    <script src="https://kit.fontawesome.com/f9d343c40d.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=dLX2MbQJLG">
+    <link rel="manifest" href="/site.webmanifest?v=dLX2MbQJLG">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=dLX2MbQJLG" color="#cf4446">
+    <link rel="shortcut icon" href="/favicon.ico?v=dLX2MbQJLG">
+    <meta name="msapplication-TileColor" content="#170c3a">
+    <meta name="theme-color" content="#170c3a">
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-527449-5', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+
+    <div id="layout" class="pure-g">
+        <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
+            <header>
+                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
+                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+
+                <nav id="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cv/">CV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/research/">Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/teaching/">Teaching</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/talks/">Talks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/now/">Now</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uses/">Uses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+        </div> 
+    
+        <div id="content" class="pure-u-1 pure-u-md-3-4">
+        
+  <section>
+    <article class="content-single">
+        <header class="post-header">
+            <h1 class="post-title">Create a cheap, disposable supercomputer with R, DigitalOcean, and future</h1>
+
+            <div class="post-meta pure-g">
+                <div class="pure-u-1-2">
+                    <span class="posted-on">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime='2018-07-30T00:00:00Z'>
+                            Monday, July 30, 2018
+                        </time>
+                    </span>
+                </div>
+                <div class="reading-time pure-u-1-2">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    16-minute read
+                </div>
+            </div>
+        </header>
+    
+        <p><em>tl;dr</em>: <a href="#full-example">Skip to complete example</a></p>
+<hr>
+<p>In one of my <a href="https://github.com/andrewheiss/donors-ngo-restrictions">current research projects</a>, I use Bayesian modeling (with <a href="http://mc-stan.org/">Stan</a> and <a href="http://mc-stan.org/rstanarm/articles/rstanarm.html">rstanarm</a>) and multiple imputation (with <a href="https://gking.harvard.edu/Amelia">Amelia</a>) to measure how international aid agencies change their funding allocations to countries that impose legal restrictions on NGOs. It&rsquo;s a fascinating topic and I&rsquo;m using exciting cutting edge research methods to do it.</p>
+<p>However, these cutting edge research methods are <em>really</em> computationally intensive. On my laptop, using all four CPU cores, it takes ≈45 minutes to run one set of models (see <a href="https://github.com/andrewheiss/donors-ngo-restrictions/blob/cb93d175e29b88502640e70b48f5a899dbdba1c4/Data/run_bayes_remote.R#L95"><code>h1.barriers.total &lt;- mods.h1.next_year.raw.bayes.nested</code> here</a>, for instance), so with all the different model specifications and robustness checks, it takes <em>hours</em> to run the complete analysis for this project. It&rsquo;s awful and I hate rerunning it.</p>
+<p>In the past, I created several <a href="https://www.digitalocean.com/">DigitalOcean</a> droplets (what they call virtual private servers), installed <a href="https://www.rstudio.com/products/rstudio/download-server/">RStudio Server</a> on each, uploaded my data to each instance, and ran separate models on each. This reduced computation time, since I could have like 5 computers all running different parts of the analysis, but it required a ton of manual work and oversight. Computers are really good at automating stuff,  and tools like <a href="https://slurm.schedmd.com/">Slurm</a> and <a href="http://hadoop.apache.org/">Hadoop</a> and <a href="https://kubernetes.io/">Kubernetes</a> all allow you to orchestrate computing across clusters of machines. However, because these tools are powerful, they&rsquo;re also really complicated and require a lot of additional configuration, and the tradeoff between teaching myself Kubernetes vs. just doing it all manually wasn&rsquo;t that favorable.</p>
+<p>Surely, <a href="https://twitter.com/andrewheiss/status/1022937013022945280?s=21">I mused on Twitter last week</a>, there&rsquo;s a better easier way to manage all this computing.</p>
+<p>There is! And it&rsquo;s surprisingly easy with the <a href="https://github.com/HenrikBengtsson/future"><strong>future</strong></a> package in R!</p>
+<p>You can create your own disposable supercomputer with remote clusters of computers in just a few intuitive steps.</p>
+<ol>
+<li>Create remote computers that have the correct R environment and packages set up already</li>
+<li>Use <code>future::plan()</code> to point R to those computers</li>
+<li>Run R commands on those computers with <code>future::future_lapply()</code> or <code>furrr::future_map()</code></li>
+<li>Throw away the remote computers when you&rsquo;re done</li>
+<li>That&rsquo;s all!</li>
+</ol>
+<p><a href="#full-example">A fully worked out, tl;dr example is at the end of this post.</a></p>
+<h2 id="0-super-quick-introduction-to-future">0. Super quick introduction to future</h2>
+<p>The key to all of this working correctly is the <a href="https://github.com/HenrikBengtsson/future"><strong>future</strong></a> package in R. <strong>future</strong> allows you to evaluate R commands and expressions in separate processes.</p>
+<p>For instance, ordinarily, when you run this command, <code>x</code> gets assigned a value immediately:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">x <span style="color:#f92672">&lt;-</span> {
+  <span style="color:#a6e22e">cat</span>(<span style="color:#e6db74">&#34;Something really computationally intensive\n&#34;</span>)
+  <span style="color:#ae81ff">10</span>
+}
+<span style="color:#75715e">#&gt; Something really computationally intensive</span>
+
+x
+<span style="color:#75715e">#&gt; [1] 10</span>
+</code></pre></div><p>The stuff in <code>cat()</code> gets printed immediately and the value of 10 is assigned to <code>x</code> immediately as well. This is all well and good, but if the command is computationally intensive, you have to wait until it&rsquo;s done before doing anything else in R.</p>
+<p><strong>future</strong> includes a special assignment command <code>%&lt;-%</code> that delays evaluation until <code>x</code> is called.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(future)
+
+x <span style="color:#f92672">%&lt;-%</span> {
+    <span style="color:#a6e22e">cat</span>(<span style="color:#e6db74">&#34;Something really computationally intensive\n&#34;</span>)
+    <span style="color:#ae81ff">10</span>
+}
+
+x
+<span style="color:#75715e">#&gt; Something really computationally intensive</span>
+<span style="color:#75715e">#&gt; [1] 10</span>
+</code></pre></div><p>Notice how <code>cat()</code> isn&rsquo;t run until <code>x</code> is run. That&rsquo;s because the whole expression isn&rsquo;t actually run yet—it isn&rsquo;t evaluated until <code>x</code> is called.</p>
+<p>The magic of <strong>future</strong> is that this deferred evaluation <em>can automatically happen anywhere else</em>. You specify where evaluation happens with <code>future::plan()</code>. For instance, if you want <code>x</code> to be handled on multiple CPUs on your local computer, you&rsquo;d do this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(future)
+<span style="color:#a6e22e">plan</span>(multiprocess)
+
+x <span style="color:#f92672">%&lt;-%</span> {
+  <span style="color:#a6e22e">cat</span>(<span style="color:#e6db74">&#34;Something really computationally intensive\n&#34;</span>)
+  <span style="color:#ae81ff">10</span>
+}
+
+x
+<span style="color:#75715e">#&gt; Something really computationally intensive</span>
+<span style="color:#75715e">#&gt; [1] 10</span>
+</code></pre></div><p>R now uses multiple cores to create <code>x</code>.</p>
+<p>Or, if you want <code>x</code> to be processed on a cluster of three remote computers, you&rsquo;d do this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(future)
+
+ips <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;192.168.1.1&#34;</span>, <span style="color:#e6db74">&#34;192.168.1.2&#34;</span>, <span style="color:#e6db74">&#34;192.168.1.3&#34;</span>)
+<span style="color:#a6e22e">plan</span>(remote, workers <span style="color:#f92672">=</span> ips)
+
+x <span style="color:#f92672">%&lt;-%</span> {
+    <span style="color:#a6e22e">cat</span>(<span style="color:#e6db74">&#34;Something really computationally intensive\n&#34;</span>)
+    <span style="color:#ae81ff">10</span>
+}
+
+x
+<span style="color:#75715e">#&gt; Something really computationally intensive</span>
+<span style="color:#75715e">#&gt; [1] 10</span>
+</code></pre></div><p><code>x</code> is now created across three computers automatically.</p>
+<p><strong>future</strong> has functions like <a href="https://github.com/HenrikBengtsson/future.apply"><code>future.apply::future_lapply()</code></a> that allow you to apply functions to lists, just like <code>lapply()</code> and friends in base R, and the <a href="https://github.com/DavisVaughan/furrr"><strong>furrr</strong> package</a> has futurized functions like <code>future_map()</code> that are equivalent to <code>map()</code> and friends in <strong>purrr</strong>. The <code>future_*</code> versions of these functions will automatically take advantage of whatever you&rsquo;ve specified in <code>plan()</code>. If you use <code>plan(multiprocess)</code>, <code>future_map()</code> will automatically send chunks of computations to each of the CPU cores; if you use <code>plan(remote)</code>, <code>future_map()</code> will automatically send chunks of computations to each of the remote computers.</p>
+<p>This is seriously magic and incredible. The backend you specify with <code>plan()</code> <em>doesn&rsquo;t matter</em> and you can change it later to anything you want <em>without having to change your code</em>.</p>
+<h2 id="1-create-remote-computers-that-have-the-correct-r-environment-and-packages-set-up-already">1. Create remote computers that have the correct R environment and packages set up already</h2>
+<h3 id="11-create-a-remote-computer-or-two-or-three">1.1. Create a remote computer (or two or three)</h3>
+<p>First, you need a remote computer. I prefer to use DigitalOcean, mostly because I already use it for my personal web hosting and other personal projects, and because I find it way more intuitive and easy to use than <a href="https://aws.amazon.com/ec2/">Amazon&rsquo;s EC2</a> (which, like Kubernetes, et al. is incredibly powerful, but incredibly complicated). But you can also do all of this with AWS, <a href="https://www.linode.com/">Linode</a>, <a href="https://cloud.google.com/">Google Cloud Platform</a>, or any other VPS service (<a href="https://gist.github.com/DavisVaughan/ef544e6ef2228920e7e7100c48def93e">here&rsquo;s how to do it with AWS</a> and with <a href="https://cloudyr.github.io/googleComputeEngineR/articles/massive-parallel.html">Google Cloud</a>). The magic of <strong>future</strong> is that it doesn&rsquo;t matter what backend you use—the package takes care of everything for you.</p>
+<p>Here&rsquo;s what to do with DigitalOcean:</p>
+<ol>
+<li>
+<p>Create a DigitalOcean account (<a href="https://m.do.co/c/cec0de11762e">get $10 for free with this link</a>)</p>
+</li>
+<li>
+<p>Create an SSH key pair between your DigitalOcean account and your computer. <a href="https://www.digitalocean.com/docs/droplets/how-to/add-ssh-keys/">Follow the instructions here</a> to create SSH keys and then upload the public keys to your account. Setting up SSH keys like this lets you securely access your remote computer without a password, which is nice when running remote computations from R.</p>
+</li>
+<li>
+<p>In your DigitalOcean account, create a new Droplet. For simplicity&rsquo;s sake, you can use the &ldquo;One-click apps&rdquo; tab to create a computer that has <a href="https://www.docker.com/">Docker</a> pre-installed.</p>
+<figure><img src="do-docker-image.png"
+         alt="Create a DigitalOcean image with Docker pre-installed"/>
+</figure>
+
+</li>
+<li>
+<p>Choose how big you want the droplet to be. For now, we&rsquo;ll just make a small $5/month VPS, but you can get as fancy as you want in real life.</p>
+</li>
+<li>
+<p>Check the box near the bottom to add your SSH key to the VPS automatically.</p>
+<figure class="img-50"><img src="do-ssh.png"
+         alt="Enable SSH key in new droplet"/>
+</figure>
+
+</li>
+<li>
+<p>All done! Take note of the IP address. You can connect to the machine now with a terminal with <code>ssh root@IPADDRESS</code> if you want, but you don&rsquo;t need to.</p>
+</li>
+</ol>
+<p>You can automate all this with the <a href="https://github.com/sckott/analogsea"><strong>analogsea</strong> package</a> in R. Create an API key in your DigitalOcean account:</p>
+<figure class="img-50"><img src="do-pat.png"
+         alt="Create new API key in DigitalOcean"/>
+</figure>
+
+<p>Then edit <code>~/.Rprofile</code> (or create a new file there, if needed) and add this line:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">Sys.setenv</span>(DO_PAT <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;KEY_GOES_HERE&#34;</span>)
+</code></pre></div><p>Now, you can use R to create DigitalOcean droplets, like so:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(tidyverse)
+<span style="color:#a6e22e">library</span>(analogsea)
+
+<span style="color:#75715e"># droplet_create() makes a generic Linux VPS</span>
+remote_computer <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">droplet_create</span>(region <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sfo2&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1gb&#34;</span>)
+
+<span style="color:#75715e"># Or...</span>
+<span style="color:#75715e"># docklet_create() makes a Linux VPS with Docker pre-installed</span>
+remote_computer <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">docklet_create</span>(region <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sfo2&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1gb&#34;</span>)
+</code></pre></div><h3 id="12-make-sure-the-remote-computer-has-the-correct-r-environment-and-packages">1.2. Make sure the remote computer has the correct R environment and packages</h3>
+<p>The computers you specify in <code>plan(remote, workers = &quot;blah&quot;)</code> need to (1) have R installed, and (2) have all the packages installed that are needed for the computation. You can manually install R and all the needed packages, but that can take a long time and it&rsquo;s tedious. If you need a cluster of 6 computers, you don&rsquo;t want to take an hour to install R on each of them (and wait for all the packages to compile).</p>
+<p>The easiest way to get a ready-to-go R environment is to use <a href="https://www.docker.com/">Docker</a>. I won&rsquo;t cover the details of Docker here (since <a href="https://www.andrewheiss.com/blog/2017/04/27/super-basic-practical-guide-to-docker-and-rstudio/">I&rsquo;ve done that already</a>)—essentially, Docker lets you install pre-configured virtual computers instantly. For example, <a href="https://hub.docker.com/r/rocker/r-base/"><code>rocker/rbase</code></a> is a Linux machine with R preinstalled, and <a href="https://hub.docker.com/r/rocker/tidyverse/"><code>rocker/tidyverse</code></a> is a Linux machine with R + RStudio server + tidyverse pre-installed. You can also create project-specific environments like <a href="https://hub.docker.com/r/andrewheiss/docker-donors-ngo-restrictions/">this one for my donors-NGOs project</a>, and you can use R packages like <a href="https://github.com/o2r-project/containerit"><strong>containerit</strong></a> to automatically create a <code>Dockerfile</code> out of your current R environment. It&rsquo;s probably best to make your own custom Docker image for your own projects if you use any packages beyond what&rsquo;s in the default <code>rbase</code> or <code>tidyverse</code> images.</p>
+<p>To get a Docker image onto your remote computer, log into the computer with <code>ssh root@IPADDRESS</code> in your terminal and run <code>docker pull rocker/tidyverse</code>.</p>
+<p>If you&rsquo;re using <strong>analogsea</strong>, run this from R:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">droplet</span>(remote_computer<span style="color:#f92672">$</span>id) <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">docklet_pull</span>(<span style="color:#e6db74">&#34;rocker/tidyverse&#34;</span>)
+</code></pre></div><p>You can do this to create as many remote computers as you want.</p>
+<p>The first time you run <code>docklet_pull()</code> on a droplet, Docker will download hundreds of megabytes of container files. This is fine for one computer, but if you&rsquo;re creating a cluster of multiple computers, you might not want to redownload everything every time on each computer (to avoid extra bandwidth charges, for example). Instead of pulling a fresh Docker image on each computer, you can take a snapshot of the first remote droplet and then make new droplets based on the snapshot:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Create new droplet with rocker/tidyverse</span>
+remote_computer <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">docklet_create</span>(region <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sfo2&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1gb&#34;</span>)
+<span style="color:#a6e22e">droplet</span>(remote_computer<span style="color:#f92672">$</span>id) <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">docklet_pull</span>(<span style="color:#e6db74">&#34;rocker/tidyverse&#34;</span>)
+
+<span style="color:#75715e"># Create snapshot</span>
+<span style="color:#a6e22e">droplet</span>(remote_computer<span style="color:#f92672">$</span>id) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">droplet_power_off</span>() <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">droplet_snapshot</span>(name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;tidyverse_ready&#34;</span>) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">droplet_power_on</span>()
+
+<span style="color:#75715e"># Create a new droplet based on this snapshot. This new computer will already</span>
+<span style="color:#75715e"># have rocker/tidyverse on it</span>
+<span style="color:#75715e">#</span>
+<span style="color:#75715e"># You can see a list of available snapshots and get the name/id with</span>
+<span style="color:#75715e"># images(private = TRUE)</span>
+remote_computer2 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">droplet_create</span>(image <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;12345678&#34;</span>, 
+                                   region <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sfo2&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;1gb&#34;</span>)
+
+<span style="color:#75715e"># This won&#39;t take long because it already has rocker/tidyverse</span>
+<span style="color:#75715e"># You should get this message:</span>
+<span style="color:#75715e">#   Status: Image is up to date for rocker/tidyverse:latest</span>
+<span style="color:#a6e22e">droplet</span>(remote_computer<span style="color:#f92672">$</span>id) <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">docklet_pull</span>(<span style="color:#e6db74">&#34;rocker/tidyverse&#34;</span>)
+</code></pre></div><p>Just make sure you delete the snapshots when you&rsquo;re done—they cost $0.05 per GB per month.</p>
+<h2 id="2-use-futureplan-to-point-r-to-those-computers">2. Use <code>future::plan()</code> to point R to those computers</h2>
+<p>We can now point R to this remote computer (or remote computers) and have <strong>future</strong> automatically use the Docker-installed R.</p>
+<p>If we didn&rsquo;t use Docker and instead installed R on the remote machine itself, all we&rsquo;d need to do is run this in R:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plan</span>(remote, workers <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;IP ADDRESS HERE&#34;</span>)
+</code></pre></div><p>However, because R lives inside a Docker image, we need to do a tiny bit of extra configuration on the local computer—we have to tell the remote computer how to turn on and access the R Docker image. We do this by defining a cluster. Here&rsquo;s a heavily commented example of how to do that:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Public IP for droplet(s); this can also be a vector of IP addresses</span>
+ip <span style="color:#f92672">&lt;-</span> IP_ADDRESS_HERE
+
+<span style="color:#75715e"># Path to private SSH key that matches key uploaded to DigitalOcean</span>
+ssh_private_key_file <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;/Users/andrew/.ssh/id_rsa&#34;</span>
+
+<span style="color:#75715e"># Connect and create a cluster</span>
+cl <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">makeClusterPSOCK</span>(
+  ip,
+  
+  <span style="color:#75715e"># User name; DigitalOcean droplets use root by default</span>
+  user <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;root&#34;</span>,
+  
+  <span style="color:#75715e"># Use private SSH key registered with DigitalOcean</span>
+  rshopts <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(
+    <span style="color:#e6db74">&#34;-o&#34;</span>, <span style="color:#e6db74">&#34;StrictHostKeyChecking=no&#34;</span>,
+    <span style="color:#e6db74">&#34;-o&#34;</span>, <span style="color:#e6db74">&#34;IdentitiesOnly=yes&#34;</span>,
+    <span style="color:#e6db74">&#34;-i&#34;</span>, ssh_private_key_file
+  ),
+  
+  <span style="color:#75715e"># Command to run on each remote machine</span>
+  <span style="color:#75715e"># The script loads the tidyverse Docker image</span>
+  <span style="color:#75715e"># --net=host allows it to communicate back to this computer</span>
+  rscript <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;sudo&#34;</span>, <span style="color:#e6db74">&#34;docker&#34;</span>, <span style="color:#e6db74">&#34;run&#34;</span>, <span style="color:#e6db74">&#34;--net=host&#34;</span>, 
+              <span style="color:#e6db74">&#34;rocker/tidyverse&#34;</span>, <span style="color:#e6db74">&#34;Rscript&#34;</span>),
+  
+  <span style="color:#75715e"># These are additional commands that are run on the remote machine. </span>
+  <span style="color:#75715e"># At minimum, the remote machine needs the future library to work—installing furrr also installs future.</span>
+  rscript_args <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(
+    <span style="color:#75715e"># Create directory for package installation</span>
+    <span style="color:#e6db74">&#34;-e&#34;</span>, <span style="color:#a6e22e">shQuote</span>(<span style="color:#e6db74">&#34;local({p &lt;- Sys.getenv(&#39;R_LIBS_USER&#39;); dir.create(p, recursive = TRUE, showWarnings = FALSE); .libPaths(p)})&#34;</span>),
+    <span style="color:#75715e"># Install furrr and future</span>
+    <span style="color:#e6db74">&#34;-e&#34;</span>, <span style="color:#a6e22e">shQuote</span>(<span style="color:#e6db74">&#34;if (!requireNamespace(&#39;furrr&#39;, quietly = TRUE)) install.packages(&#39;furrr&#39;)&#34;</span>)
+  ),
+  
+  <span style="color:#75715e"># Actually run this stuff. Set to TRUE if you don&#39;t want it to run remotely.</span>
+  dryrun <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>
+)
+</code></pre></div><p>With this cluster defined, we can now use it in <code>future::plan()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plan</span>(cluster, workers <span style="color:#f92672">=</span> cl)
+</code></pre></div><p>And that&rsquo;s it! <strong>future</strong> is now ready to run commands on the remote computer.</p>
+<h2 id="3-run-r-commands-on-those-computers-with-futurefuture_lapply-or-furrrfuture_map">3. Run R commands on those computers with <code>future::future_lapply()</code> or <code>furrr::future_map()</code></h2>
+<p>Now we can run <strong>future</strong>-based commands on the remote computer with <code>%&lt;-%</code>. First, let&rsquo;s check the remote computer&rsquo;s name:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Verify that commands run remotely by looking at the name of the remote</span>
+<span style="color:#75715e"># Create future expression; this doesn&#39;t run remotely yet</span>
+remote_name <span style="color:#f92672">%&lt;-%</span> {
+  <span style="color:#a6e22e">Sys.info</span>()[[<span style="color:#e6db74">&#34;nodename&#34;</span>]]
+} 
+
+<span style="color:#75715e"># Run remote expression and see that it&#39;s running inside Docker, not locally</span>
+remote_name
+<span style="color:#75715e">#&gt; [1] &#34;docker-s-1vcpu-2gb-sfo2-01&#34;</span>
+</code></pre></div><p>How many CPUs does it have?</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># See how many CPU cores the remote machine has</span>
+n_cpus <span style="color:#f92672">%&lt;-%</span> {parallel<span style="color:#f92672">::</span><span style="color:#a6e22e">detectCores</span>()} 
+n_cpus
+<span style="color:#75715e">#&gt; [1] 1</span>
+<span style="color:#75715e"># Just one, since this is a small machine</span>
+</code></pre></div><p>We can now outsource any command we want to the remote computer. We don&rsquo;t even have to transfer data manually to the remote—<strong>future</strong> takes care of all of that automatically:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Do stuff with data locally</span>
+top_5_worlds <span style="color:#f92672">&lt;-</span> starwars <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">filter</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">is.na</span>(homeworld)) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">count</span>(homeworld, sort <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">5</span>) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(homeworld <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(homeworld, ordered <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>))
+
+<span style="color:#75715e"># Create plot remotely, just for fun</span>
+homeworld_plot <span style="color:#f92672">%&lt;-%</span> { 
+  <span style="color:#a6e22e">ggplot</span>(top_5_worlds, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> homeworld, y <span style="color:#f92672">=</span> n)) <span style="color:#f92672">+</span>
+    <span style="color:#a6e22e">geom_bar</span>(stat <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;identity&#34;</span>) <span style="color:#f92672">+</span> 
+    <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Homeworld&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Count&#34;</span>, 
+         title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Most Star Wars characters are from Naboo and Tatooine&#34;</span>,
+         subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;It really is a Skywalker/Amidala epic&#34;</span>)
+}
+
+<span style="color:#75715e"># Run the command remotely and show plot locally</span>
+<span style="color:#75715e"># Note how we didn&#39;t have to load any data on the remote machine. future takes</span>
+<span style="color:#75715e"># care of all of that for us!</span>
+homeworld_plot
+</code></pre></div><p><img src="star-wars-homeworlds.png" width="75%" style="display: block; margin: auto;" alt="Top homeworlds in Star Wars" /></p>
+<p>In addition to <code>%&lt;-%</code>, we can use functions like <code>furrr::future_map()</code> to run functions across a vector of values. Because we&rsquo;re only running one remote computer, all these calculations happen on that remote image. If we used more, <strong>future</strong> would automatically dispatch different chunks of this code across different computers and then reassemble them locally. Anything you can do with <strong>furrr</strong> or <strong>future</strong> can now be done remotely.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Multiply the numbers 1-5 by 10000 random numbers</span>
+<span style="color:#75715e"># All these calculations happen remotely!</span>
+<span style="color:#a6e22e">future_map</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">5</span>, <span style="color:#f92672">~</span> <span style="color:#a6e22e">rnorm</span>(<span style="color:#ae81ff">10000</span>) <span style="color:#f92672">*</span> .x)
+<span style="color:#75715e">#&gt; [[1]]</span>
+<span style="color:#75715e">#&gt;     [1] -6.249602e-01  1.949156e+00  2.205669e+00  4.525842e-01</span>
+<span style="color:#75715e">#&gt; ...</span>
+</code></pre></div><p>You can even nest <strong>future</strong> plans by <a href="https://cran.r-project.org/web/packages/future/vignettes/future-3-topologies.html">specifying them in a list</a>, and the package will take care of the different nested layers automatically. You can also place <code>plan(list(...))</code> in a file named <code>.future.R</code>, which <strong>future</strong> will source automatically when it is loaded. This allows you to use different plans on different computers without ever changing your code.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plan</span>(<span style="color:#a6e22e">list</span>( 
+  <span style="color:#a6e22e">tweak</span>(cluster, workers <span style="color:#f92672">=</span> cl),  <span style="color:#75715e"># Use a cluster of computers locally </span>
+  multiprocess  <span style="color:#75715e"># Use all the CPUs on remote machines </span>
+)) 
+
+complicated_remote_stuff <span style="color:#f92672">%&lt;-%</span> {  
+  <span style="color:#75715e"># Do complicated stuff on all the remote CPUs with future or furrr functions</span>
+  <span style="color:#a6e22e">future_map</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">5</span>, <span style="color:#f92672">~</span> <span style="color:#a6e22e">rnorm</span>(<span style="color:#ae81ff">10000</span>) <span style="color:#f92672">*</span> .x)
+} 
+
+complicated_remote_stuff
+<span style="color:#75715e">#&gt; [[1]]</span>
+<span style="color:#75715e">#&gt;     [1] -4.746093e-02  1.874897e+00  1.679342e+00 -5.775777e-01</span>
+<span style="color:#75715e">#&gt; ...</span>
+</code></pre></div><h2 id="4-throw-away-the-remote-computers-when-youre-done">4. Throw away the remote computers when you&rsquo;re done</h2>
+<p>Because we&rsquo;ve used Docker-based R installations, spinning up new droplets is trivial—you don&rsquo;t have to manually install R and all the packages you need by hand. All these remote images are completely disposable.</p>
+<p>Once you&rsquo;re done running stuff remotely, you can delete the droplets and save money. Either delete them through the DigitalOcean dashboard, or use <strong>analogsea</strong>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">droplet_destroy</span>(remote_computer<span style="color:#f92672">$</span>id)
+</code></pre></div><h2 id="5-thats-all">5. That&rsquo;s all!</h2>
+<p>Phew. That&rsquo;s all! This is a lot easier than figuring out how to orchestrate Docker images with Kubernetes or figuring out how to create Hadoop clusters. <strong>future</strong> takes care of all the hard work behind the scenes and this all Just Works™.</p>
+<h2 id="full-example">Full example</h2>
+<p>Here&rsquo;s a real-life example of using Stan to estimate a bunch of models on a cluster of two 4-CPU, 8 GB RAM machines. It uses the <a href="https://hub.docker.com/r/andrewheiss/docker-donors-ngo-restrictions/"><code>andrewheiss/docker-donors-ngo-restrictions</code></a> Docker image because it already has Stan and family pre-installed. Each machine costs $0.06 per hour to run, so it&rsquo;s essentially a cheap, fast, remote, and disposable supercomputer.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Load libraries ----------------------------------------------------------</span>
+
+<span style="color:#a6e22e">library</span>(tidyverse)
+<span style="color:#a6e22e">library</span>(analogsea)
+<span style="color:#a6e22e">library</span>(broom)
+<span style="color:#a6e22e">library</span>(rstanarm)
+<span style="color:#a6e22e">library</span>(gapminder)
+<span style="color:#a6e22e">library</span>(tictoc)
+<span style="color:#a6e22e">library</span>(ggstance)
+
+<span style="color:#75715e"># Path to private SSH key that matches key on DigitalOcean</span>
+ssh_private_key_file <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;/Users/andrew/.ssh/id_rsa&#34;</span>
+
+
+<span style="color:#75715e"># Set up remote machines --------------------------------------------------</span>
+
+<span style="color:#75715e"># Create two new droplets with Docker pre-installed</span>
+<span style="color:#75715e"># Here I&#39;m using &#34;s-4vcpu-8gb&#34;, which has 4 CPUs and 8 GB of RAM.</span>
+<span style="color:#75715e"># Run analogsea::sizes() to see all the available sizes</span>
+droplet1 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">docklet_create</span>(region <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sfo2&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;s-4vcpu-8gb&#34;</span>)
+droplet2 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">docklet_create</span>(region <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;sfo2&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;s-4vcpu-8gb&#34;</span>)
+
+<span style="color:#75715e"># Pull the docker image with the environment for this project</span>
+<span style="color:#75715e">#</span>
+<span style="color:#75715e"># Here I&#39;m using andrewheiss/docker-donors-ngo-restrictions because it already</span>
+<span style="color:#75715e"># has rstan and friends installed; none of the rocker R images do that</span>
+<span style="color:#75715e">#</span>
+<span style="color:#75715e"># NB: Wait for a minute before running this so that Docker is ready to</span>
+<span style="color:#75715e"># run on the remote machines</span>
+<span style="color:#a6e22e">droplet</span>(droplet1<span style="color:#f92672">$</span>id) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">docklet_pull</span>(<span style="color:#e6db74">&#34;andrewheiss/docker-donors-ngo-restrictions&#34;</span>)
+
+<span style="color:#a6e22e">droplet</span>(droplet2<span style="color:#f92672">$</span>id) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">docklet_pull</span>(<span style="color:#e6db74">&#34;andrewheiss/docker-donors-ngo-restrictions&#34;</span>)
+
+<span style="color:#75715e"># Get IP addresses</span>
+ip1 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">droplet</span>(droplet1<span style="color:#f92672">$</span>id)<span style="color:#f92672">$</span>networks<span style="color:#f92672">$</span>v4[[1]]<span style="color:#f92672">$</span>ip_address
+ip2 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">droplet</span>(droplet2<span style="color:#f92672">$</span>id)<span style="color:#f92672">$</span>networks<span style="color:#f92672">$</span>v4[[1]]<span style="color:#f92672">$</span>ip_address
+
+ips <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(ip1, ip2)
+
+
+<span style="color:#75715e"># Make remote cluster -----------------------------------------------------</span>
+
+<span style="color:#75715e"># Command to run on each remote machine</span>
+<span style="color:#75715e"># The script loads the docker-donors-ngo-restrictions Docker image</span>
+<span style="color:#75715e"># --net=host allows it to communicate back to this computer</span>
+rscript <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;sudo&#34;</span>, <span style="color:#e6db74">&#34;docker&#34;</span>, <span style="color:#e6db74">&#34;run&#34;</span>, <span style="color:#e6db74">&#34;--net=host&#34;</span>, 
+             <span style="color:#e6db74">&#34;andrewheiss/docker-donors-ngo-restrictions&#34;</span>, <span style="color:#e6db74">&#34;Rscript&#34;</span>)
+
+<span style="color:#75715e"># Connect and create a cluster</span>
+cl <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">makeClusterPSOCK</span>(
+  ips,
+  
+  <span style="color:#75715e"># User name; DO droplets use root by default</span>
+  user <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;root&#34;</span>,
+  
+  <span style="color:#75715e"># Use private SSH key registered with DO</span>
+  rshopts <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(
+    <span style="color:#e6db74">&#34;-o&#34;</span>, <span style="color:#e6db74">&#34;StrictHostKeyChecking=no&#34;</span>,
+    <span style="color:#e6db74">&#34;-o&#34;</span>, <span style="color:#e6db74">&#34;IdentitiesOnly=yes&#34;</span>,
+    <span style="color:#e6db74">&#34;-i&#34;</span>, ssh_private_key_file
+  ),
+  
+  rscript <span style="color:#f92672">=</span> rscript,
+  
+  <span style="color:#75715e"># Things to run each time the remote instance starts</span>
+  rscript_args <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(
+    <span style="color:#75715e"># Set up .libPaths() for the root user and install future/purrr/furrr packages</span>
+    <span style="color:#75715e"># Technically future and furrr are already installed on </span>
+    <span style="color:#75715e"># andrewheiss/docker-donors-ngo-restrictions, so these won&#39;t do anything</span>
+    <span style="color:#e6db74">&#34;-e&#34;</span>, <span style="color:#a6e22e">shQuote</span>(<span style="color:#e6db74">&#34;local({p &lt;- Sys.getenv(&#39;R_LIBS_USER&#39;); dir.create(p, recursive = TRUE, showWarnings = FALSE); .libPaths(p)})&#34;</span>),
+    <span style="color:#e6db74">&#34;-e&#34;</span>, <span style="color:#a6e22e">shQuote</span>(<span style="color:#e6db74">&#34;if (!requireNamespace(&#39;furrr&#39;, quietly = TRUE)) install.packages(&#39;furrr&#39;)&#34;</span>),
+    <span style="color:#75715e"># Make sure the remote computer uses all CPU cores with Stan</span>
+    <span style="color:#e6db74">&#34;-e&#34;</span>, <span style="color:#a6e22e">shQuote</span>(<span style="color:#e6db74">&#34;options(mc.cores = parallel::detectCores())&#34;</span>)
+  ),
+  
+  dryrun <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>
+)
+
+<span style="color:#75715e"># Use the cluster of computers as the backend for future and furrr functions</span>
+<span style="color:#a6e22e">plan</span>(cluster, workers <span style="color:#f92672">=</span> cl)
+
+<span style="color:#75715e"># We&#39;ll use gapminder data to estimate the relationship between health and </span>
+<span style="color:#75715e"># wealth in each continent using a Bayesian model</span>
+
+<span style="color:#75715e"># Process and manipulate data locally</span>
+<span style="color:#75715e"># Nest continent-based data frames into one larger data frame</span>
+gapminder_to_model <span style="color:#f92672">&lt;-</span> gapminder <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">group_by</span>(continent) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">nest</span>() <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#75715e"># Not enough observations here, so ignore it</span>
+  <span style="color:#a6e22e">filter</span>(continent <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#34;Oceania&#34;</span>)
+gapminder_to_model
+<span style="color:#75715e">#&gt; # A tibble: 4 x 2</span>
+<span style="color:#75715e">#&gt;   continent data              </span>
+<span style="color:#75715e">#&gt;   &lt;fct&gt;     &lt;list&gt;            </span>
+<span style="color:#75715e">#&gt; 1 Asia      &lt;tibble [396 × 5]&gt;</span>
+<span style="color:#75715e">#&gt; 2 Europe    &lt;tibble [360 × 5]&gt;</span>
+<span style="color:#75715e">#&gt; 3 Africa    &lt;tibble [624 × 5]&gt;</span>
+<span style="color:#75715e">#&gt; 4 Americas  &lt;tibble [300 × 5]&gt; </span>
+
+<span style="color:#75715e"># Fit a Bayesian model with naive normal priors on the coefficients and</span>
+<span style="color:#75715e"># intercept on each of the continents. In real life, you&#39;d want to use less</span>
+<span style="color:#75715e"># naive priors and rescale your data, but this is just an example.</span>
+model_to_run <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(df) {
+  model_stan <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">stan_glm</span>(lifeExp <span style="color:#f92672">~</span> gdpPercap <span style="color:#f92672">+</span> country, 
+                         data <span style="color:#f92672">=</span> df, family <span style="color:#f92672">=</span> <span style="color:#a6e22e">gaussian</span>(),
+                         prior <span style="color:#f92672">=</span> <span style="color:#a6e22e">normal</span>(), prior_intercept <span style="color:#f92672">=</span> <span style="color:#a6e22e">normal</span>(),
+                         chains <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>, iter <span style="color:#f92672">=</span> <span style="color:#ae81ff">2000</span>, warmup <span style="color:#f92672">=</span> <span style="color:#ae81ff">1000</span>, seed <span style="color:#f92672">=</span> <span style="color:#ae81ff">1234</span>)
+  <span style="color:#a6e22e">return</span>(model_stan)
+}
+
+<span style="color:#75715e"># Use future_map to outsource each of the continent-based models to a different</span>
+<span style="color:#75715e"># remote computer, where it will be run with all 4 remote cores</span>
+<span style="color:#a6e22e">tic</span>()
+gapminder_models <span style="color:#f92672">&lt;-</span> gapminder_to_model <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(model <span style="color:#f92672">=</span> data <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">future_map</span>(<span style="color:#f92672">~</span> <span style="color:#a6e22e">model_to_run</span>(.x)))
+<span style="color:#a6e22e">toc</span>()
+<span style="color:#75715e">#&gt; 27.786 sec elapsed</span>
+
+<span style="color:#75715e"># That&#39;s so fast!</span>
+
+<span style="color:#75715e"># It worked!</span>
+gapminder_models
+<span style="color:#75715e">#&gt; # A tibble: 4 x 3</span>
+<span style="color:#75715e">#&gt;   continent data               model        </span>
+<span style="color:#75715e">#&gt;   &lt;fct&gt;     &lt;list&gt;             &lt;list&gt;       </span>
+<span style="color:#75715e">#&gt; 1 Asia      &lt;tibble [396 × 5]&gt; &lt;S3: stanreg&gt;</span>
+<span style="color:#75715e">#&gt; 2 Europe    &lt;tibble [360 × 5]&gt; &lt;S3: stanreg&gt;</span>
+<span style="color:#75715e">#&gt; 3 Africa    &lt;tibble [624 × 5]&gt; &lt;S3: stanreg&gt;</span>
+<span style="color:#75715e">#&gt; 4 Americas  &lt;tibble [300 × 5]&gt; &lt;S3: stanreg&gt;</span>
+
+
+<span style="color:#75715e"># Do stuff with the models ------------------------------------------------</span>
+
+<span style="color:#75715e"># Extract the gdpPercap coefficient from the rstanarm models</span>
+gapminder_models_to_plot <span style="color:#f92672">&lt;-</span> gapminder_models <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(tidied <span style="color:#f92672">=</span> model <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">map</span>(<span style="color:#f92672">~</span> <span style="color:#a6e22e">tidy</span>(.x, intervals <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>, prob <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.9</span>))) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">unnest</span>(tidied) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">filter</span>(term <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;gdpPercap&#34;</span>)
+
+<span style="color:#75715e"># Plot the coefficients</span>
+<span style="color:#a6e22e">ggplot</span>(gapminder_models_to_plot, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> estimate, y <span style="color:#f92672">=</span> continent)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_vline</span>(xintercept <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_pointrangeh</span>(<span style="color:#a6e22e">aes</span>(xmin <span style="color:#f92672">=</span> lower, xmax <span style="color:#f92672">=</span> upper, color <span style="color:#f92672">=</span> continent), size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Coefficient estimate (log GDP per capita)&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>,
+       caption <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Bars show 90% credible intervals&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_color_viridis_d</span>(begin <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, end <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.9</span>, name <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_grey</span>() <span style="color:#f92672">+</span> <span style="color:#a6e22e">theme</span>(legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>)
+</code></pre></div><p><img src="model-coefs.png" width="75%" style="display: block; margin: auto;" alt="Model coefficients by continent" /></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Delete droplets ---------------------------------------------------------</span>
+
+<span style="color:#a6e22e">droplet_delete</span>(droplet1<span style="color:#f92672">$</span>id)
+<span style="color:#a6e22e">droplet_delete</span>(droplet2<span style="color:#f92672">$</span>id)
+</code></pre></div>
+    
+        <footer>
+            <div class="tags">
+    <i class="fas fa-tags" aria-hidden="true"></i>&ensp;
+    <a href="/blog/tags/r/">r</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/docker/">docker</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/tidyverse/">tidyverse</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/future/">future</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/digitalocean/">digitalocean</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/docker/">docker</a></div>
+
+        </footer>
+
+        <div id="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                 
+                var disqus_shortname = 'andrewheisscom';
+                var disqus_title = document.title;
+                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2018\/07\/30\/disposable-supercomputer-future\/';
+
+                 
+                (function () {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+        </div>
+    </article>
+</section>
+
+  
+
+        </div> 
+    </div> 
+    
+    <div id="footer">
+        <footer>
+    <ul class="links">
+        <li>
+            <a href="mailto:aheiss@gsu.edu" aria-label="E-mail"   >
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/andrewheiss" aria-label="Twitter"   >
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/andrewheiss" aria-label="GitHub"   >
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/andrewheiss" aria-label="YouTube"   >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://stackoverflow.com/users/120898/andrew" aria-label="StackOverflow"   >
+                <i class="fab fa-stack-overflow" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.heissatopia.com" aria-label="Heissatopia (family blog)"   >
+                <i class="fab fa-blogger" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/andrewheiss" aria-label="Facebook"   >
+                <i class="fab fa-facebook" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/in/andrewheiss" aria-label="LinkedIn"   >
+                <i class="fab fa-linkedin" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+
+    <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
+
+    <p class="pgp">
+        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
+    </p>
+
+    <p class="copyright">
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+            title="Creative Commons Attribution-ShareAlike 4.0 International license"><i class="fab fa-creative-commons"></i>
+        <i class="fab fa-creative-commons-by" title="Attribution"></i>
+        <i class="fab fa-creative-commons-share" title="Share alike"></i></a>
+        <span class="cc-year">&bull; 2007&ndash;2021</span>
+    </p>
+
+    <p class="colophon"><a href="https://github.com/andrewheiss/ath-hugo">Code for site</a></p>
+</footer>
+
+    </div>
+
+</body>
+
+</html>

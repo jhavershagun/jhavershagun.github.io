@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+
+    <meta name="author" content="Andrew Heiss">
+    <meta name="description" content="Use R and parts-of-speech tagging to explore the Qur&#39;an in Arabic">
+    <meta name="keywords" content="r, ggplot, tidyverse, tidytext, arabic">
+    <meta name="generator" content="Hugo 0.88.1" />
+
+    <title>
+  Tidy text, parts of speech, and unique words in the Qur&#39;an | Andrew Heiss
+</title>
+
+    <link rel="canonical" href="https://www.andrewheiss.com/blog/2018/12/28/tidytext-pos-arabic/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+
+    <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
+    <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png?v=1"/>
+    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:title" content="Tidy text, parts of speech, and unique words in the Qur&#39;an"/>
+    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:description" content="Use R and parts-of-speech tagging to explore the Qur&#39;an in Arabic"/>
+
+
+    <meta property="og:title" content="Tidy text, parts of speech, and unique words in the Qur&#39;an" />
+<meta property="og:description" content="Use R and parts-of-speech tagging to explore the Qur&#39;an in Arabic" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.andrewheiss.com/blog/2018/12/28/tidytext-pos-arabic/" />
+<meta property="og:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta property="article:published_time" content="2018-12-28T00:00:00+00:00" />
+<meta property="article:modified_time" content="2018-12-28T00:00:00+00:00" />
+
+<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:section" content="blog" />
+<meta property="article:tag" content="r" />
+<meta property="article:tag" content="ggplot" />
+<meta property="article:tag" content="tidyverse" />
+<meta property="article:tag" content="tidytext" />
+<meta property="article:tag" content="arabic" />
+
+
+    <meta itemprop="name" content="Tidy text, parts of speech, and unique words in the Qur&#39;an">
+<meta itemprop="description" content="Use R and parts-of-speech tagging to explore the Qur&#39;an in Arabic"><meta itemprop="datePublished" content="2018-12-28T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2018-12-28T00:00:00+00:00" />
+<meta itemprop="wordCount" content="2018"><meta itemprop="image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta itemprop="keywords" content="r,ggplot,tidyverse,tidytext,arabic," />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/pure-and-grids-responsive.min.css">
+    <link rel="stylesheet" href="/css/ath-hugo.min.c5619237d890aa972042ca0497d2594d6f3f34b1746c377f560f5096573fb6e3.css" integrity="sha256-xWGSN9iQqpcgQsoEl9JZTW8/NLF0bDd/Vg9Qllc/tuM=" crossorigin="anonymous" media="screen" />
+
+    <script src="https://kit.fontawesome.com/f9d343c40d.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=dLX2MbQJLG">
+    <link rel="manifest" href="/site.webmanifest?v=dLX2MbQJLG">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=dLX2MbQJLG" color="#cf4446">
+    <link rel="shortcut icon" href="/favicon.ico?v=dLX2MbQJLG">
+    <meta name="msapplication-TileColor" content="#170c3a">
+    <meta name="theme-color" content="#170c3a">
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-527449-5', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+
+    <div id="layout" class="pure-g">
+        <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
+            <header>
+                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
+                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+
+                <nav id="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cv/">CV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/research/">Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/teaching/">Teaching</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/talks/">Talks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/now/">Now</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uses/">Uses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+        </div> 
+    
+        <div id="content" class="pure-u-1 pure-u-md-3-4">
+        
+  <section>
+    <article class="content-single">
+        <header class="post-header">
+            <h1 class="post-title">Tidy text, parts of speech, and unique words in the Qur&rsquo;an</h1>
+
+            <div class="post-meta pure-g">
+                <div class="pure-u-1-2">
+                    <span class="posted-on">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime='2018-12-28T00:00:00Z'>
+                            Friday, December 28, 2018
+                        </time>
+                    </span>
+                </div>
+                <div class="reading-time pure-u-1-2">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    10-minute read
+                </div>
+            </div>
+        </header>
+    
+        <p><span class="small">(<a href="https://github.com/andrewheiss/tidytext-pos-arabic">See this notebook on GitHub</a>)</span></p>
+<hr>
+<p>As I showed in <a href="https://www.andrewheiss.com/blog/2018/12/26/tidytext-pos-john/">a previous blog post</a>, the <a href="https://statsmaths.github.io/cleanNLP/"><strong>cleanNLP</strong> package</a> is a phenomenal frontend for natural language processing in R. Rather than learn the exact syntax for NLP packages like <a href="https://spacy.io/">spaCy</a> or <a href="https://nlp.stanford.edu/">CoreNLP</a>, you can use a consistent set of functions and let <strong>cleanNLP</strong> handle the API translation behind the scenes for you.</p>
+<p>Previously, I used spaCy to tag the parts of speech in the Four Gospels to find the most distinctive nouns and verbs in the Gospel of John. Here, I’ll show a quick example of how to use CoreNLP to tag parts of speech in Arabic. CoreNLP is far far far slower than spaCy, but it can handle languages like Arabic and Chinese, which is pretty magical.</p>
+<p>Here we go!</p>
+<h2 id="load-packages-and-data">Load packages and data</h2>
+<p>You’ll need to install the <a href="https://github.com/andrewheiss/quRan">new <strong>quRan</strong> package</a>, which contains two Arabic versions of the Qur’an (with and without vowels) and two English translations (Yusuf Ali and Saheeh International). Install it with <code>remotes::install_github(&quot;andrewheiss/quRan&quot;)</code> or <code>devtools::install_github(&quot;andrewheiss/quRan&quot;)</code>. It’ll be on CRAN once they open up for submissions again in January.</p>
+<p>You’ll also need to install <strong>rJava</strong>. <a href="https://twitter.com/andrewheiss/status/1078476157119418370?s=21">Best of luck with this.</a> It is the worst package in the world to install, especially on macOS. The only way I got it to work was to <a href="https://www.snaq.net/software/rjava-macos.php">follow the instructions here</a> (even though at the top of that page it says that recent versions of R/Java no longer require this fix—that is false). Here’s basically what you have to do:</p>
+<ul>
+<li>Download and install the <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">most recent Java SE 8 JDK from Oracle</a> (I did Java SE 8u191)</li>
+<li>Reinstall R</li>
+<li>Download and run the <a href="https://gist.github.com/gwinstanley/884d6af25844bdaeb0c81f95bb285768"><code>fix-rJava.sh</code> script</a> listed at <a href="https://www.snaq.net/software/rjava-macos.php">snaq.net</a></li>
+<li>Install rJava with <code>install.packages(&quot;rJava&quot;)</code> or <code>install.packages(&quot;rJava&quot;, type = &quot;source&quot;, repos = &quot;http://cran.us.r-project.org&quot;)</code></li>
+<li>Hopefully it worked?</li>
+</ul>
+<p>Finally, you&rsquo;ll need to install <code>cleanNLP</code> and use it to download the CoreNLP parser and all its accompanying languages. Here’s how you do that:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(cleanNLP)
+
+<span style="color:#75715e"># This should download everything</span>
+<span style="color:#a6e22e">cnlp_download_corenlp</span>()
+
+<span style="color:#75715e"># Check if Arabic is there</span>
+<span style="color:#a6e22e">dir</span>(<span style="color:#a6e22e">system.file</span>(<span style="color:#e6db74">&#34;extdata&#34;</span>, package <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;cleanNLP&#34;</span>))
+</code></pre></div><p>Phew. If you’ve done all that, we can get started officially. We’ll load these packages:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(tidyverse)
+<span style="color:#a6e22e">library</span>(cleanNLP)
+<span style="color:#a6e22e">library</span>(quRan)
+<span style="color:#a6e22e">library</span>(tidytext)
+<span style="color:#a6e22e">library</span>(arabicStemR)  <span style="color:#75715e"># Has a list of Arabic stopwords</span>
+</code></pre></div><h2 id="part-of-speech-tagging">Part-of-speech tagging</h2>
+<p>To start, we’ll initialize the CoreNLP Arabic tagging engine (this takes a few seconds to run):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">cnlp_init_corenlp</span>(language <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ar&#34;</span>)
+</code></pre></div><p>Then, for the sake of speed, we’ll extract just the first surah of the Qur’an (<a href="https://en.wikipedia.org/wiki/Al-Fatiha">the Fatihah</a>) and tag it with <code>cnlp_annotate()</code>. We’ll use the version of the Qur’an without vowels because it seems to work better with CoreNLP. <code>cnlp_annotate()</code> does the heavy lifting of annotation and returns an object with the <code>annotate</code> class, which isn’t readily usable.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">fatiha <span style="color:#f92672">&lt;-</span> quran_ar_min <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">filter</span>(surah_id <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>)
+
+fatiha_annotated <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">cnlp_annotate</span>(fatiha,
+                                  text_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;text&#34;</span>, doc_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ayah_title&#34;</span>)
+
+fatiha_terms <span style="color:#f92672">&lt;-</span> fatiha_annotated<span style="color:#f92672">$</span>token
+
+<span style="color:#a6e22e">head</span>(fatiha_terms)
+
+<span style="color:#75715e">## # A tibble: 6 x 8</span>
+<span style="color:#75715e">##   id      sid   tid word   lemma upos  pos     cid</span>
+<span style="color:#75715e">##   &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;int&gt;</span>
+<span style="color:#75715e">## 1 1:1       1     1 بسم    &#34;&#34;    NOUN  NNP       1</span>
+<span style="color:#75715e">## 2 1:1       1     2 الله   &#34;&#34;    NOUN  NNP       5</span>
+<span style="color:#75715e">## 3 1:1       1     3 الرحمن &#34;&#34;    &#34;&#34;    DTNNP    10</span>
+<span style="color:#75715e">## 4 1:1       1     4 الرحيم &#34;&#34;    &#34;&#34;    DTNNP    17</span>
+<span style="color:#75715e">## 5 1:2       1     1 الحمد  &#34;&#34;    &#34;&#34;    DTNNP     0</span>
+<span style="color:#75715e">## 6 1:2       1     2 لله    &#34;&#34;    NOUN  NN        6</span>
+</code></pre></div><p>The output we get here isn’t as fancy as what spaCy returns for English text. We don’t get lemmatized words (base unpluralized, unconjugated words), and the <code>upos</code> column isn’t very rich—it just pulls out verbs and nouns. The <code>pos</code> column, though, seems to have more information in it. This column uses <a href="https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html">codes from the Penn Treebank Project</a>. For instance, “Allah” (الله) in the second row is marked as <code>NNP</code>, which is a singular proper noun, while “al-rahman” (the merciful; الرحمن) in the third row is marked as <code>DTNNP</code>, which is a determiner (<code>DT</code>; ال / “the”) + a singular proper noun (<code>NNP</code>; رحمن / “merciful”).</p>
+<p>Now that we know the tagging works, we can tag the entire Qur’an. <em><strong>Warning:</strong></em> CoreNLP is <em>incredibly</em> slow with this much text. It took 2,194 seconds to run this on my newish MacBook Pro (36 minutes!). To speed this up, you can download and load the pre-tagged text:</p>
+<ul>
+<li><a href="quran_annotated.rds"><code>quran_annotated.rds</code></a></li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># THIS TAKES SO LONG</span>
+quran_annotated <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">cnlp_annotate</span>(quran_ar_min,
+                                 text_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;text&#34;</span>, doc_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ayah_title&#34;</span>)
+
+<span style="color:#75715e"># SAVE THIS SO YOU NEVER HAVE TO RUN IT AGAIN</span>
+<span style="color:#a6e22e">saveRDS</span>(quran_annotated, <span style="color:#e6db74">&#34;quran_annotated.rds&#34;</span>)
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">quran_annotated <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">readRDS</span>(<span style="color:#e6db74">&#34;data/quran_annotated.rds&#34;</span>)
+
+<span style="color:#75715e"># Convert to data frame</span>
+quran_terms <span style="color:#f92672">&lt;-</span> quran_annotated<span style="color:#f92672">$</span>token
+</code></pre></div><h2 id="most-common-nouns-and-verbs">Most common nouns and verbs</h2>
+<p>Now that we have all the parts of speech for the Qur’an, we can do some quick exploratory data analysis.</p>
+<p>For instance, what are the most common nouns in the book? We need to do a little fancy filtering for this to work because the <code>pos</code> column marks all sorts of nouns: singular proper nouns (<code>NNP</code>), plural proper nouns (<code>NNPS</code>), regular nouns with a “the” (<code>DTNN</code>), etc. We need to find all the words with <code>pos</code> that contains <code>NN</code>. The <code>str_detect()</code> function from <strong>stringr</strong> makes this easy.</p>
+<p>Additionally, we need to remove common words like في and لهم. The <strong>arabicStemR</strong> package has a list of Arabic stopwords, but it’s buried in a <code>removeStopWords()</code> function. We can extract that list into its own mini data frame, though.</p>
+<p>The <a href="https://github.com/davnn/stopwords"><strong>stopwords</strong> package</a> also has a bunch of common Arabic words, accessible through <code>stopwords::stopwords(language = &quot;ar&quot;, source = &quot;misc&quot;))</code>, but it’s not as long of a list as <code>arabicStemR::removeStopWords()</code>, and it includes important Qur’anic words like يوم (day). So we’ll just use the <strong>arabicStemR</strong> words here.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># In order to get the full list of Arabic stopwords, we have to feed</span>
+<span style="color:#75715e"># removeStopWorsd some sort of Arabic text, and then access the</span>
+<span style="color:#75715e"># `arabicStopwordList` from the resulting object. It&#39;s a roundabout approach,</span>
+<span style="color:#75715e"># but it works</span>
+arabic_stopwords <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">data_frame</span>(word <span style="color:#f92672">=</span> <span style="color:#a6e22e">removeStopWords</span>(<span style="color:#e6db74">&#34;سلام&#34;</span>)<span style="color:#f92672">$</span>arabicStopwordList)
+</code></pre></div><p>(NOTE: It is currently not possible to correctly plot Arabic text (or any right-to-left text) in R on macOS, and <a href="https://stackoverflow.com/questions/22423760/right-to-left-languages-support-in-r-using-mac">it’s been an issue for a long time</a>. I made all these graphs with <a href="https://hub.docker.com/r/rocker/tidyverse/">the tidyverse Docker image</a>. You can also use <code>plotly::ggplotly()</code>)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">top_nouns <span style="color:#f92672">&lt;-</span> quran_terms <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">str_detect</span>(pos, <span style="color:#e6db74">&#34;NN&#34;</span>)) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">count</span>(word, sort <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#75715e"># Get rid of tiny diacritic-like words</span>
+  <span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">nchar</span>(word) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Get rid of stopwords</span>
+  <span style="color:#a6e22e">anti_join</span>(arabic_stopwords, by <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;word&#34;</span>) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">top_n</span>(<span style="color:#ae81ff">10</span>, n) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(word <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(word))
+
+plot_top_nouns <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(top_nouns, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_rev</span>(word), y <span style="color:#f92672">=</span> n, fill <span style="color:#f92672">=</span> n <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">500</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_col</span>() <span style="color:#f92672">+</span> 
+  <span style="color:#a6e22e">scale_fill_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;#8F562B&#34;</span>, <span style="color:#e6db74">&#34;#276B42&#34;</span>), guide <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_y_continuous</span>(labels <span style="color:#f92672">=</span> scales<span style="color:#f92672">::</span>comma) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Frequency&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_flip</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_minimal</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+plot_top_nouns
+</code></pre></div><p><img src="most-common-nouns-1.png" width="95%" style="display: block; margin: auto;" alt="Most common nouns in the Qur'an" /></p>
+<p>The most common noun <em>by far</em> is Allah, which makes sense, given that this is the Qur’an. The other common words are “earth,” “by Allah,” “day,” “your Lord,” “thing,” “heavens,” “people,” “book,” and “the Merciful.”</p>
+<p>What about the most common verbs? Here we select words that have <code>VB</code> in their <code>pos</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">top_verbs <span style="color:#f92672">&lt;-</span> quran_terms <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">str_detect</span>(pos, <span style="color:#e6db74">&#34;VB&#34;</span>)) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">count</span>(word, sort <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#75715e"># Get rid of tiny diacritic-like words</span>
+  <span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">nchar</span>(word) <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Get rid of stopwords</span>
+  <span style="color:#a6e22e">anti_join</span>(arabic_stopwords, by <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;word&#34;</span>) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">top_n</span>(<span style="color:#ae81ff">10</span>, n) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(word <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(word))
+
+word_themes <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">data_frame</span>(theme <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Saying&#34;</span>, <span style="color:#e6db74">&#34;Other&#34;</span>, <span style="color:#e6db74">&#34;Saying&#34;</span>, <span style="color:#e6db74">&#34;Believing&#34;</span>, 
+                                    <span style="color:#e6db74">&#34;Saying&#34;</span>, <span style="color:#e6db74">&#34;Other&#34;</span>, <span style="color:#e6db74">&#34;Other&#34;</span>, <span style="color:#e6db74">&#34;Believing&#34;</span>, 
+                                    <span style="color:#e6db74">&#34;Other&#34;</span>, <span style="color:#e6db74">&#34;Other&#34;</span>))
+top_verbs_themes <span style="color:#f92672">&lt;-</span> top_verbs <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">bind_cols</span>(word_themes) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(theme <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(theme, levels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Saying&#34;</span>, <span style="color:#e6db74">&#34;Believing&#34;</span>, <span style="color:#e6db74">&#34;Other&#34;</span>)))
+
+plot_top_verbs <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(top_verbs_themes, 
+                         <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_rev</span>(word), y <span style="color:#f92672">=</span> n, fill <span style="color:#f92672">=</span> theme)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_col</span>() <span style="color:#f92672">+</span> 
+  <span style="color:#a6e22e">scale_fill_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;#2BCAE0&#34;</span>, <span style="color:#e6db74">&#34;#9D2D2A&#34;</span>, <span style="color:#e6db74">&#34;#F5D085&#34;</span>),
+                    name <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Frequency&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_flip</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_minimal</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>,
+        legend.key.size <span style="color:#f92672">=</span> <span style="color:#a6e22e">unit</span>(<span style="color:#ae81ff">0.65</span>, <span style="color:#e6db74">&#34;lines&#34;</span>))
+plot_top_verbs
+</code></pre></div><p><img src="most-common-verbs-1.png" width="95%" style="display: block; margin: auto;" alt="Most common verbs in the Qur'an" /></p>
+<p>Here, the most common verbs fall into two general themes: “saying” and “believing”. The most common “saying” words are literally “he said” and “said”, while the most common “believing” words are “y’all believe” (imperative) and “they disbelieve.” The other words are either forms of “to be” or preposition-like things that the tagger thought were verbs.</p>
+<h2 id="most-distinctive-meccan-and-medinan-nouns">Most distinctive Meccan and Medinan nouns</h2>
+<p>The Qur’an is a collection of revelations received by Mohammed in two different locations during two different time periods: <a href="https://en.wikipedia.org/wiki/Meccan_surah">Mecca</a> and <a href="https://en.wikipedia.org/wiki/Medinan_surah">Medina</a>. Scholars have categorized the different surahs by their likely provenance, and the <strong>quRan</strong> package helpfully includes a column marking if each surah is Meccan or Medinan.</p>
+<p>Typically, Meccan surahs are shorter than Medinan surahs and were revealed earlier during the development of Islam. As a check, lets see what the average surah length is across these two types of surahs:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">period_length <span style="color:#f92672">&lt;-</span> quran_ar_min <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">group_by</span>(revelation_type, surah_id) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">summarize</span>(n_ayaat <span style="color:#f92672">=</span> <span style="color:#a6e22e">n</span>()) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">group_by</span>(revelation_type) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">summarize</span>(avg_ayaat <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(n_ayaat))
+period_length
+
+<span style="color:#75715e">## # A tibble: 2 x 2</span>
+<span style="color:#75715e">##   revelation_type avg_ayaat</span>
+<span style="color:#75715e">##   &lt;chr&gt;               &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1 Meccan               53.6</span>
+<span style="color:#75715e">## 2 Medinan              58.0</span>
+</code></pre></div><p>Meccan surahs are an average of 4.5 ayahs shorter than Medinan surahs. Cool.</p>
+<p>What are the most distinctive nouns and verbs in these two types of surahs? As in <a href="https://www.andrewheiss.com/blog/2018/12/26/tidytext-pos-john/">my previous post about John and the synoptic gospels</a>, we can use the <a href="https://www.andrewheiss.com/blog/2018/12/26/tidytext-pos-john/#most-unique-words">tf-idf score as a measure of word uniqueness</a>. The higher this value, the more unique a word is in a document in a corpus.</p>
+<p>We lost lots of the helpful columns from <code>quran_ar_min</code> when tagging the parts of speech, though. All we’re left with from the original data is the <code>ayah_title</code> column, which gives the surah and ayah of each word (e.g. 2:242). To bring the revelation type and other columns back in, we’ll make a smaller dataset and then join that to our tagged data:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">type_lookup <span style="color:#f92672">&lt;-</span> quran_ar_min <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">select</span>(ayah_title, surah_id, surah_title_ar, surah_title_en, ayah, revelation_type)
+
+quran_terms <span style="color:#f92672">&lt;-</span> quran_terms <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">left_join</span>(type_lookup, by <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;id&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ayah_title&#34;</span>))
+
+<span style="color:#a6e22e">glimpse</span>(quran_terms)
+
+<span style="color:#75715e">## Observations: 82,823</span>
+<span style="color:#75715e">## Variables: 13</span>
+<span style="color:#75715e">## $ id              &lt;chr&gt; &#34;1:1&#34;, &#34;1:1&#34;, &#34;1:1&#34;, &#34;1:1&#34;, &#34;1:2&#34;, &#34;1:2&#34;, &#34;1:2...</span>
+<span style="color:#75715e">## $ sid             &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...</span>
+<span style="color:#75715e">## $ tid             &lt;int&gt; 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 1, 2, 3, 1, 2, 3...</span>
+<span style="color:#75715e">## $ word            &lt;chr&gt; &#34;بسم&#34;, &#34;الله&#34;, &#34;الرحمن&#34;, &#34;الرحيم&#34;, &#34;الحمد&#34;, &#34;ل...</span>
+<span style="color:#75715e">## $ lemma           &lt;chr&gt; &#34;&#34;, &#34;&#34;, &#34;&#34;, &#34;&#34;, &#34;&#34;, &#34;&#34;, &#34;&#34;, &#34;&#34;, &#34;&#34;, &#34;&#34;, &#34;&#34;, &#34;&#34;...</span>
+<span style="color:#75715e">## $ upos            &lt;chr&gt; &#34;NOUN&#34;, &#34;NOUN&#34;, &#34;&#34;, &#34;&#34;, &#34;&#34;, &#34;NOUN&#34;, &#34;NOUN&#34;, &#34;&#34;...</span>
+<span style="color:#75715e">## $ pos             &lt;chr&gt; &#34;NNP&#34;, &#34;NNP&#34;, &#34;DTNNP&#34;, &#34;DTNNP&#34;, &#34;DTNNP&#34;, &#34;NN&#34;,...</span>
+<span style="color:#75715e">## $ cid             &lt;int&gt; 1, 5, 10, 17, 0, 6, 10, 13, 0, 7, 0, 5, 9, 0, ...</span>
+<span style="color:#75715e">## $ surah_id        &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...</span>
+<span style="color:#75715e">## $ surah_title_ar  &lt;fct&gt; الفاتحة, الفاتحة, الفاتحة, الفاتحة, الفاتحة, ا...</span>
+<span style="color:#75715e">## $ surah_title_en  &lt;fct&gt; Al-Faatiha, Al-Faatiha, Al-Faatiha, Al-Faatiha...</span>
+<span style="color:#75715e">## $ ayah            &lt;int&gt; 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5...</span>
+<span style="color:#75715e">## $ revelation_type &lt;chr&gt; &#34;Meccan&#34;, &#34;Meccan&#34;, &#34;Meccan&#34;, &#34;Meccan&#34;, &#34;Mecca...</span>
+</code></pre></div><p>Now we can use the <code>bind_tf_idf()</code> function from <strong>tidytext</strong> to calculate the tf-idf for each word in each type of revelation:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">type_tf_idf <span style="color:#f92672">&lt;-</span> quran_terms <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">count</span>(revelation_type, word, pos, sort <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">bind_tf_idf</span>(word, revelation_type, n) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">arrange</span>(<span style="color:#a6e22e">desc</span>(tf_idf))
+</code></pre></div><p>Now we can find the uniquest nouns across the two types of surahs:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">uniquest_nouns <span style="color:#f92672">&lt;-</span> type_tf_idf <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#75715e"># Only look at nouns</span>
+  <span style="color:#a6e22e">filter</span>(<span style="color:#a6e22e">str_detect</span>(pos, <span style="color:#e6db74">&#34;NN&#34;</span>)) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">group_by</span>(revelation_type) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">top_n</span>(<span style="color:#ae81ff">10</span>, tf_idf) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">ungroup</span>() <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(word <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(word))
+
+plot_unique_nouns <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(uniquest_nouns, 
+                            <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_rev</span>(word), y <span style="color:#f92672">=</span> tf_idf, fill <span style="color:#f92672">=</span> revelation_type)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_col</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_fill_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;#A02513&#34;</span>, <span style="color:#e6db74">&#34;#274E49&#34;</span>), guide <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;tf-idf&#34;</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Most unique nouns in the Meccan and Medinan surahs&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_flip</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_minimal</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(plot.title <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(face <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bold&#34;</span>),
+        strip.text <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(face <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bold&#34;</span>),
+        panel.grid.major.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>()) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">facet_wrap</span>(<span style="color:#f92672">~</span> revelation_type, scales <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;free_y&#34;</span>)
+plot_unique_nouns
+</code></pre></div><p><img src="plot-unique-nouns-1.png" width="95%" style="display: block; margin: auto;" alt="Most unique nouns in the Qur'an" /></p>
+<p>This is so cool. The most unique and distinctive Meccan nouns are “Joseph,” “criminals,” “filling,” “wo,” “others,” <a href="https://en.wikipedia.org/wiki/Thamud">“Thamoud,”</a> “right,” “humans,” “liars,” and “hearing.” Most of these make sense: For instance, surah 12, “Yusuf”, is Meccan and is all about the story of Joseph in Egypt.</p>
+<p>The most distinctive Medinan nouns, on the other hand, are “liars,” “his prophet,” “borders/limits,” “wisdom,” “Arabs,” “the Messiah,” “houses,” “killing/fighting,” “the Jews,” “the Hajj,” “hypocrites,” and “promised.”</p>
+<p>We can also find the uniquest verbs—just use <code>filter(str_detect(pos, &quot;VB&quot;))</code> to select the verbs and do the same thing. I’ll leave that as an exercise to the reader.</p>
+<p>Thus, we can do a lot of cool text analysis with Arabic using R!</p>
+
+    
+        <footer>
+            <div class="tags">
+    <i class="fas fa-tags" aria-hidden="true"></i>&ensp;
+    <a href="/blog/tags/r/">r</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/ggplot/">ggplot</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/tidyverse/">tidyverse</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/tidytext/">tidytext</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/arabic/">arabic</a></div>
+
+        </footer>
+
+        <div id="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                 
+                var disqus_shortname = 'andrewheisscom';
+                var disqus_title = document.title;
+                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2018\/12\/28\/tidytext-pos-arabic\/';
+
+                 
+                (function () {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+        </div>
+    </article>
+</section>
+
+  
+
+        </div> 
+    </div> 
+    
+    <div id="footer">
+        <footer>
+    <ul class="links">
+        <li>
+            <a href="mailto:aheiss@gsu.edu" aria-label="E-mail"   >
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/andrewheiss" aria-label="Twitter"   >
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/andrewheiss" aria-label="GitHub"   >
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/andrewheiss" aria-label="YouTube"   >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://stackoverflow.com/users/120898/andrew" aria-label="StackOverflow"   >
+                <i class="fab fa-stack-overflow" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.heissatopia.com" aria-label="Heissatopia (family blog)"   >
+                <i class="fab fa-blogger" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/andrewheiss" aria-label="Facebook"   >
+                <i class="fab fa-facebook" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/in/andrewheiss" aria-label="LinkedIn"   >
+                <i class="fab fa-linkedin" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+
+    <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
+
+    <p class="pgp">
+        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
+    </p>
+
+    <p class="copyright">
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+            title="Creative Commons Attribution-ShareAlike 4.0 International license"><i class="fab fa-creative-commons"></i>
+        <i class="fab fa-creative-commons-by" title="Attribution"></i>
+        <i class="fab fa-creative-commons-share" title="Share alike"></i></a>
+        <span class="cc-year">&bull; 2007&ndash;2021</span>
+    </p>
+
+    <p class="colophon"><a href="https://github.com/andrewheiss/ath-hugo">Code for site</a></p>
+</footer>
+
+    </div>
+
+</body>
+
+</html>

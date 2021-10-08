@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+
+    <meta name="author" content="Andrew Heiss">
+    <meta name="description" content="Use R to explore possible biases that come from differential treatment timing in two-way fixed effects (TWFE) regression models">
+    <meta name="keywords" content="r, tidyverse, regression, statistics, data visualization, econometrics, panel data">
+    <meta name="generator" content="Hugo 0.88.1" />
+
+    <title>
+  Exploring Pamela Jakiela&#39;s simple TWFE diagnostics with R | Andrew Heiss
+</title>
+
+    <link rel="canonical" href="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+
+    <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
+    <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png"/>
+    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:title" content="Exploring Pamela Jakiela&#39;s simple TWFE diagnostics with R"/>
+    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:description" content="Use R to explore possible biases that come from differential treatment timing in two-way fixed effects (TWFE) regression models"/>
+
+
+    <meta property="og:title" content="Exploring Pamela Jakiela&#39;s simple TWFE diagnostics with R" />
+<meta property="og:description" content="Use R to explore possible biases that come from differential treatment timing in two-way fixed effects (TWFE) regression models" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/" />
+<meta property="og:image" content="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png" />
+<meta property="article:published_time" content="2021-08-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-08-25T00:00:00+00:00" />
+
+<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:section" content="blog" />
+<meta property="article:tag" content="r" />
+<meta property="article:tag" content="tidyverse" />
+<meta property="article:tag" content="regression" />
+<meta property="article:tag" content="statistics" />
+<meta property="article:tag" content="data visualization" />
+<meta property="article:tag" content="econometrics" />
+
+
+    <meta itemprop="name" content="Exploring Pamela Jakiela&#39;s simple TWFE diagnostics with R">
+<meta itemprop="description" content="Use R to explore possible biases that come from differential treatment timing in two-way fixed effects (TWFE) regression models"><meta itemprop="datePublished" content="2021-08-25T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2021-08-25T00:00:00+00:00" />
+<meta itemprop="wordCount" content="7919"><meta itemprop="image" content="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png">
+<meta itemprop="keywords" content="r,tidyverse,regression,statistics,data visualization,econometrics,panel data," />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/pure-and-grids-responsive.min.css">
+    <link rel="stylesheet" href="/css/ath-hugo.min.c5619237d890aa972042ca0497d2594d6f3f34b1746c377f560f5096573fb6e3.css" integrity="sha256-xWGSN9iQqpcgQsoEl9JZTW8/NLF0bDd/Vg9Qllc/tuM=" crossorigin="anonymous" media="screen" />
+
+    <script src="https://kit.fontawesome.com/f9d343c40d.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=dLX2MbQJLG">
+    <link rel="manifest" href="/site.webmanifest?v=dLX2MbQJLG">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=dLX2MbQJLG" color="#cf4446">
+    <link rel="shortcut icon" href="/favicon.ico?v=dLX2MbQJLG">
+    <meta name="msapplication-TileColor" content="#170c3a">
+    <meta name="theme-color" content="#170c3a">
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-527449-5', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+
+    <div id="layout" class="pure-g">
+        <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
+            <header>
+                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
+                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+
+                <nav id="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cv/">CV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/research/">Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/teaching/">Teaching</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/talks/">Talks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/now/">Now</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uses/">Uses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+        </div> 
+    
+        <div id="content" class="pure-u-1 pure-u-md-3-4">
+        
+  <section>
+    <article class="content-single">
+        <header class="post-header">
+            <h1 class="post-title">Exploring Pamela Jakiela&rsquo;s simple TWFE diagnostics with R</h1>
+
+            <div class="post-meta pure-g">
+                <div class="pure-u-1-2">
+                    <span class="posted-on">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime='2021-08-25T00:00:00Z'>
+                            Wednesday, August 25, 2021
+                        </time>
+                    </span>
+                </div>
+                <div class="reading-time pure-u-1-2">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    38-minute read
+                </div>
+            </div>
+        </header>
+    
+        <script src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/kePrint/kePrint.js"></script>
+<link href="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/lightable/lightable.css" rel="stylesheet" />
+<script src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/kePrint/kePrint.js"></script>
+<link href="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/lightable/lightable.css" rel="stylesheet" />
+<h2 id="contents----omit-in-toc---">Contents <!-- omit in toc --></h2>
+<ul>
+<li><a href="#a-different-way-of-thinking-about-ols-coefficients">A different way of thinking about OLS coefficients</a></li>
+<li><a href="#residualized-weights-with-twfe-models">Residualized weights with TWFE models</a>
+<ul>
+<li><a href="#load-and-clean-data">Load and clean data</a></li>
+<li><a href="#model-specification">Model specification</a></li>
+<li><a href="#twfe-models-with-r">TWFE models with R</a></li>
+<li><a href="#twfe-estimate-with-residualized-treatment-weights">TWFE estimate with residualized treatment weights</a></li>
+</ul>
+</li>
+<li><a href="#jakielas-diagnostics">Jakiela’s diagnostics</a>
+<ul>
+<li><a href="#31-do-treated-observations-receive-negative-weights">3.1: Do treated observations receive negative weights?</a></li>
+<li><a href="#32-testing-the-homogeneity-assumption-directly">3.2: Testing the homogeneity assumption directly</a></li>
+</ul>
+</li>
+<li><a href="#jakielas-robustness-checks">Jakiela’s robustness checks</a>
+<ul>
+<li><a href="#exclude-later-years">Exclude later years</a></li>
+<li><a href="#change-how-many-post-treatment-years-are-kept">Change how many post-treatment years are kept</a></li>
+<li><a href="#exclude-individual-countries">Exclude individual countries</a></li>
+</ul>
+</li>
+<li><a href="#tldr-conclusion">tl;dr: Conclusion</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<hr>
+<p>The world of econometrics has been roiled over the past couple years with a bunch of new papers showing how two-way fixed effects (TWFE; situations with nested levels of observations, like country-year, state-month, etc.) estimates of causal effects from difference-in-differences-based natural experiments can be biased when treatment is applied at different times. There are a ton of these papers, like <a href="#ref-de-ChaisemartindHaultfoeuille:2020">de Chaisemartin and d’Haultfoeuille</a> (<a href="#ref-de-ChaisemartindHaultfoeuille:2020">2020</a>), <a href="#ref-Goodman-Bacon:2021">Goodman-Bacon</a> (<a href="#ref-Goodman-Bacon:2021">2021</a>), <a href="#ref-SunAbraham:2020">Sun and Abraham</a> (<a href="#ref-SunAbraham:2020">2020</a>), <a href="#ref-CallawaySantAnna:2020">Callaway and Sant’Anna</a> (<a href="#ref-CallawaySantAnna:2020">2020</a>), and <a href="#ref-BakerLarckerWang:2021">Baker, Larcker, and Wang</a> (<a href="#ref-BakerLarckerWang:2021">2021</a>). And they’re all really technical and scary.</p>
+<p>I’ve been peripherally following these discussions on Twitter, since I teach a class on causal inference and include <a href="https://evalf21.classes.andrewheiss.com/example/diff-in-diff/">a couple sessions and assignments on difference-in-differences approaches</a>, and since I do lots of <a href="https://www.andrewheiss.com/research/articles/chaudhry-heiss-ngos-aid/">research with country-year panel data</a> (see <a href="https://www.andrewheiss.com/blog/tags/inverse-probability-weighting/">all my posts on marginal structural models</a> for more on that), but I’ve admittedly been lost in the mathy details of all these papers and I’ve been slightly terrified of trying to work through these papers and figuring out what this differential timing bias actually looks like in real life. I’m not a real economist or econometrician (I just teach microeconomics and econometrics lolz), so this world is still pretty intimidating for me.</p>
+<p>But <a href="https://pjakiela.github.io/">Pamela Jakiela</a> recently posted <a href="https://arxiv.org/abs/2103.13229">a working paper called “Simple Diagnostics for Two-Way Fixed Effects”</a> (<a href="#ref-Jakiela:2021">Jakiela 2021</a>) where she presents an easy-to-follow example of all this newfangled TWFE work, so I figured I’d finally officially plunge into this new TWFE world and try to figure out what it all means. Her paper is fantastic—you should read it if you want a quick introduction to the issues of differential timing and TWFE and if you want some easy ways to see how bad these situations might bias causal estimates.</p>
+<p>In the spirit of <a href="http://arelbundock.com/">Vincent Arel-Bundock</a>, who publicly codes through more technical papers to understand them better (see <a href="http://arelbundock.com/posts/frontdoor/">this</a> or <a href="http://arelbundock.com/posts/robustness_values/">this</a> or <a href="http://arelbundock.com/posts/marginal_structural_models/">this</a>), this post is my attempt at translating Jakiela’s paper from conceptual math and Stata code into R. Here we go!</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(tidyverse)     <span style="color:#75715e"># For ggplot2, dplyr, and friends</span>
+<span style="color:#a6e22e">library</span>(haven)         <span style="color:#75715e"># For reading Stata files</span>
+<span style="color:#a6e22e">library</span>(fixest)        <span style="color:#75715e"># One way of doing fixed effects regression</span>
+<span style="color:#a6e22e">library</span>(estimatr)      <span style="color:#75715e"># Another way of doing fixed effects regression</span>
+<span style="color:#a6e22e">library</span>(broom)         <span style="color:#75715e"># For converting model objects to data frames</span>
+<span style="color:#a6e22e">library</span>(kableExtra)    <span style="color:#75715e"># For pretty tables</span>
+<span style="color:#a6e22e">library</span>(modelsummary)  <span style="color:#75715e"># For pretty regression tables</span>
+<span style="color:#a6e22e">library</span>(patchwork)     <span style="color:#75715e"># For combining plots</span>
+<span style="color:#a6e22e">library</span>(scales)        <span style="color:#75715e"># For nice formatting functions</span>
+
+<span style="color:#75715e"># Custom ggplot theme to make pretty plots</span>
+<span style="color:#75715e"># Get the font at https://fonts.google.com/specimen/Barlow+Semi+Condensed</span>
+theme_clean <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>() {
+  <span style="color:#a6e22e">theme_minimal</span>(base_family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Barlow Semi Condensed&#34;</span>) <span style="color:#f92672">+</span>
+    <span style="color:#a6e22e">theme</span>(panel.grid.minor <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+          plot.title <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(face <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bold&#34;</span>),
+          axis.title <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Barlow Semi Condensed Medium&#34;</span>),
+          strip.text <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Barlow Semi Condensed&#34;</span>,
+                                    face <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bold&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#a6e22e">rel</span>(<span style="color:#ae81ff">1</span>), hjust <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>),
+          strip.background <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_rect</span>(fill <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;grey80&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#66d9ef">NA</span>),
+          plot.caption <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(hjust <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>))
+}
+</code></pre></div><h2 id="a-different-way-of-thinking-about-ols-coefficients">A different way of thinking about OLS coefficients</h2>
+<p>Before diving into the issues that come with TWFE estimation (and Jakiela’s proposed diagnostics), we first have to think about regression coefficients in a slightly different way (that was completely new to me!)</p>
+<p>To do this, let’s make some simulated data to play with. We have two variables: (1) an outcome that ranges from ≈400–2000, and (2) a continuous treatment that ranges from ≈2–70. For the sake of simplicity, we’ll pretend that the outcome represents weekly income, and the treatment is some sort of social policy (test scores from some job training program? idk—imagine something neat here). We’ll also pretend that this treatment is experimental so we can talk about causation here.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">set.seed</span>(<span style="color:#ae81ff">1234</span>)  <span style="color:#75715e"># For reproducibility</span>
+
+n_rows <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">500</span>
+fake_data <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tibble</span>(treatment <span style="color:#f92672">=</span> <span style="color:#a6e22e">rbeta</span>(n_rows, shape1 <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>, shape2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">7</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(treatment <span style="color:#f92672">=</span> <span style="color:#a6e22e">round</span>(treatment <span style="color:#f92672">*</span> <span style="color:#ae81ff">100</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Build the outcome based on some baseline level of outcome + a boost in</span>
+  <span style="color:#75715e"># outcome that happens because of the treatment + some noise</span>
+  <span style="color:#a6e22e">mutate</span>(outcome_baseline <span style="color:#f92672">=</span> <span style="color:#a6e22e">rnorm</span>(n_rows, mean <span style="color:#f92672">=</span> <span style="color:#ae81ff">800</span>, sd <span style="color:#f92672">=</span> <span style="color:#ae81ff">200</span>),
+         treatment_boost <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span> <span style="color:#f92672">*</span> treatment,
+         outcome <span style="color:#f92672">=</span> outcome_baseline <span style="color:#f92672">+</span> treatment_boost <span style="color:#f92672">+</span> <span style="color:#a6e22e">rnorm</span>(n_rows, <span style="color:#ae81ff">200</span>, <span style="color:#ae81ff">100</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">select</span>(outcome, treatment)
+
+<span style="color:#a6e22e">head</span>(fake_data)
+<span style="color:#75715e">## # A tibble: 6 × 2</span>
+<span style="color:#75715e">##   outcome treatment</span>
+<span style="color:#75715e">##     &lt;dbl&gt;     &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1    514.        13</span>
+<span style="color:#75715e">## 2   1550.        35</span>
+<span style="color:#75715e">## 3   1562.        52</span>
+<span style="color:#75715e">## 4   1037.         4</span>
+<span style="color:#75715e">## 5   1137.        38</span>
+<span style="color:#75715e">## 6   1277.        39</span>
+</code></pre></div><p>For reference, here’s what the distributions of these variables look like, along with the relationship between treatment and outcome:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">hist_out <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(fake_data, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> outcome)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_histogram</span>(binwidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;white&#34;</span>,
+                 boundary <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, fill <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FFA615&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_x_continuous</span>(labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">dollar_format</span>()) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Distribution of outcome&#34;</span>,
+       x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Outcome&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Count&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(ylim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">80</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+hist_trt <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(fake_data, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> treatment)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_histogram</span>(binwidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;white&#34;</span>,
+                 boundary <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, fill <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#A4BD0A&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Distribution of treatment&#34;</span>,
+       x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Treatment&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Count&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(ylim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">80</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+plot_trt_out <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(fake_data, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> treatment, y <span style="color:#f92672">=</span> outcome)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_point</span>(size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.75</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_smooth</span>(method <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;lm&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#0599B0&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_y_continuous</span>(labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">dollar_format</span>()) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Effect of treatment on outcome&#34;</span>,
+       x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Treatment&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Outcome&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+
+(hist_out <span style="color:#f92672">+</span> hist_trt) <span style="color:#f92672">/</span> <span style="color:#a6e22e">plot_spacer</span>() <span style="color:#f92672">/</span> plot_trt_out <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.28</span>, <span style="color:#ae81ff">0.02</span>, <span style="color:#ae81ff">0.7</span>))
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-fake-data-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>We can find the average treatment effect (ATE) of this imaginary program on the outcome using a simple univariate regression model:</p>
+<p><code>$$\color{gray}{\overbrace{\color{#FFA615}{Y}}^{\text{Outcome}}_{\underbrace{\color{#FFA615}{i}}_{\text{An individual}}}} \color{black}{=} \color{gray}{\overbrace{\color{black}{\alpha}}^{\text{Intercept}}} \color{black}{+} \color{gray}{\underbrace{\color{#0599B0}{\beta}}_{\text{ATE}}} \color{gray}{\overbrace{\color{#A4BD0A}{D_i}}^{\text{Treatment}}} \color{black}{+} \color{gray}{\overbrace{\color{black}{\epsilon_i}}^{\text{Error}}}$$</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">model_effect <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(outcome <span style="color:#f92672">~</span> treatment, data <span style="color:#f92672">=</span> fake_data)
+<span style="color:#a6e22e">tidy</span>(model_effect)
+<span style="color:#75715e">## # A tibble: 2 × 5</span>
+<span style="color:#75715e">##   term        estimate std.error statistic   p.value</span>
+<span style="color:#75715e">##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1 (Intercept)  1001.      22.5        44.6 5.70e-176</span>
+<span style="color:#75715e">## 2 treatment       9.69     0.672      14.4 1.26e- 39</span>
+</code></pre></div><p>This is just regular old OLS regression. Based on this model, a 1-unit increase in treatment causes a $9.69 increase in the outcome. Lovely.</p>
+<p><a href="#ref-Jakiela:2021">Jakiela</a> (<a href="#ref-Jakiela:2021">2021, 4</a>) shows an alternate way of calculating <code>\(\beta\)</code>, though, based on the <a href="https://en.wikipedia.org/wiki/Frisch%E2%80%93Waugh%E2%80%93Lovell_theorem">Frisch-Waugh-Lovell theorem</a>, which is an econometrics idea that I’ve never heard of (since I’m defs not an economist). According to this theorem, we can rewrite the OLS estimate of <code>\(\beta\)</code> based on the residuals ($\tilde{D}_i$) of a model that predicts treatment:</p>
+<p><code>$$\color{#0599B0}{\beta}\ \color{black}{=}\ \sum_i \color{#FFA615}{Y_i} \color{black}\left( \frac{\color{#353D03}{\tilde{D}_i}}{\sum_i \color{#353D03}{\tilde{D}_i}^2} \right)$$</code></p>
+<p>Since this is a univariate model, the residuals here are really just the deviations from the average value of the treatment, or <code>\(D_i - \bar{D}\)</code>. We can confirm this by running an intercept-only model and comparing it to <code>\(D_i - \bar{D}\)</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">trt_resid <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(treatment <span style="color:#f92672">~</span> <span style="color:#ae81ff">1</span>, data <span style="color:#f92672">=</span> fake_data)
+
+fake_data_resid <span style="color:#f92672">&lt;-</span> fake_data <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(treatment_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">residuals</span>(trt_resid)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(mean_treat <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(treatment),
+         diff <span style="color:#f92672">=</span> treatment <span style="color:#f92672">-</span> mean_treat)
+
+<span style="color:#a6e22e">head</span>(fake_data_resid)
+<span style="color:#75715e">## # A tibble: 6 × 5</span>
+<span style="color:#75715e">##   outcome treatment treatment_resid mean_treat   diff</span>
+<span style="color:#75715e">##     &lt;dbl&gt;     &lt;dbl&gt;           &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1    514.        13          -17.2        30.2 -17.2 </span>
+<span style="color:#75715e">## 2   1550.        35            4.82       30.2   4.82</span>
+<span style="color:#75715e">## 3   1562.        52           21.8        30.2  21.8 </span>
+<span style="color:#75715e">## 4   1037.         4          -26.2        30.2 -26.2 </span>
+<span style="color:#75715e">## 5   1137.        38            7.82       30.2   7.82</span>
+<span style="color:#75715e">## 6   1277.        39            8.82       30.2   8.82</span>
+</code></pre></div><p>The <code>treatment_resid</code> and <code>diff</code> columns here are identical. Now that we have <code>\(\tilde{D}_i\)</code>, we can use that fancy rewritten formula and calculate <code>\(\beta\)</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">fake_data_resid <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">summarize</span>(beta <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(outcome <span style="color:#f92672">*</span> (treatment_resid <span style="color:#f92672">/</span> <span style="color:#a6e22e">sum</span>(treatment_resid^2))))
+<span style="color:#75715e">## # A tibble: 1 × 1</span>
+<span style="color:#75715e">##    beta</span>
+<span style="color:#75715e">##   &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1  9.69</span>
+</code></pre></div><p>WHAAAAAT it’s the same ATE that we get from running a regular OLS model! That’s magical!</p>
+<p>The reason Jakiela reparameterizes <code>\(\beta\)</code> this way is because looking at residuals like this creates inherent weights for each observation. Essentially, <code>\(\beta\)</code> is a <strong>weighted sum of the outcome variable</strong>, with the weights calculated with <code>\(\frac{\tilde{D}_{it}}{\sum_{it} \tilde{D}_{it}^2}\)</code>, or <code>(treatment_resid / sum(treatment_resid^2))</code>. We can calculate the weights for each observation:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">fake_data_with_weights <span style="color:#f92672">&lt;-</span> fake_data_resid <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(treatment_weight <span style="color:#f92672">=</span> treatment_resid <span style="color:#f92672">/</span> <span style="color:#a6e22e">sum</span>(treatment_resid^2))
+<span style="color:#a6e22e">head</span>(fake_data_with_weights)
+<span style="color:#75715e">## # A tibble: 6 × 6</span>
+<span style="color:#75715e">##   outcome treatment treatment_resid mean_treat   diff treatment_weight</span>
+<span style="color:#75715e">##     &lt;dbl&gt;     &lt;dbl&gt;           &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;            &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1    514.        13          -17.2        30.2 -17.2        -0.000168 </span>
+<span style="color:#75715e">## 2   1550.        35            4.82       30.2   4.82        0.0000471</span>
+<span style="color:#75715e">## 3   1562.        52           21.8        30.2  21.8         0.000213 </span>
+<span style="color:#75715e">## 4   1037.         4          -26.2        30.2 -26.2        -0.000255 </span>
+<span style="color:#75715e">## 5   1137.        38            7.82       30.2   7.82        0.0000764</span>
+<span style="color:#75715e">## 6   1277.        39            8.82       30.2   8.82        0.0000861</span>
+</code></pre></div><p>In this case, given that this is overly perfect simulated data, the weights are really small. In theory, the weights should sum up to 0. Let’s check that really quick:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">fake_data_with_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">summarize</span>(total_weights <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(treatment_weight))
+<span style="color:#75715e">## # A tibble: 1 × 1</span>
+<span style="color:#75715e">##   total_weights</span>
+<span style="color:#75715e">##           &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1     -1.28e-18</span>
+</code></pre></div><p>We can visualize the distribution of weights too:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(fake_data_with_weights, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> treatment_weight)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_histogram</span>(binwidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.00005</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;white&#34;</span>,
+                 boundary <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, fill <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#F6C848&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_vline</span>(xintercept <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF2E00&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Residualized treatment weight&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Count&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_x_continuous</span>(labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">comma_format</span>()) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-fake-data-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>There’s a pattern to which observations get positive or negative weights. According to <a href="#ref-Jakiela:2021">Jakiela</a> (<a href="#ref-Jakiela:2021">2021, 4</a>),</p>
+<blockquote>
+<p>As in any univariate OLS regression of an outcome on a continuous measure of treatment intensity, observations with below mean treatment intensity receive negative weight, and may be thought of as part of the comparison group.</p>
+</blockquote>
+<p>Since treatment here is continuous, there’s no clear division between treatment and control groups, so mathematically, that threshold becomes the average value of treatment: observations where the treatment value is less than the average (or <code>\(D_i &lt; \bar{D}\)</code>) receive negative weight and can conceptually be considered part of the control/comparison group, while observations where <code>\(D_i &gt; \bar{D}\)</code> are in the treatment group. That’s apparent in the data too. Look at the first few rows of <code>fake_data_with_weights</code> above—observations where <code>treatment_resid</code> is negative have negative weights.</p>
+<h2 id="residualized-weights-with-twfe-models">Residualized weights with TWFE models</h2>
+<p>This idea of weighting the outcome variable by treatment status (with treated units getting positive weight and untreated units getting negative weight) is central to the rest of Jakiela’s argument and diagnostics (as well as all the other neat new diff-in-diff papers). Fundamentally, the main reason TWFE estimates get weird and biased with differently-timed treatments is because of issues with weights—in TWFE settings, treated observations often get negative weights and vice versa. This isn’t always bad, and Jakiela explains why and when it’s okay. That’s essentially the whole point of her paper—she provides diagnostics to help determine if there are serious issues with these residualized treatment weights.</p>
+<h3 id="load-and-clean-data">Load and clean data</h3>
+<p>To demonstrate issues with TWFE models, weights, and differential timing, Jakiela looks at the effect of eliminating primary school fees on school enrollment in 15 African countries, based on data from the World Bank. You can get <a href="https://pjakiela.github.io/TWFE/">her data and Stata code at GitHub</a>. First let’s load the data and clean it up a little.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">fpe_raw <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">read_dta</span>(<span style="color:#e6db74">&#34;WDI-FPE-data.dta&#34;</span>)
+
+<span style="color:#75715e"># Remove rows where primary school enrollment is missing</span>
+fpe_primary <span style="color:#f92672">&lt;-</span> fpe_raw <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">is.na</span>(primary))
+
+<span style="color:#75715e"># Remove rows where secondary school enrollment is missing</span>
+fpe_secondary <span style="color:#f92672">&lt;-</span> fpe_raw <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">is.na</span>(secondary))
+
+<span style="color:#a6e22e">head</span>(fpe_primary)
+<span style="color:#75715e">## # A tibble: 6 × 8</span>
+<span style="color:#75715e">##    year country ccode primary    id secondary fpe_year treatment</span>
+<span style="color:#75715e">##   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1  1981 Benin   BEN      60.3     2      15.5     2006         0</span>
+<span style="color:#75715e">## 2  1982 Benin   BEN      64.7     2      18.5     2006         0</span>
+<span style="color:#75715e">## 3  1983 Benin   BEN      66.2     2      21.2     2006         0</span>
+<span style="color:#75715e">## 4  1984 Benin   BEN      64.2     2      20.1     2006         0</span>
+<span style="color:#75715e">## 5  1985 Benin   BEN      64.3     2      19.0     2006         0</span>
+<span style="color:#75715e">## 6  1986 Benin   BEN      62.4     2      16.3     2006         0</span>
+</code></pre></div><p>We have 8 columns to work with:</p>
+<ul>
+<li><code>year</code>: The year of the observation</li>
+<li><code>country</code> &amp; <code>ccode</code> &amp; <code>id</code>: The country name, ISO3 country code, and id number for each country (Stata apparently struggles with string-based variables, so <code>id</code> works better as a country identifier there)</li>
+<li><code>primary</code>: Gross enrollment in primary schools</li>
+<li><code>secondary</code>: Gross enrollment in secondary schools</li>
+<li><code>fpe_year</code>: Year the country eliminated fees for primary schools</li>
+<li><code>treatment</code>: Indicator variable that is <code>1</code> when <code>year &gt; fpe_year</code> and <code>0</code> otherwise</li>
+</ul>
+<h3 id="model-specification">Model specification</h3>
+<p>We can estimate the causal effect of eliminating primary school fees (<code>treatment</code>) on primary and secondary school enrollment (<code>primary</code> and <code>secondary</code>) treatment with a TWFE diff-in-diff model:</p>
+<p><code>$$\color{gray}{\overbrace{\color{#FFA615}{Y}}^{\text{Outcome}}_{\underbrace{\color{#FFA615}{it}}_{\substack{i: \text{ country} \\ t: \text{ year}}}}} \color{black} = \color{gray}{\overbrace{\color{black}{\alpha}}^{\text{Intercept}}} + \color{gray}{\overbrace{\color{black}{\lambda_i}}^{\substack{\text{Country} \\ \text{fixed} \\ \text{effects}}}} + \color{gray}{\overbrace{\color{black}{\gamma_t}}^{\substack{\text{Year} \\ \text{fixed} \\ \text{effects}}}} + \color{gray}{\underbrace{\color{#0599B0}{\beta}}_{\text{ATE}}} \color{gray}{\overbrace{\color{#A4BD0A}{D_{it}}}^{\text{Treatment}}} + \color{gray}{\overbrace{\color{black}{\epsilon_{it}}}^{\text{Error}}}$$</code></p>
+<p>Or without all the annotations:</p>
+<p><code>$$\color{#FFA615}{Y_{it}} \color{black}{\ = \alpha + \lambda_i + \gamma_t +} \color{#0599B0}{\beta} \color{#A4BD0A}{D_{it}} \color{black}{\ + \epsilon_{it}}$$</code></p>
+<h3 id="twfe-models-with-r">TWFE models with R</h3>
+<p>There are a few different ways to do fixed effects regression with clustered robust standard errors in R. In Stata you do this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-fallback" data-lang="fallback">reg primary treatment i.year i.id, cluster(id)
+</code></pre></div><p>In R, you can use the standard <code>lm()</code> function, but it treats country and year as regular explanatory variables, so it includes them in the results from <code>summary()</code> or <code>tidy()</code>. If you don’t want overly long and detailed results tables, you have to filter those results out.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">model_lm <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(primary <span style="color:#f92672">~</span> treatment <span style="color:#f92672">+</span> country <span style="color:#f92672">+</span> <span style="color:#a6e22e">factor</span>(year),
+               data <span style="color:#f92672">=</span> fpe_primary)
+
+<span style="color:#a6e22e">tidy</span>(model_lm) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">str_detect</span>(term, <span style="color:#e6db74">&#34;country&#34;</span>), <span style="color:#f92672">!</span><span style="color:#a6e22e">str_detect</span>(term, <span style="color:#e6db74">&#34;year&#34;</span>))
+<span style="color:#75715e">## # A tibble: 2 × 5</span>
+<span style="color:#75715e">##   term        estimate std.error statistic  p.value</span>
+<span style="color:#75715e">##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1 (Intercept)     72.4      4.63     15.6  4.23e-44</span>
+<span style="color:#75715e">## 2 treatment       20.4      2.75      7.43 5.82e-13</span>
+<span style="color:#a6e22e">glance</span>(model_lm)
+<span style="color:#75715e">## # A tibble: 1 × 12</span>
+<span style="color:#75715e">##   r.squared adj.r.squared sigma statistic   p.value    df logLik   AIC   BIC deviance</span>
+<span style="color:#75715e">##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1     0.768         0.742  14.7      29.8 1.30e-110    49 -1985. 4073. 4287.   94828.</span>
+<span style="color:#75715e">## # … with 2 more variables: df.residual &lt;int&gt;, nobs &lt;int&gt;</span>
+</code></pre></div><p>These observations are clustered by country, so we should probably <a href="https://theeffectbook.net/ch-StatisticalAdjustment.html#your-standard-errors-are-probably-wrong">cluster our standard errors to capture within-country errors</a>. Using <code>lm()</code> doesn’t let you automatically create robust or clustered standard errors. You can use <code>lmtest::coeftest()</code> to do that after the fact, though. We can copy Stata’s standard errors precisely if we (1) specify the variance-covariance matrix using the <code>vcovCl()</code> function from the <strong>sandwich</strong> library, and (2) specify the degrees of freedom to use, based on the number of countries in the data, minus 1.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">df_primary <span style="color:#f92672">&lt;-</span> fpe_primary <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">distinct</span>(country) <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">nrow</span>()
+
+model_lm_clustered <span style="color:#f92672">&lt;-</span> lmtest<span style="color:#f92672">::</span><span style="color:#a6e22e">coeftest</span>(model_lm,
+                                       vcov <span style="color:#f92672">=</span> sandwich<span style="color:#f92672">::</span>vcovCL,
+                                       cluster <span style="color:#f92672">=</span> <span style="color:#f92672">~</span>country,
+                                       df <span style="color:#f92672">=</span> df_primary <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>,
+                                       <span style="color:#75715e"># Keep original model so modelsummary shows R2</span>
+                                       save <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)
+
+<span style="color:#a6e22e">tidy</span>(model_lm_clustered) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(<span style="color:#f92672">!</span><span style="color:#a6e22e">str_detect</span>(term, <span style="color:#e6db74">&#34;country&#34;</span>), <span style="color:#f92672">!</span><span style="color:#a6e22e">str_detect</span>(term, <span style="color:#e6db74">&#34;year&#34;</span>))
+<span style="color:#75715e">## # A tibble: 2 × 5</span>
+<span style="color:#75715e">##   term        estimate std.error statistic       p.value</span>
+<span style="color:#75715e">##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1 (Intercept)     72.4      5.83     12.4  0.00000000601</span>
+<span style="color:#75715e">## 2 treatment       20.4      9.12      2.24 0.0418</span>
+</code></pre></div><p>You can also use fancier regression functions that can handle fixed effects more systematically. The <code>lm_robust()</code> function from <a href="https://declaredesign.org/r/estimatr/">the <strong>estimatr</strong> package</a> works really well for defining special fixed effects that are automatically omitted from results tables <em>and</em> returning robust and optionally clustered standard errors:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">model_lm_robust <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm_robust</span>(primary <span style="color:#f92672">~</span> treatment,
+                             fixed_effects <span style="color:#f92672">=</span> <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> year,
+                             data <span style="color:#f92672">=</span> fpe_primary,
+                             clusters <span style="color:#f92672">=</span> country, se_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;stata&#34;</span>)
+
+<span style="color:#a6e22e">tidy</span>(model_lm_robust)
+<span style="color:#75715e">##        term estimate std.error statistic p.value conf.low conf.high df outcome</span>
+<span style="color:#75715e">## 1 treatment     20.4      9.12      2.24  0.0418    0.867        40 14 primary</span>
+<span style="color:#a6e22e">glance</span>(model_lm_robust)
+<span style="color:#75715e">##   r.squared adj.r.squared statistic p.value df.residual nobs se_type</span>
+<span style="color:#75715e">## 1     0.768         0.742        NA      NA          14  490   stata</span>
+</code></pre></div><p>The <code>feols()</code> function from <a href="https://lrberge.github.io/fixest/">the <strong>fixest</strong> package</a> also works well, though you need to change one of the default settings to get the same SEs as Stata when you have a small sample with nested fixed effects like we have here. By default, <code>feols()</code> will nest the fixed effect errors (which is also what <a href="http://scorreia.com/software/reghdfe/">Stata’s <code>reghdfe</code> package</a> does), but you can tell it to use the full set of country and year fixed effect errors with the <code>dof</code> argument (thanks to <a href="https://grantmcdermott.com/">Grant McDermott</a> for pointing this out!):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">model_feols <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">feols</span>(primary <span style="color:#f92672">~</span> treatment <span style="color:#f92672">|</span> country <span style="color:#f92672">+</span> year,
+                     data <span style="color:#f92672">=</span> fpe_primary,
+                     cluster <span style="color:#f92672">=</span> <span style="color:#f92672">~</span> country,
+                     dof <span style="color:#f92672">=</span> <span style="color:#a6e22e">dof</span>(fixef.K <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;full&#34;</span>))
+<span style="color:#a6e22e">tidy</span>(model_feols)
+<span style="color:#75715e">## # A tibble: 1 × 5</span>
+<span style="color:#75715e">##   term      estimate std.error statistic p.value</span>
+<span style="color:#75715e">##   &lt;chr&gt;        &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1 treatment     20.4      9.12      2.24  0.0418</span>
+<span style="color:#a6e22e">glance</span>(model_feols)
+<span style="color:#75715e">## # A tibble: 1 × 9</span>
+<span style="color:#75715e">##   r.squared adj.r.squared within.r.squared pseudo.r.squared sigma  nobs   AIC   BIC logLik</span>
+<span style="color:#75715e">##       &lt;dbl&gt;         &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1     0.768         0.742            0.111               NA  14.7   490 4071. 4280. -1985.</span>
+</code></pre></div><p>We can show these all in a side-by-side table using <a href="https://vincentarelbundock.github.io/modelsummary/">the <strong>modelsummary</strong> package</a>. Conveniently, <code>modelsummary()</code> also lets you <a href="https://grantmcdermott.com/better-way-adjust-SEs/">adjust standard errors on the fly</a> with the <code>vcov</code> argument, so we could theoretically handle all the clustering here instead of inside <code>lmtest::coeftest()</code>, <code>lm_robust()</code>, or <code>feols()</code>. But since we already specified the clusters above, we’ll just use those.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Look at secondary schools too</span>
+model_lm_sec <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(secondary <span style="color:#f92672">~</span> treatment <span style="color:#f92672">+</span> country <span style="color:#f92672">+</span> <span style="color:#a6e22e">factor</span>(year),
+                   data <span style="color:#f92672">=</span> fpe_secondary)
+
+df_secondary <span style="color:#f92672">&lt;-</span> fpe_secondary <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">distinct</span>(country) <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">nrow</span>()
+
+model_lm_clustered_sec <span style="color:#f92672">&lt;-</span> lmtest<span style="color:#f92672">::</span><span style="color:#a6e22e">coeftest</span>(model_lm_sec,
+                                           vcov <span style="color:#f92672">=</span> sandwich<span style="color:#f92672">::</span>vcovCL,
+                                           cluster <span style="color:#f92672">=</span> <span style="color:#f92672">~</span>country,
+                                           df <span style="color:#f92672">=</span> df_secondary <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>,
+                                           save <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)
+
+model_lm_robust_sec <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm_robust</span>(secondary <span style="color:#f92672">~</span> treatment,
+                                 fixed_effects <span style="color:#f92672">=</span> <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> year,
+                                 data <span style="color:#f92672">=</span> fpe_secondary,
+                                 clusters <span style="color:#f92672">=</span> country, se_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;stata&#34;</span>)
+
+model_feols_sec <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">feols</span>(secondary <span style="color:#f92672">~</span> treatment <span style="color:#f92672">|</span> country <span style="color:#f92672">+</span> year,
+                         data <span style="color:#f92672">=</span> fpe_secondary,
+                         cluster <span style="color:#f92672">=</span> <span style="color:#f92672">~</span> country,
+                         dof <span style="color:#f92672">=</span> <span style="color:#a6e22e">dof</span>(fixef.K <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;full&#34;</span>))
+
+<span style="color:#75715e"># Define the goodness-of-fit stats to include</span>
+gof_stuff <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tribble</span>(
+  <span style="color:#f92672">~</span>raw, <span style="color:#f92672">~</span>clean, <span style="color:#f92672">~</span>fmt,
+  <span style="color:#e6db74">&#34;nobs&#34;</span>, <span style="color:#e6db74">&#34;N&#34;</span>, <span style="color:#ae81ff">0</span>,
+  <span style="color:#e6db74">&#34;r.squared&#34;</span>, <span style="color:#e6db74">&#34;R²&#34;</span>, <span style="color:#ae81ff">3</span>
+)
+
+<span style="color:#75715e"># Define extra rows at the end of the table</span>
+extra_rows <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tribble</span>(
+  <span style="color:#f92672">~</span>term, <span style="color:#f92672">~</span>a, <span style="color:#f92672">~</span>b, <span style="color:#f92672">~</span>c, <span style="color:#f92672">~</span>d, <span style="color:#f92672">~</span>e, <span style="color:#f92672">~</span>f,
+  <span style="color:#e6db74">&#34;Country fixed effects&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>,
+  <span style="color:#e6db74">&#34;Year fixed effects&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>, <span style="color:#e6db74">&#34;•&#34;</span>
+)
+
+<span style="color:#a6e22e">modelsummary</span>(<span style="color:#a6e22e">list</span>(<span style="color:#e6db74">&#34;&lt;code&gt;lm()&lt;/code&gt;&#34;</span> <span style="color:#f92672">=</span> model_lm_clustered,
+                  <span style="color:#e6db74">&#34;&lt;code&gt;lm_robust()&lt;/code&gt;&#34;</span> <span style="color:#f92672">=</span> model_lm_robust,
+                  <span style="color:#e6db74">&#34;&lt;code&gt;feols()&lt;/code&gt;&#34;</span> <span style="color:#f92672">=</span> model_feols,
+                  <span style="color:#e6db74">&#34;&lt;code&gt;lm()&lt;/code&gt;&#34;</span> <span style="color:#f92672">=</span> model_lm_clustered_sec,
+                  <span style="color:#e6db74">&#34;&lt;code&gt;lm_robust()&lt;/code&gt;&#34;</span> <span style="color:#f92672">=</span> model_lm_robust_sec,
+                  <span style="color:#e6db74">&#34;&lt;code&gt;feols()&lt;/code&gt;&#34;</span> <span style="color:#f92672">=</span> model_feols_sec),
+             coef_rename <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;treatment&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Treatment&#34;</span>),
+             estimate <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;{estimate}&#34;</span>,
+             statistic <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;s.e. = {std.error}&#34;</span>, <span style="color:#e6db74">&#34;p = {p.value}&#34;</span>),
+             coef_omit <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;^country|^factor|Intercept&#34;</span>,
+             gof_map <span style="color:#f92672">=</span> gof_stuff,
+             add_rows <span style="color:#f92672">=</span> extra_rows,
+             table.attr <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;style=&#39;font-size:80%;&#39;&#34;</span>, escape <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, output <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kableExtra&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">add_header_above</span>(<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34; &#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, <span style="color:#e6db74">&#34;Primary enrollment&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>, <span style="color:#e6db74">&#34;Secondary enrollment&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">kable_styling</span>(htmltable_class <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;pure-table&#34;</span>)
+</code></pre></div><table style="font-size:80%; width: auto !important; margin-left: auto; margin-right: auto; margin-left: auto; margin-right: auto;" class="table pure-table">
+<thead>
+<tr>
+<th style="empty-cells: hide;border-bottom:hidden;" colspan="1">
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+<p>Primary enrollment</p>
+</div>
+</th>
+<th style="border-bottom:hidden;padding-bottom:0; padding-left:3px;padding-right:3px;text-align: center; " colspan="3">
+<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+<p>Secondary enrollment</p>
+</div>
+</th>
+</tr>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:center;">
+<code>lm()</code>
+</th>
+<th style="text-align:center;">
+<code>lm\_robust()</code>
+</th>
+<th style="text-align:center;">
+<code>feols()</code>
+</th>
+<th style="text-align:center;">
+<code>lm()</code>
+</th>
+<th style="text-align:center;">
+<code>lm\_robust()</code>
+</th>
+<th style="text-align:center;">
+<code>feols()</code>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Treatment
+</td>
+<td style="text-align:center;">
+20.428
+</td>
+<td style="text-align:center;">
+20.428
+</td>
+<td style="text-align:center;">
+20.428
+</td>
+<td style="text-align:center;">
+−0.468
+</td>
+<td style="text-align:center;">
+−0.468
+</td>
+<td style="text-align:center;">
+−0.468
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+s.e. = 9.120
+</td>
+<td style="text-align:center;">
+s.e. = 9.120
+</td>
+<td style="text-align:center;">
+s.e. = 9.120
+</td>
+<td style="text-align:center;">
+s.e. = 3.081
+</td>
+<td style="text-align:center;">
+s.e. = 3.081
+</td>
+<td style="text-align:center;">
+s.e. = 3.081
+</td>
+</tr>
+<tr>
+<td style="text-align:left;box-shadow: 0px 1px">
+</td>
+<td style="text-align:center;box-shadow: 0px 1px">
+p = 0.042
+</td>
+<td style="text-align:center;box-shadow: 0px 1px">
+p = 0.042
+</td>
+<td style="text-align:center;box-shadow: 0px 1px">
+p = 0.042
+</td>
+<td style="text-align:center;box-shadow: 0px 1px">
+p = 0.881
+</td>
+<td style="text-align:center;box-shadow: 0px 1px">
+p = 0.881
+</td>
+<td style="text-align:center;box-shadow: 0px 1px">
+p = 0.881
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:center;">
+490
+</td>
+<td style="text-align:center;">
+490
+</td>
+<td style="text-align:center;">
+490
+</td>
+<td style="text-align:center;">
+369
+</td>
+<td style="text-align:center;">
+369
+</td>
+<td style="text-align:center;">
+369
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+R²
+</td>
+<td style="text-align:center;">
+0.768
+</td>
+<td style="text-align:center;">
+0.768
+</td>
+<td style="text-align:center;">
+0.768
+</td>
+<td style="text-align:center;">
+0.942
+</td>
+<td style="text-align:center;">
+0.942
+</td>
+<td style="text-align:center;">
+0.942
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Country fixed effects
+</td>
+<td style="text-align:center;">
+•
+</td>
+<td style="text-align:center;">
+•
+</td>
+<td style="text-align:center;">
+•
+</td>
+<td style="text-align:center;">
+•
+</td>
+<td style="text-align:center;">
+•
+</td>
+<td style="text-align:center;">
+•
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Year fixed effects
+</td>
+<td style="text-align:center;">
+•
+</td>
+<td style="text-align:center;">
+•
+</td>
+<td style="text-align:center;">
+•
+</td>
+<td style="text-align:center;">
+•
+</td>
+<td style="text-align:center;">
+•
+</td>
+<td style="text-align:center;">
+•
+</td>
+</tr>
+</tbody>
+</table>
+<p>All these models show the same result: <strong>eliminating primary school fees caused primary school enrollment to increase by 20.4 percentage points.</strong> That’s astounding! Removing these fees doesn’t have any effect on secondary enrollment though.</p>
+<h3 id="twfe-estimate-with-residualized-treatment-weights">TWFE estimate with residualized treatment weights</h3>
+<p>These regressions are simple enough to run with <code>lm()</code> or <code>lm_robust()</code>, but there’s an issue with differential timing here. These 15 countries each passed laws eliminating fees in different years:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot_fpe_start <span style="color:#f92672">&lt;-</span> fpe_raw <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(year <span style="color:#f92672">==</span> fpe_year) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">arrange</span>(fpe_year, country) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(country <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(country))
+
+<span style="color:#a6e22e">ggplot</span>(plot_fpe_start, <span style="color:#a6e22e">aes</span>(y <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_rev</span>(country))) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_segment</span>(<span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> fpe_year, xend <span style="color:#f92672">=</span> <span style="color:#ae81ff">2015</span>, yend <span style="color:#f92672">=</span> country),
+               size <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#D6EB52&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_text</span>(<span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> fpe_year <span style="color:#f92672">+</span> <span style="color:#ae81ff">0.2</span>), label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;▶&#34;</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Arial Unicode MS&#34;</span>,
+            size <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#A4BD0A&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Year free primary education implemented&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-fpe-start-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>This timing could cause problems. To see these issues, let’s calculate the ATE ($\beta$) with that fancy schmancy Frisch-Waugh-Lovell theorem with residualized treatment weights. There’s one key difference here when calculating the residuals though. With the simple model earlier, the treatment residuals were just <code>\(D_i - \bar{D}\)</code>, or the residuals from <code>lm(treatment ~ 1)</code>. In TWFE situations, though, treatment residuals need to account for both country and year fixed effects, or <code>lm(treatment ~ country + year)</code>:</p>
+<p><code>$$\color{#0599B0}{\beta^{\text{TWFE}}} \color{black}{= \sum_{it}} \color{#FFA615}{Y_{it}} \color{black} \left( \frac{\color{#353D03}{\tilde{D}_{it}}}{\sum_{it} \color{#353D03}{\tilde{D}_{it}}^2} \right)$$</code></p>
+<p>Or, with code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">trt_resid_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(treatment <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> <span style="color:#a6e22e">factor</span>(year), data <span style="color:#f92672">=</span> fpe_primary)
+trt_resid_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(treatment <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> <span style="color:#a6e22e">factor</span>(year), data <span style="color:#f92672">=</span> fpe_secondary)
+
+fpe_primary_weights <span style="color:#f92672">&lt;-</span> fpe_primary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(treatment_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">residuals</span>(trt_resid_primary)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(treatment_weight <span style="color:#f92672">=</span> treatment_resid <span style="color:#f92672">/</span> <span style="color:#a6e22e">sum</span>(treatment_resid^2))
+
+fpe_secondary_weights <span style="color:#f92672">&lt;-</span> fpe_secondary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(treatment_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">residuals</span>(trt_resid_secondary)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(treatment_weight <span style="color:#f92672">=</span> treatment_resid <span style="color:#f92672">/</span> <span style="color:#a6e22e">sum</span>(treatment_resid^2))
+
+fpe_primary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">summarize</span>(twfe_beta_primary <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(primary <span style="color:#f92672">*</span> treatment_weight))
+<span style="color:#75715e">## # A tibble: 1 × 1</span>
+<span style="color:#75715e">##   twfe_beta_primary</span>
+<span style="color:#75715e">##               &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1              20.4</span>
+
+fpe_secondary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">summarize</span>(twfe_beta_secondary <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(secondary <span style="color:#f92672">*</span> treatment_weight))
+<span style="color:#75715e">## # A tibble: 1 × 1</span>
+<span style="color:#75715e">##   twfe_beta_secondary</span>
+<span style="color:#75715e">##                 &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1              -0.468</span>
+</code></pre></div><p>Whoa! It still works this way. This still blows my mind every time.</p>
+<h2 id="jakielas-diagnostics">Jakiela’s diagnostics</h2>
+<p>However, because of the differential treatment timing, there are some issues with weighting. Remember from the simple example with fake data that observations in the treatment group typically have positive treatment weights, while those in the comparison/control group have negative weights. With TWFE, some observations’ weights switch directions. There are systematic reasons for this. According to <a href="#ref-Jakiela:2021">Jakiela</a> (<a href="#ref-Jakiela:2021">2021, 5</a>), negative weights in treated observations are more likely in (1) early adopter countries, since the country-level treatment mean is high, and (2) later years, since the year-level treatment mean is higher.</p>
+<p>Having negative weights on treated observations isn’t necessarily bad! It’s often just a mathematical artefact, and if you have (1) enough never-treated observations and (2) enough pre-treatment data, and if (3) the treatment effects are homogenous across all countries, it won’t be a problem. But if you don’t have enough data, your results will be biased and distorted for later years and for early adopters.</p>
+<p>Starting in section 3 of her paper, Jakiela presents a set of diagnostics to see how bad these distortions might be. We need to answer two questions:</p>
+<ol>
+<li>Do any treated units get negative weight when calculating <code>\(\beta^{\text{TWFE}}\)</code>? Check this by looking at the weights</li>
+<li>Can we reject the hypothesis that the treatment effects are homogenous? Check this by looking at the relationship between <code>\(\tilde{Y}_{it}\)</code> and <code>\(\tilde{D}_{it}\)</code>. The slope shouldn’t be different.</li>
+</ol>
+<h3 id="31-do-treated-observations-receive-negative-weights">3.1: Do treated observations receive negative weights?</h3>
+<p>For this first diagnostic, we need to investigate patterns in the residualized weights. Some of the treated country-year observations have negative weight:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Total treated in primary data</span>
+n_treated_primary <span style="color:#f92672">&lt;-</span> fpe_primary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">nrow</span>()
+
+<span style="color:#75715e"># Total treated in secondary data</span>
+n_treated_secondary <span style="color:#f92672">&lt;-</span> fpe_secondary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">nrow</span>()
+
+<span style="color:#75715e"># Negatively weighted treated observations in the primary data</span>
+n_treated_negative_primary <span style="color:#f92672">&lt;-</span> fpe_primary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(treatment_weight <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">nrow</span>()
+
+n_treated_negative_primary
+<span style="color:#75715e">## [1] 50</span>
+n_treated_negative_primary <span style="color:#f92672">/</span> n_treated_primary
+<span style="color:#75715e">## [1] 0.259</span>
+
+<span style="color:#75715e"># Negatively weighted treated observations in the secondary data</span>
+n_treated_negative_secondary <span style="color:#f92672">&lt;-</span> fpe_secondary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(treatment_weight <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">nrow</span>()
+
+n_treated_negative_secondary
+<span style="color:#75715e">## [1] 36</span>
+n_treated_negative_secondary <span style="color:#f92672">/</span> n_treated_secondary
+<span style="color:#75715e">## [1] 0.261</span>
+</code></pre></div><p>Roughly a quarter of the treated observations in both the primary and secondary enrollment data are negatively weighted. That might be bad.</p>
+<p>We can look at the distribution of these weights too:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot_weights_primary <span style="color:#f92672">&lt;-</span> fpe_primary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(treatment_fct <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(treatment, labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Untreated&#34;</span>, <span style="color:#e6db74">&#34;Treated&#34;</span>), ordered <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(oh_no <span style="color:#f92672">=</span> (treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;</span> treatment_weight <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#f92672">|</span> (treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment_weight <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>))
+
+plot_weights_secondary <span style="color:#f92672">&lt;-</span> fpe_secondary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(treatment_fct <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(treatment, labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Untreated&#34;</span>, <span style="color:#e6db74">&#34;Treated&#34;</span>), ordered <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(oh_no <span style="color:#f92672">=</span> (treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;</span> treatment_weight <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#f92672">|</span> (treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment_weight <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>))
+
+hist_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(plot_weights_primary,
+                       <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> treatment_weight, fill <span style="color:#f92672">=</span> treatment_fct, alpha <span style="color:#f92672">=</span> oh_no)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_histogram</span>(binwidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.002</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;white&#34;</span>, boundary <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
+                 position <span style="color:#f92672">=</span> <span style="color:#a6e22e">position_identity</span>()) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_vline</span>(xintercept <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF4136&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_alpha_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.6</span>, <span style="color:#ae81ff">1</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_fill_viridis_d</span>(option <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;rocket&#34;</span>, begin <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.2</span>, end <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.8</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Residualized treatment&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Count&#34;</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Primary school enrollment&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">guides</span>(fill <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;none&#34;</span>, alpha <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;none&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">facet_wrap</span>(<span style="color:#a6e22e">vars</span>(treatment_fct), ncol <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+
+hist_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(plot_weights_secondary,
+                         <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> treatment_weight, fill <span style="color:#f92672">=</span> treatment_fct, alpha <span style="color:#f92672">=</span> oh_no)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_histogram</span>(binwidth <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.002</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;white&#34;</span>, boundary <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
+                 position <span style="color:#f92672">=</span> <span style="color:#a6e22e">position_identity</span>()) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_vline</span>(xintercept <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF4136&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_alpha_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.6</span>, <span style="color:#ae81ff">1</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_fill_viridis_d</span>(option <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;rocket&#34;</span>, begin <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.2</span>, end <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.8</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Residualized treatment&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Count&#34;</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Secondary school enrollment&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">guides</span>(fill <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;none&#34;</span>, alpha <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;none&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">facet_wrap</span>(<span style="color:#a6e22e">vars</span>(treatment_fct), ncol <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>()
+
+hist_primary <span style="color:#f92672">+</span> hist_secondary
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>These histograms confirm the proportions we found earlier—about 25% of the treated observations have negative weights.</p>
+<p>Which treated country-years are getting these negative weights, though? According to Jakiela, early adopters and later years are more likely to have this switch happen. Let’s make another plot:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot_waffle_primary <span style="color:#f92672">&lt;-</span> fpe_primary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(weight_fill <span style="color:#f92672">=</span> <span style="color:#a6e22e">case_when</span>(
+    treatment_resid <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;Treatment observations, negative weight&#34;</span>,
+    treatment_resid <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;Treatment observations, positive weight&#34;</span>,
+    <span style="color:#f92672">!</span>treatment <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;Comparison observations&#34;</span>
+  )) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">arrange</span>(<span style="color:#a6e22e">desc</span>(fpe_year), <span style="color:#a6e22e">desc</span>(country)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(country <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(country)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(weight_fill <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(weight_fill))
+
+plot_waffle_secondary <span style="color:#f92672">&lt;-</span> fpe_secondary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(weight_fill <span style="color:#f92672">=</span> <span style="color:#a6e22e">case_when</span>(
+    treatment_resid <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;Treatment observations, negative weight&#34;</span>,
+    treatment_resid <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;Treatment observations, positive weight&#34;</span>,
+    <span style="color:#f92672">!</span>treatment <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34;Comparison observations&#34;</span>
+  )) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">arrange</span>(<span style="color:#a6e22e">desc</span>(fpe_year), <span style="color:#a6e22e">desc</span>(country)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(country <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(country)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(weight_fill <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(weight_fill))
+
+waffle_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(plot_waffle_primary,
+                         <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> year, y <span style="color:#f92672">=</span> country, fill <span style="color:#f92672">=</span> weight_fill)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_tile</span>(color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;white&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_fill_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;grey50&#34;</span>, <span style="color:#e6db74">&#34;#0074D9&#34;</span>, <span style="color:#e6db74">&#34;#FF4136&#34;</span>),
+                    guide <span style="color:#f92672">=</span> <span style="color:#a6e22e">guide_legend</span>(reverse <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>),
+                    name <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_x_continuous</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">expansion</span>(add <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>),
+                     breaks <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">1980</span>, <span style="color:#ae81ff">2015</span>, <span style="color:#ae81ff">5</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Primary school enrollment&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_equal</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>,
+        panel.grid <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        legend.key.size <span style="color:#f92672">=</span> <span style="color:#a6e22e">unit</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#e6db74">&#34;lines&#34;</span>))
+
+waffle_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(plot_waffle_secondary,
+                         <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> year, y <span style="color:#f92672">=</span> country, fill <span style="color:#f92672">=</span> weight_fill)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_tile</span>(color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;white&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_fill_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;grey50&#34;</span>, <span style="color:#e6db74">&#34;#0074D9&#34;</span>, <span style="color:#e6db74">&#34;#FF4136&#34;</span>),
+                    guide <span style="color:#f92672">=</span> <span style="color:#a6e22e">guide_legend</span>(reverse <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>),
+                    name <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_x_continuous</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">expansion</span>(add <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>),
+                     breaks <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">1980</span>, <span style="color:#ae81ff">2015</span>, <span style="color:#ae81ff">5</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Secondary school enrollment&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_equal</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>,
+        panel.grid <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        legend.key.size <span style="color:#f92672">=</span> <span style="color:#a6e22e">unit</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#e6db74">&#34;lines&#34;</span>))
+
+waffle_primary <span style="color:#f92672">/</span> waffle_secondary
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weight-waffle-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>And that is indeed the case! Malawi, Ethiopia, Ghana, Uganda, and Cameroon all eliminated fees before 2000, and they start getting negative weights after 2005.</p>
+<h3 id="32-testing-the-homogeneity-assumption-directly">3.2: Testing the homogeneity assumption directly</h3>
+<p>We thus have issues with negative weighting here for early adopting countries and later country-years. However, as long as the treatment effects are homogenous—or that the elimination of school fees has the same effect across time and country—this negative weighting isn’t an issue. If treatment effects are heterogenous—especially if the effects change over time within treated countries—the TWFE estimate will be severely biased.</p>
+<p>Jakiela’s second diagnostic tests this assumption of homogeneity based on the mathematical relationship between the residuals of the outcome variable (<code>$\tilde{Y}_{it}$</code>) and the residuals of the treatment variable (<code>$\tilde{D}_{it}$</code>). Essentially, if there’s no difference in slopes across treated and untreated observations in a regression of <code>$\tilde{Y}_{it} = \tilde{D}_{it}$</code>, there’s no evidence for heterogeneity and all is well.</p>
+<p>This wasn’t intuitive for me since I’m not a real econometrician, so I had to dig into the math to try to wrap my head around it, and I’m still only like 80% sure I’ve got it :)</p>
+<p>We can think of the outcome <code>\(Y_{it}\)</code> as a combination of three different moving parts: (1) an initial baseline value for each country, or <code>\(\mu_{i}\)</code>, (2) a constant change in each additional year in the absence of treatment (i.e. what would naturally happen over time regardless of an intervention), or <code>\(\eta_t\)</code>, and (3) a homogenous treatment effect, or <code>\(\delta\)</code> (doesn’t have subscripts for <code>\(i\)</code> or <code>\(t\)</code>—it’s the same across year and country):</p>
+<p><code>$$\color{gray}{\overbrace{\color{#FFA615}{Y_{it}}}^{\text{Outcome}}} = \color{gray}{\overbrace{\color{black}{\mu_i}}^{\substack{\text{Baseline} \\ \text{outcome} \\ \text{at } t = 1}}} + \color{black} \sum_{\tau = 1}^t  \color{gray}{\overbrace{\color{black}{\eta_t}}^{\substack{\text{Global} \\ \text{time} \\ \text{trend}}}} + \color{gray}{\overbrace{\color{black}{\delta}}^{\substack{\text{Homogenous} \\ \text{treatment} \\ \text{effect}}}} \color{#A4BD0A}{D_{it}}$$</code></p>
+<p>This all makes perfect sense is is nice and intuitive. It’s how I typically generate fake data too (see the <code>outcome_baseline</code> up at the beginning of this post, for instance) and it’s a neat way of thinking about the separate components of a data generating process.</p>
+<p>According to Jakiela, if the treatment effect <code>\(\delta\)</code> is truly homogenous over time and country, the residuals of the outcome (i.e. the residuals from a model like <code>lm(outcome ~ country + year)</code>, or <code>\(\tilde{Y}_{it}\)</code>) should have a linear relationship to the residualized treatment (i.e. the residuals from a model like <code>lm(treatment ~ country + year)</code>, or <code>\(\delta\tilde{D}_{it}\)</code>).</p>
+<p>Again, due to my non-econometricianness, this idea that <code>\(\tilde{Y}_{it}\)</code> should be related to <code>\(\delta\tilde{D}_{it}\)</code> didn’t click for me until I thought about this formula in more regression-y terms. Consider this pseudo-regression equation:</p>
+<p><code>$$\overbrace{Y_{it}}^{\text{Outcome}} = \overbrace{\alpha_i}^{\text{Intercept}} + \overbrace{\beta_t}^{\text{Slope / trend}} + \overbrace{\epsilon_{it}}^{\text{Residuals}}$$</code></p>
+<p>Here, if we run a regression like <code>lm(outcome ~ country + year)</code>, the intercept <code>\(\alpha_i\)</code> is analogous to <code>\(\mu_i\)</code>, the slope <code>\(\beta_t\)</code> is like <code>\(\eta_t\)</code>, and whatever’s leftover (i.e. <code>\(\epsilon_{it}\)</code>, or the residualized outcome <code>\(\tilde{Y}_{it}\)</code>) is similar to <code>\(\delta D_{it}\)</code>. <code>\(\delta D_{it}\)</code> isn’t the same as <code>\(\delta \tilde{D}_{it}\)</code>, but we can calculate the residualized treatment the same way by removing country and year effects (like <code>lm(treatment ~ country + year)</code>). Basically, by residualizing both the treatment and outcome, and thus removing country and time effects (or the baseline country effect <code>\(\mu_i\)</code> and the time trend <code>\(\eta_t\)</code>) from each, the residuals that remain are related to <code>\(\delta\)</code>.</p>
+<p>As long as <code>\(\delta\)</code> is constant across time and country—or as long as the effect is homogenous—it should show up equally in the residuals for both the outcome and treatment for both treated and untreated observations. (I THINK! I’M NOT SURE ABOUT THIS)</p>
+<p>We already calculated the treatment residuals (or <code>\(\tilde{D}_{it}\)</code>) when we looked at treatment weights earlier, so now we just need to calculate the outcome residuals ($\tilde{Y}_{it}$). We can then see if the relationship between <code>\(\tilde{D}_{it}\)</code> and <code>\(\tilde{D}_{it}\)</code> looks the same for treated and untreated observations—the slopes in the two groups should be statistically indistinguishable from each other.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Build models for the residualized outcomes</span>
+out_resid_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(primary <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> <span style="color:#a6e22e">factor</span>(year), data <span style="color:#f92672">=</span> fpe_primary)
+out_resid_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(secondary <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> <span style="color:#a6e22e">factor</span>(year), data <span style="color:#f92672">=</span> fpe_secondary)
+
+<span style="color:#75715e"># Add residuals to data with weights</span>
+fpe_primary_weights <span style="color:#f92672">&lt;-</span> fpe_primary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(out_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">residuals</span>(out_resid_primary))
+
+fpe_secondary_weights <span style="color:#f92672">&lt;-</span> fpe_secondary_weights <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(out_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">residuals</span>(out_resid_secondary))
+</code></pre></div><p>We can check the similarity of these slopes a couple different ways. First, let’s plot the residuals:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot_out_trt_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(fpe_primary_weights,
+                               <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> treatment_resid, y <span style="color:#f92672">=</span> out_resid, color <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(treatment))) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_point</span>(size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.75</span>, alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_smooth</span>(<span style="color:#a6e22e">aes</span>(linetype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Loess&#34;</span>), method <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;loess&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, se <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_smooth</span>(<span style="color:#a6e22e">aes</span>(linetype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;OLS&#34;</span>), method <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;lm&#34;</span>, se <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_color_viridis_d</span>(option <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;rocket&#34;</span>, begin <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.2</span>, end <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.8</span>,
+                        labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Untreated&#34;</span>, <span style="color:#e6db74">&#34;Treated&#34;</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_linetype_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;OLS&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;solid&#34;</span>, <span style="color:#e6db74">&#34;Loess&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;21&#34;</span>),
+                        guide <span style="color:#f92672">=</span> <span style="color:#a6e22e">guide_legend</span>(override.aes <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;grey30&#34;</span>))) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Residualized treatment&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Residualized outcome&#34;</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Primary school enrollment&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, linetype <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>)
+
+plot_out_trt_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(fpe_secondary_weights,
+                                 <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> treatment_resid, y <span style="color:#f92672">=</span> out_resid, color <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(treatment))) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_point</span>(size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.75</span>, alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_smooth</span>(<span style="color:#a6e22e">aes</span>(linetype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Loess&#34;</span>), method <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;loess&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, se <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_smooth</span>(<span style="color:#a6e22e">aes</span>(linetype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;OLS&#34;</span>), method <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;lm&#34;</span>, se <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_color_viridis_d</span>(option <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;rocket&#34;</span>, begin <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.2</span>, end <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.8</span>,
+                        labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Untreated&#34;</span>, <span style="color:#e6db74">&#34;Treated&#34;</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_linetype_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;OLS&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;solid&#34;</span>, <span style="color:#e6db74">&#34;Loess&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;21&#34;</span>),
+                        guide <span style="color:#f92672">=</span> <span style="color:#a6e22e">guide_legend</span>(override.aes <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;grey30&#34;</span>))) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Residualized treatment&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Residualized outcome&#34;</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Secondary school enrollment&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, linetype <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>)
+
+plot_out_trt_primary <span style="color:#f92672">|</span> plot_out_trt_secondary
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-outcome-trt-resid-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>For primary enrollment, the lines for treated and untreated observations look like they have similar slopes. When using Loess lines, the two groups don’t align perfectly, and the relationship between residualized treatment and residualized outcome doesn’t look perfectly linear. When secondary enrollment is the outcome, the lines for the treated and untreated groups seem to switch directions—the slope is negative for untreated observations but positive for treated. This is a bad sign for the homogeneity assumption.</p>
+<p>We can statistically test if the slopes in two groups are the same or not by using an interaction term in a regression model:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">check_slopes_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(out_resid <span style="color:#f92672">~</span> treatment_resid <span style="color:#f92672">*</span> <span style="color:#a6e22e">factor</span>(treatment),
+                           data <span style="color:#f92672">=</span> fpe_primary_weights)
+
+check_slopes_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(out_resid <span style="color:#f92672">~</span> treatment_resid <span style="color:#f92672">*</span> <span style="color:#a6e22e">factor</span>(treatment),
+                           data <span style="color:#f92672">=</span> fpe_secondary_weights)
+
+<span style="color:#a6e22e">modelsummary</span>(<span style="color:#a6e22e">list</span>(<span style="color:#e6db74">&#34;Primary enrollment&#34;</span> <span style="color:#f92672">=</span> check_slopes_primary,
+                  <span style="color:#e6db74">&#34;Secondary enrollment&#34;</span> <span style="color:#f92672">=</span> check_slopes_secondary),
+             coef_rename <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;treatment_resid&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Residualized treatment&#34;</span>,
+                             <span style="color:#e6db74">&#34;factor(treatment)1&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Treatment group&#34;</span>,
+                             <span style="color:#e6db74">&#34;treatment_resid:factor(treatment)1&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Treatment group × residualized treatment&#34;</span>,
+                             <span style="color:#e6db74">&#34;(Intercept)&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Intercept&#34;</span>),
+             estimate <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;{estimate}&#34;</span>,
+             statistic <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;s.e. = {std.error}&#34;</span>, <span style="color:#e6db74">&#34;p = {p.value}&#34;</span>),
+             gof_map <span style="color:#f92672">=</span> <span style="color:#a6e22e">tribble</span>(
+               <span style="color:#f92672">~</span>raw, <span style="color:#f92672">~</span>clean, <span style="color:#f92672">~</span>fmt,
+               <span style="color:#e6db74">&#34;nobs&#34;</span>, <span style="color:#e6db74">&#34;N&#34;</span>, <span style="color:#ae81ff">0</span>,
+               <span style="color:#e6db74">&#34;r.squared&#34;</span>, <span style="color:#e6db74">&#34;R²&#34;</span>, <span style="color:#ae81ff">3</span>
+             ),
+             table.attr <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;style=&#39;font-size:80%;&#39;&#34;</span>, escape <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, output <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;kableExtra&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">kable_styling</span>(htmltable_class <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;pure-table&#34;</span>)
+</code></pre></div><table style="font-size:80%; width: auto !important; margin-left: auto; margin-right: auto; margin-left: auto; margin-right: auto;" class="table pure-table">
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:center;">
+Primary enrollment
+</th>
+<th style="text-align:center;">
+Secondary enrollment
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Intercept
+</td>
+<td style="text-align:center;">
+0.320
+</td>
+<td style="text-align:center;">
+−0.202
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+s.e. = 0.894
+</td>
+<td style="text-align:center;">
+s.e. = 0.276
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+p = 0.721
+</td>
+<td style="text-align:center;">
+p = 0.466
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Residualized treatment
+</td>
+<td style="text-align:center;">
+23.761
+</td>
+<td style="text-align:center;">
+−2.902
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+s.e. = 3.968
+</td>
+<td style="text-align:center;">
+s.e. = 1.357
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+p = 0.000
+</td>
+<td style="text-align:center;">
+p = 0.033
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Treatment group
+</td>
+<td style="text-align:center;">
+0.341
+</td>
+<td style="text-align:center;">
+−0.189
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+s.e. = 1.506
+</td>
+<td style="text-align:center;">
+s.e. = 0.473
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+p = 0.821
+</td>
+<td style="text-align:center;">
+p = 0.690
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Treatment group × residualized treatment
+</td>
+<td style="text-align:center;">
+−7.806
+</td>
+<td style="text-align:center;">
+5.248
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+</td>
+<td style="text-align:center;">
+s.e. = 6.073
+</td>
+<td style="text-align:center;">
+s.e. = 1.993
+</td>
+</tr>
+<tr>
+<td style="text-align:left;box-shadow: 0px 1px">
+</td>
+<td style="text-align:center;box-shadow: 0px 1px">
+p = 0.199
+</td>
+<td style="text-align:center;box-shadow: 0px 1px">
+p = 0.009
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+N
+</td>
+<td style="text-align:center;">
+490
+</td>
+<td style="text-align:center;">
+369
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+R²
+</td>
+<td style="text-align:center;">
+0.114
+</td>
+<td style="text-align:center;">
+0.019
+</td>
+</tr>
+</tbody>
+</table>
+<p>The coefficient for “Treatment group × residualized treatment” shows the change in slope between the two groups. For primary enrollment, being in the treatment group reduces the slope by 7.8 (so from 23.761 to 15.961), but the standard errors around that change are huge and the p-value is not significant (p = 0.199). For secondary enrollment, though, being in the treatment group increases the slope by 5.3 (from -2.9 to positive 2.4), and that change is statistically significant (p = 0.009).</p>
+<p>So for primary enrollment, there’s not enough evidence to reject the hypothesis that the slopes are the same (or the hypothesis that the effect is homogenous), so we’ll treat the effect as homogenous. Yay! That means we don’t need to worry so much about the negatively-weighted treated country-years. For secondary enrollment, though, there’s pretty strong evidence that the slopes aren’t the same, which means the treatment effect is likely heterogenous, which also means that the treated country-years with negative weights are biasing the results substantially and we should thus be worried.</p>
+<p>When there are heterogenous treatment effects, we don’t need to give up! This is what <a href="#ref-CallawaySantAnna:2020">Callaway and Sant’Anna</a> (<a href="#ref-CallawaySantAnna:2020">2020</a>) and <a href="#ref-SunAbraham:2020">Sun and Abraham</a> (<a href="#ref-SunAbraham:2020">2020</a>) show how to do in their papers (and see <a href="#ref-BakerLarckerWang:2021">Baker, Larcker, and Wang</a> (<a href="#ref-BakerLarckerWang:2021">2021</a>) for a general overview of those approaches). If treatment effects are indeed homogenous, there’s no need to turn to these fancier TWFE estimators—but if they are heterogenous, there are new tools that help.</p>
+<h2 id="jakielas-robustness-checks">Jakiela’s robustness checks</h2>
+<p>Now that we’ve run those two diagnostics (checked for negative weights in treated units and checked for treatment effect homogeneity), we can do some neat robustness checks to see how badly these negative weight issues bias the TWFE estimate.</p>
+<p>As long as we assume that treatment effects are homogenous (remember that <code>\(\delta\)</code> in the equation above doesn’t have subscripts for country or year), we can safely drop some observations from the data and still find the same result. We can also strategically drop observations to check if negative treatment weights influence the results. Jakiela presents three different robustness checks that all involve dropping different categories of observations:</p>
+<ul>
+<li>Exclude later years</li>
+<li>Limit how many post-treatment years are kept</li>
+<li>Exclude individual countries</li>
+</ul>
+<h3 id="exclude-later-years">Exclude later years</h3>
+<p>Since negative treatment weights for treated country-years are more likely to appear in later years in the data, we can drop those later years and see how the treatment effect changes.</p>
+<p>For primary schools, if we cut the data off at 2000, the treatment effect is 31.8 instead of the 20.4 we’ve been seeing with the full data. That estimate is higher, but it also has wider errors. Both the coefficient and the errors shrink as we add more years to the data, and the estimate eventually settles on ≈20 by 2005, which is also when negatively weighted treated rows start appearing.</p>
+<p>For secondary schools, the treatment effect hovers around 0 is never statistically significant regardless of the cutoff year.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">different_max_years_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tibble</span>(end_year <span style="color:#f92672">=</span> <span style="color:#ae81ff">2000</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2015</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Nest a filtered dataset in a cell for each year</span>
+  <span style="color:#a6e22e">mutate</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(end_year, <span style="color:#f92672">~</span><span style="color:#a6e22e">filter</span>(fpe_primary, year <span style="color:#f92672">&lt;=</span> .))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Calculate the TWFE estimate for each dataset</span>
+  <span style="color:#a6e22e">mutate</span>(model <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(data, <span style="color:#f92672">~</span><span style="color:#a6e22e">lm_robust</span>(primary <span style="color:#f92672">~</span> treatment,
+                                      fixed_effects <span style="color:#f92672">=</span> <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> year,
+                                      data <span style="color:#f92672">=</span> .,
+                                      clusters <span style="color:#f92672">=</span> country, se_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;stata&#34;</span>))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Extract a data frame of the results</span>
+  <span style="color:#a6e22e">mutate</span>(tidied <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(model, <span style="color:#f92672">~</span><span style="color:#a6e22e">tidy</span>(., conf.int <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Calculate residuals and treatment weights</span>
+  <span style="color:#a6e22e">mutate</span>(model_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(data, <span style="color:#f92672">~</span><span style="color:#a6e22e">lm</span>(treatment <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> <span style="color:#a6e22e">factor</span>(year), data <span style="color:#f92672">=</span> .)),
+         treatment_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(model_resid, <span style="color:#f92672">~</span><span style="color:#a6e22e">residuals</span>(.)),
+         treatment_weight <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(treatment_resid, <span style="color:#f92672">~</span> . <span style="color:#f92672">/</span> <span style="color:#a6e22e">sum</span>(.^2)))
+
+<span style="color:#75715e"># Calculate how many treated observations have negative weights</span>
+prop_negative_primary <span style="color:#f92672">&lt;-</span> different_max_years_primary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">unnest</span>(<span style="color:#a6e22e">c</span>(data, treatment_resid, treatment_weight)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">group_by</span>(end_year) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">summarize</span>(n_treated_negative_weight <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(treatment_weight <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>),
+            n_treated <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>),
+            prop_treated_negative_weight <span style="color:#f92672">=</span> n_treated_negative_weight <span style="color:#f92672">/</span> n_treated) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(prop_nice <span style="color:#f92672">=</span> <span style="color:#a6e22e">percent</span>(prop_treated_negative_weight, accuracy <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>))
+
+<span style="color:#75715e"># Extract tidied results for plotting</span>
+coefs_to_plot_primary <span style="color:#f92672">&lt;-</span> different_max_years_primary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">unnest</span>(tidied)
+
+different_max_years_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tibble</span>(end_year <span style="color:#f92672">=</span> <span style="color:#ae81ff">2000</span><span style="color:#f92672">:</span><span style="color:#ae81ff">2015</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(end_year, <span style="color:#f92672">~</span><span style="color:#a6e22e">filter</span>(fpe_secondary, year <span style="color:#f92672">&lt;=</span> .))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(model <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(data, <span style="color:#f92672">~</span><span style="color:#a6e22e">lm_robust</span>(secondary <span style="color:#f92672">~</span> treatment,
+                                      fixed_effects <span style="color:#f92672">=</span> <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> year,
+                                      data <span style="color:#f92672">=</span> .,
+                                      clusters <span style="color:#f92672">=</span> country, se_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;stata&#34;</span>))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(tidied <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(model, <span style="color:#f92672">~</span><span style="color:#a6e22e">tidy</span>(., conf.int <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(model_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(data, <span style="color:#f92672">~</span><span style="color:#a6e22e">lm</span>(treatment <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> <span style="color:#a6e22e">factor</span>(year), data <span style="color:#f92672">=</span> .)),
+         treatment_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(model_resid, <span style="color:#f92672">~</span><span style="color:#a6e22e">residuals</span>(.)),
+         treatment_weight <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(treatment_resid, <span style="color:#f92672">~</span> . <span style="color:#f92672">/</span> <span style="color:#a6e22e">sum</span>(.^2)))
+
+prop_negative_secondary <span style="color:#f92672">&lt;-</span> different_max_years_secondary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">unnest</span>(<span style="color:#a6e22e">c</span>(data, treatment_resid, treatment_weight)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">group_by</span>(end_year) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">summarize</span>(n_treated_negative_weight <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(treatment_weight <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>),
+            n_treated <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>),
+            prop_treated_negative_weight <span style="color:#f92672">=</span> n_treated_negative_weight <span style="color:#f92672">/</span> n_treated) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(prop_nice <span style="color:#f92672">=</span> <span style="color:#a6e22e">percent</span>(prop_treated_negative_weight, accuracy <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>))
+
+coefs_to_plot_secondary <span style="color:#f92672">&lt;-</span> different_max_years_secondary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">unnest</span>(tidied)
+
+<span style="color:#75715e"># Coefficient plot</span>
+ate_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(coefs_to_plot_primary, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> end_year, y <span style="color:#f92672">=</span> estimate)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_hline</span>(yintercept <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF2E00&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_pointrange</span>(<span style="color:#a6e22e">aes</span>(ymin <span style="color:#f92672">=</span> conf.low, ymax <span style="color:#f92672">=</span> conf.high),
+                  color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#0599B0&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, fatten <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;TWFE-based treatment effect&#34;</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Primary school enrollment&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(axis.title.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        axis.text.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+ate_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(coefs_to_plot_secondary, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> end_year, y <span style="color:#f92672">=</span> estimate)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_hline</span>(yintercept <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF2E00&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_pointrange</span>(<span style="color:#a6e22e">aes</span>(ymin <span style="color:#f92672">=</span> conf.low, ymax <span style="color:#f92672">=</span> conf.high),
+                  color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#0599B0&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, fatten <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;TWFE-based treatment effect&#34;</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Secondary school enrollment&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(axis.title.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        axis.text.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+<span style="color:#75715e"># Bar plot</span>
+prop_neg_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(<span style="color:#a6e22e">filter</span>(prop_negative_primary,
+                                  prop_treated_negative_weight <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>),
+                           <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> end_year, y <span style="color:#f92672">=</span> prop_treated_negative_weight)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_col</span>(fill <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF4136&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_text</span>(<span style="color:#a6e22e">aes</span>(label <span style="color:#f92672">=</span> prop_nice),
+            nudge_y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.02</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>,
+            family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Barlow Semi Condensed Bold&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF4136&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(xlim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">2000</span>, <span style="color:#ae81ff">2015</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Last year included in data&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>,
+       subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;% of treated observations with negative weight&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        axis.text.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+prop_neg_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(<span style="color:#a6e22e">filter</span>(prop_negative_secondary,
+                                    prop_treated_negative_weight <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>),
+                             <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> end_year, y <span style="color:#f92672">=</span> prop_treated_negative_weight)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_col</span>(fill <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF4136&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_text</span>(<span style="color:#a6e22e">aes</span>(label <span style="color:#f92672">=</span> prop_nice),
+            nudge_y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.02</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>,
+            family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Barlow Semi Condensed Bold&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF4136&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(xlim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">2000</span>, <span style="color:#ae81ff">2015</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Last year included in data&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>,
+       subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;% of treated observations with negative weight&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        axis.text.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+((ate_primary <span style="color:#f92672">/</span> prop_neg_primary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>))) <span style="color:#f92672">|</span>
+  ((ate_secondary <span style="color:#f92672">/</span> prop_neg_secondary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>)))
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-exclude-later-years-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<h3 id="change-how-many-post-treatment-years-are-kept">Change how many post-treatment years are kept</h3>
+<p>Dropping rows based on end years like this is neat, but it doesn’t take into account the differential treatment timing. Countries like Mozambique, which eliminated its fees in 2005, don’t even show up in the first few models of exclude-later-years robustness check, since those models end in 2000–2004. As an alternative, we can keep specific numbers of years post-treatment for each country. For instance, we can look at Mozambique 2, 3, 4, or 5 (and so on) years after treatment. Doing this centers all countries at <code>\(t = 0\)</code>, rather than <code>\(t = \text{start year}\)</code>.</p>
+<p>For primary schools in this situation, the effect is smaller and not significant when only a few post-treatment years are kept, but it stabilizes at around 20 after only 5 post-treatment years, which suggests that <code>\(\delta\)</code> is indeed homogenous—we don’t need a ton of post-treatment data to find it. For secondary schools, though, the effect remains negative and insigificant throughout every specification.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">fpe_primary_years_since <span style="color:#f92672">&lt;-</span> fpe_primary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(years_after <span style="color:#f92672">=</span> year <span style="color:#f92672">-</span> fpe_year)
+
+fpe_secondary_years_since <span style="color:#f92672">&lt;-</span> fpe_secondary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(years_after <span style="color:#f92672">=</span> year <span style="color:#f92672">-</span> fpe_year)
+
+different_years_after_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tibble</span>(post_trt_years <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#ae81ff">22</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Nest a filtered dataset in a cell for each year</span>
+  <span style="color:#a6e22e">mutate</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(post_trt_years, <span style="color:#f92672">~</span><span style="color:#a6e22e">filter</span>(fpe_primary_years_since, years_after <span style="color:#f92672">&lt;=</span> .))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Calculate the TWFE estimate for each dataset</span>
+  <span style="color:#a6e22e">mutate</span>(model <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(data, <span style="color:#f92672">~</span><span style="color:#a6e22e">lm_robust</span>(primary <span style="color:#f92672">~</span> treatment,
+                                      fixed_effects <span style="color:#f92672">=</span> <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> year,
+                                      data <span style="color:#f92672">=</span> .,
+                                      clusters <span style="color:#f92672">=</span> country, se_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;stata&#34;</span>))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Extract a data frame of the results</span>
+  <span style="color:#a6e22e">mutate</span>(tidied <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(model, <span style="color:#f92672">~</span><span style="color:#a6e22e">tidy</span>(., conf.int <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Calculate residuals and treatment weights</span>
+  <span style="color:#a6e22e">mutate</span>(model_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(data, <span style="color:#f92672">~</span><span style="color:#a6e22e">lm</span>(treatment <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> <span style="color:#a6e22e">factor</span>(year), data <span style="color:#f92672">=</span> .)),
+         treatment_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(model_resid, <span style="color:#f92672">~</span><span style="color:#a6e22e">residuals</span>(.)),
+         treatment_weight <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(treatment_resid, <span style="color:#f92672">~</span> . <span style="color:#f92672">/</span> <span style="color:#a6e22e">sum</span>(.^2)))
+
+<span style="color:#75715e"># Calculate how many treated observations have negative weights</span>
+prop_negative_primary <span style="color:#f92672">&lt;-</span> different_years_after_primary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">unnest</span>(<span style="color:#a6e22e">c</span>(data, treatment_resid, treatment_weight)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">group_by</span>(post_trt_years) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">summarize</span>(n_treated_negative_weight <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(treatment_weight <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>),
+            n_treated <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>),
+            prop_treated_negative_weight <span style="color:#f92672">=</span> n_treated_negative_weight <span style="color:#f92672">/</span> n_treated) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(prop_nice <span style="color:#f92672">=</span> <span style="color:#a6e22e">percent</span>(prop_treated_negative_weight, accuracy <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>))
+
+<span style="color:#75715e"># Extract tidied results for plotting</span>
+coefs_to_plot_primary <span style="color:#f92672">&lt;-</span> different_years_after_primary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">unnest</span>(tidied)
+
+different_years_after_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tibble</span>(post_trt_years <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#ae81ff">22</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(post_trt_years, <span style="color:#f92672">~</span><span style="color:#a6e22e">filter</span>(fpe_secondary_years_since, years_after <span style="color:#f92672">&lt;=</span> .))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(model <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(data, <span style="color:#f92672">~</span><span style="color:#a6e22e">lm_robust</span>(secondary <span style="color:#f92672">~</span> treatment,
+                                      fixed_effects <span style="color:#f92672">=</span> <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> year,
+                                      data <span style="color:#f92672">=</span> .,
+                                      clusters <span style="color:#f92672">=</span> country, se_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;stata&#34;</span>))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(tidied <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(model, <span style="color:#f92672">~</span><span style="color:#a6e22e">tidy</span>(., conf.int <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(model_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(data, <span style="color:#f92672">~</span><span style="color:#a6e22e">lm</span>(treatment <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> <span style="color:#a6e22e">factor</span>(year), data <span style="color:#f92672">=</span> .)),
+         treatment_resid <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(model_resid, <span style="color:#f92672">~</span><span style="color:#a6e22e">residuals</span>(.)),
+         treatment_weight <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(treatment_resid, <span style="color:#f92672">~</span> . <span style="color:#f92672">/</span> <span style="color:#a6e22e">sum</span>(.^2)))
+
+prop_negative_secondary <span style="color:#f92672">&lt;-</span> different_years_after_secondary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">unnest</span>(<span style="color:#a6e22e">c</span>(data, treatment_resid, treatment_weight)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">group_by</span>(post_trt_years) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">summarize</span>(n_treated_negative_weight <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(treatment_weight <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;</span> treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>),
+            n_treated <span style="color:#f92672">=</span> <span style="color:#a6e22e">sum</span>(treatment <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>),
+            prop_treated_negative_weight <span style="color:#f92672">=</span> n_treated_negative_weight <span style="color:#f92672">/</span> n_treated) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(prop_nice <span style="color:#f92672">=</span> <span style="color:#a6e22e">percent</span>(prop_treated_negative_weight, accuracy <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>))
+
+coefs_to_plot_secondary <span style="color:#f92672">&lt;-</span> different_years_after_secondary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">unnest</span>(tidied)
+
+<span style="color:#75715e"># Coefficient plot</span>
+ate_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(coefs_to_plot_primary, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> post_trt_years, y <span style="color:#f92672">=</span> estimate)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_hline</span>(yintercept <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF2E00&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_pointrange</span>(<span style="color:#a6e22e">aes</span>(ymin <span style="color:#f92672">=</span> conf.low, ymax <span style="color:#f92672">=</span> conf.high),
+                  color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#0599B0&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, fatten <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;TWFE-based treatment effect&#34;</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Primary school enrollment&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(axis.title.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        axis.text.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+ate_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(coefs_to_plot_secondary, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> post_trt_years, y <span style="color:#f92672">=</span> estimate)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_hline</span>(yintercept <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF2E00&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_pointrange</span>(<span style="color:#a6e22e">aes</span>(ymin <span style="color:#f92672">=</span> conf.low, ymax <span style="color:#f92672">=</span> conf.high),
+                  color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#0599B0&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, fatten <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;TWFE-based treatment effect&#34;</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Secondary school enrollment&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(axis.title.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        axis.text.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+<span style="color:#75715e"># Bar plot</span>
+prop_neg_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(<span style="color:#a6e22e">filter</span>(prop_negative_primary,
+                                  prop_treated_negative_weight <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>),
+                           <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> post_trt_years, y <span style="color:#f92672">=</span> prop_treated_negative_weight)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_col</span>(fill <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF4136&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_text</span>(<span style="color:#a6e22e">aes</span>(label <span style="color:#f92672">=</span> prop_nice),
+            nudge_y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.02</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>,
+            family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Barlow Semi Condensed Bold&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF4136&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(xlim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">22</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Post-treatment years included&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>,
+       subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;% of treated observations with negative weight&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        axis.text.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+prop_neg_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(<span style="color:#a6e22e">filter</span>(prop_negative_secondary,
+                                    prop_treated_negative_weight <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>),
+                             <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> post_trt_years, y <span style="color:#f92672">=</span> prop_treated_negative_weight)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_col</span>(fill <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF4136&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_text</span>(<span style="color:#a6e22e">aes</span>(label <span style="color:#f92672">=</span> prop_nice),
+            nudge_y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.02</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>,
+            family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Barlow Semi Condensed Bold&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF4136&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(xlim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">22</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Last year included in data&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>,
+       subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;% of treated observations with negative weight&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        axis.text.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+((ate_primary <span style="color:#f92672">/</span> prop_neg_primary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>))) <span style="color:#f92672">|</span>
+  ((ate_secondary <span style="color:#f92672">/</span> prop_neg_secondary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>)))
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-post-treatment-years-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<h3 id="exclude-individual-countries">Exclude individual countries</h3>
+<p>Finally, since early adopter countries are more likely to have negative treatment weights, we can remove individual countries from the panel to see what their omission does to the overall TWFE estimate. For primary school enrollment, the ATE remains positive and significant across most specifications, except when Malawi, Uganda, or Namibia are excluded. But Malawi and Uganda were early adopters and thus have negatively weighted treatment observations in later years, as we saw earlier, which give them strange leverage in the the overall TWFE ATE calculation. For secondary schools, the effect remains basically zero and insignificant across all specifications except when Malawi is omitted, but that’s again because Malawi was an early adopter.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">fpe_omit_countries_primary <span style="color:#f92672">&lt;-</span> fpe_primary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">arrange</span>(fpe_year, country) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(country_start <span style="color:#f92672">=</span> <span style="color:#a6e22e">paste0</span>(country, <span style="color:#e6db74">&#34; (&#34;</span>, fpe_year, <span style="color:#e6db74">&#34;)&#34;</span>),
+         country_start <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(country_start)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">distinct</span>(country, country_start) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(country, <span style="color:#f92672">~</span><span style="color:#a6e22e">filter</span>(fpe_primary, country <span style="color:#f92672">!=</span> .))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(model <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(data, <span style="color:#f92672">~</span><span style="color:#a6e22e">lm_robust</span>(primary <span style="color:#f92672">~</span> treatment,
+                                      fixed_effects <span style="color:#f92672">=</span> <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> year,
+                                      data <span style="color:#f92672">=</span> .,
+                                      clusters <span style="color:#f92672">=</span> country, se_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;stata&#34;</span>))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(tidied <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(model, <span style="color:#f92672">~</span><span style="color:#a6e22e">tidy</span>(., conf.int <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)))
+
+coefs_to_plot_primary <span style="color:#f92672">&lt;-</span> fpe_omit_countries_primary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">unnest</span>(tidied)
+
+fpe_omit_countries_secondary <span style="color:#f92672">&lt;-</span> fpe_secondary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">arrange</span>(fpe_year, country) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(country_start <span style="color:#f92672">=</span> <span style="color:#a6e22e">paste0</span>(country, <span style="color:#e6db74">&#34; (&#34;</span>, fpe_year, <span style="color:#e6db74">&#34;)&#34;</span>),
+         country_start <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(country_start)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">distinct</span>(country, country_start)  <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(country, <span style="color:#f92672">~</span><span style="color:#a6e22e">filter</span>(fpe_secondary, country <span style="color:#f92672">!=</span> .))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(model <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(data, <span style="color:#f92672">~</span><span style="color:#a6e22e">lm_robust</span>(secondary <span style="color:#f92672">~</span> treatment,
+                                      fixed_effects <span style="color:#f92672">=</span> <span style="color:#f92672">~</span> country <span style="color:#f92672">+</span> year,
+                                      data <span style="color:#f92672">=</span> .,
+                                      clusters <span style="color:#f92672">=</span> country, se_type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;stata&#34;</span>))) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(tidied <span style="color:#f92672">=</span> <span style="color:#a6e22e">map</span>(model, <span style="color:#f92672">~</span><span style="color:#a6e22e">tidy</span>(., conf.int <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)))
+
+coefs_to_plot_secondary <span style="color:#f92672">&lt;-</span> fpe_omit_countries_secondary <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">unnest</span>(tidied)
+
+ate_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(coefs_to_plot_primary, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> estimate, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_rev</span>(country_start))) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_vline</span>(xintercept <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF2E00&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_pointrange</span>(<span style="color:#a6e22e">aes</span>(xmin <span style="color:#f92672">=</span> conf.low, xmax <span style="color:#f92672">=</span> conf.high),
+                  color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#0599B0&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, fatten <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;TWFE-based treatment effect&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Primary school enrollment&#34;</span>,
+       subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Each point represents the ATE when omitting the specified country&#34;</span>,
+       caption <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Year that fees were eliminated is shown in parentheses&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(xlim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">-10</span>, <span style="color:#ae81ff">50</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+ate_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(coefs_to_plot_secondary, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> estimate, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_rev</span>(country_start))) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_vline</span>(xintercept <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#FF2E00&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_pointrange</span>(<span style="color:#a6e22e">aes</span>(xmin <span style="color:#f92672">=</span> conf.low, xmax <span style="color:#f92672">=</span> conf.high),
+                  color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#0599B0&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, fatten <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;TWFE-based treatment effect&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Secondary school enrollment&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(xlim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">-10</span>, <span style="color:#ae81ff">50</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+ate_primary <span style="color:#f92672">|</span> ate_secondary
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-drop-countries-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<h2 id="tldr-conclusion">tl;dr: Conclusion</h2>
+<p><em><strong>Phew.</strong></em> That was a ton of code, but coding my way through this paper and translating Jakiela’s diagnostics and robustness checks from math into R was incredibly helpful for me to start understanding all this new TWFE stuff.</p>
+<p>Here are the main tl;dr takeaways from her paper:</p>
+<ul>
+<li>We can think of OLS as a weighted sum of outcome values - these weights are typically negative for untreated observations and positive for treated observations</li>
+<li>In TWFE situations, these weights take country and year into account</li>
+<li>Because of mathy reasons, treated observations can actually get negative weights—especially countries that are early adopters, and country-year observations in later years</li>
+<li>We can see if these negative weights on treated observations are an issue by using a couple simple diagnostics: see how many and which treated observations have negative weights, and see if the treatment effect is homogenous across treated countries</li>
+<li>We can look at which treated observations have negative weights by making some plots and exploring the data</li>
+<li>We can check for the homogeniety of the treatment effect by running a regression that uses the residualized treatment and treatment status to
+explain the residualized outcome. If the slopes for treated and comparison observations are indistinguishable, we can safely assume treatment homogeneity.</li>
+<li>Finally, we can check how robust the TWFE estimate is to negative treatment weights and the assumption of homogeneity by dropping specific types of observations and checking the ATE across these modified datasets</li>
+</ul>
+<h2 id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-BakerLarckerWang:2021" class="csl-entry">
+<p>Baker, Andrew, David F. Larcker, and Charles C. Y. Wang. 2021. “How Much Should We Trust Staggered Difference-in-Differences Estimates?” Working paper 246. Rock Center for Corporate Governance at Stanford University. <a href="https://doi.org/10.2139/ssrn.3794018">https://doi.org/10.2139/ssrn.3794018</a>.</p>
+</div>
+<div id="ref-CallawaySantAnna:2020" class="csl-entry">
+<p>Callaway, Brantly, and Pedro H. C. Sant’Anna. 2020. “Difference-in-Differences with Multiple Time Periods.” <em>Journal of Econometrics</em>, December. <a href="https://doi.org/10.1016/j.jeconom.2020.12.001">https://doi.org/10.1016/j.jeconom.2020.12.001</a>.</p>
+</div>
+<div id="ref-de-ChaisemartindHaultfoeuille:2020" class="csl-entry">
+<p>de Chaisemartin, Clément, and Xavier d’Haultfoeuille. 2020. “Two-Way Fixed Effects Estimators with Heterogeneous Treatment Effects.” <em>American Economic Review</em> 110 (9): 2964–96. <a href="https://doi.org/10.1257/aer.20181169">https://doi.org/10.1257/aer.20181169</a>.</p>
+</div>
+<div id="ref-Goodman-Bacon:2021" class="csl-entry">
+<p>Goodman-Bacon, Andrew. 2021. “Difference-in-Differences with Variation in Treatment Timing.” <em>Journal of Econometrics</em>, June. <a href="https://doi.org/10.1016/j.jeconom.2021.03.014">https://doi.org/10.1016/j.jeconom.2021.03.014</a>.</p>
+</div>
+<div id="ref-Jakiela:2021" class="csl-entry">
+<p>Jakiela, Pamela. 2021. “Simple Diagnostics for Two-Way Fixed Effects,” March. <a href="https://arxiv.org/abs/2103.13229">https://arxiv.org/abs/2103.13229</a>.</p>
+</div>
+<div id="ref-SunAbraham:2020" class="csl-entry">
+<p>Sun, Liyang, and Sarah Abraham. 2020. “Estimating Dynamic Treatment Effects in Event Studies with Heterogeneous Treatment Effects.” <em>Journal of Econometrics</em>, December. <a href="https://doi.org/10.1016/j.jeconom.2020.09.006">https://doi.org/10.1016/j.jeconom.2020.09.006</a>.</p>
+</div>
+</div>
+
+    
+        <footer>
+            <div class="tags">
+    <i class="fas fa-tags" aria-hidden="true"></i>&ensp;
+    <a href="/blog/tags/r/">r</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/tidyverse/">tidyverse</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/regression/">regression</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/statistics/">statistics</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/data-visualization/">data visualization</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/econometrics/">econometrics</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/panel-data/">panel data</a></div>
+
+        </footer>
+
+        <div id="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                 
+                var disqus_shortname = 'andrewheisscom';
+                var disqus_title = document.title;
+                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2021\/08\/25\/twfe-diagnostics\/';
+
+                 
+                (function () {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+        </div>
+    </article>
+</section>
+
+  
+
+<script src="/js/math-code.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+<script>
+    MathJax = {
+        tex: {
+            inlineMath: [
+                ['$', '$'], ['\\(', '\\)']
+            ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        }
+    };
+</script>
+
+        </div> 
+    </div> 
+    
+    <div id="footer">
+        <footer>
+    <ul class="links">
+        <li>
+            <a href="mailto:aheiss@gsu.edu" aria-label="E-mail"   >
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/andrewheiss" aria-label="Twitter"   >
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/andrewheiss" aria-label="GitHub"   >
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/andrewheiss" aria-label="YouTube"   >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://stackoverflow.com/users/120898/andrew" aria-label="StackOverflow"   >
+                <i class="fab fa-stack-overflow" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.heissatopia.com" aria-label="Heissatopia (family blog)"   >
+                <i class="fab fa-blogger" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/andrewheiss" aria-label="Facebook"   >
+                <i class="fab fa-facebook" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/in/andrewheiss" aria-label="LinkedIn"   >
+                <i class="fab fa-linkedin" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+
+    <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
+
+    <p class="pgp">
+        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
+    </p>
+
+    <p class="copyright">
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+            title="Creative Commons Attribution-ShareAlike 4.0 International license"><i class="fab fa-creative-commons"></i>
+        <i class="fab fa-creative-commons-by" title="Attribution"></i>
+        <i class="fab fa-creative-commons-share" title="Share alike"></i></a>
+        <span class="cc-year">&bull; 2007&ndash;2021</span>
+    </p>
+
+    <p class="colophon"><a href="https://github.com/andrewheiss/ath-hugo">Code for site</a></p>
+</footer>
+
+    </div>
+
+</body>
+
+</html>

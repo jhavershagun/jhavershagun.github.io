@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+
+    <meta name="author" content="Andrew Heiss">
+    <meta name="description" content="A detailed, updated tutorial on how to install, use, and customize pdftk-php.php, which combines the power of pdftk and PHP, allowing you to serve dynamic PDF forms from the web.">
+    <meta name="keywords" content="html, pdftk, pdftk-php, php, sh, sql, text">
+    <meta name="generator" content="Hugo 0.88.1" />
+
+    <title>
+  Installing pdftk-php | Andrew Heiss
+</title>
+
+    <link rel="canonical" href="https://www.andrewheiss.com/blog/2009/07/29/installing-pdftk-php/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+
+    <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
+    <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png?v=1"/>
+    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:title" content="Installing pdftk-php"/>
+    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:description" content="A detailed, updated tutorial on how to install, use, and customize pdftk-php.php, which combines the power of pdftk and PHP, allowing you to serve dynamic PDF forms from the web."/>
+
+
+    <meta property="og:title" content="Installing pdftk-php" />
+<meta property="og:description" content="A detailed, updated tutorial on how to install, use, and customize pdftk-php.php, which combines the power of pdftk and PHP, allowing you to serve dynamic PDF forms from the web." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.andrewheiss.com/blog/2009/07/29/installing-pdftk-php/" />
+<meta property="og:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta property="article:published_time" content="2009-07-29T00:00:00+00:00" />
+<meta property="article:modified_time" content="2009-07-29T00:00:00+00:00" />
+
+<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:section" content="blog" />
+<meta property="article:tag" content="html" />
+<meta property="article:tag" content="pdftk" />
+<meta property="article:tag" content="pdftk-php" />
+<meta property="article:tag" content="php" />
+<meta property="article:tag" content="sh" />
+<meta property="article:tag" content="sql" />
+
+
+    <meta itemprop="name" content="Installing pdftk-php">
+<meta itemprop="description" content="A detailed, updated tutorial on how to install, use, and customize pdftk-php.php, which combines the power of pdftk and PHP, allowing you to serve dynamic PDF forms from the web."><meta itemprop="datePublished" content="2009-07-29T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2009-07-29T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1563"><meta itemprop="image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta itemprop="keywords" content="html,pdftk,pdftk-php,php,sh,sql,text," />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/pure-and-grids-responsive.min.css">
+    <link rel="stylesheet" href="/css/ath-hugo.min.c5619237d890aa972042ca0497d2594d6f3f34b1746c377f560f5096573fb6e3.css" integrity="sha256-xWGSN9iQqpcgQsoEl9JZTW8/NLF0bDd/Vg9Qllc/tuM=" crossorigin="anonymous" media="screen" />
+
+    <script src="https://kit.fontawesome.com/f9d343c40d.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=dLX2MbQJLG">
+    <link rel="manifest" href="/site.webmanifest?v=dLX2MbQJLG">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=dLX2MbQJLG" color="#cf4446">
+    <link rel="shortcut icon" href="/favicon.ico?v=dLX2MbQJLG">
+    <meta name="msapplication-TileColor" content="#170c3a">
+    <meta name="theme-color" content="#170c3a">
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-527449-5', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+
+    <div id="layout" class="pure-g">
+        <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
+            <header>
+                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
+                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+
+                <nav id="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cv/">CV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/research/">Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/teaching/">Teaching</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/talks/">Talks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/now/">Now</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uses/">Uses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+        </div> 
+    
+        <div id="content" class="pure-u-1 pure-u-md-3-4">
+        
+  <section>
+    <article class="content-single">
+        <header class="post-header">
+            <h1 class="post-title">Installing pdftk-php</h1>
+
+            <div class="post-meta pure-g">
+                <div class="pure-u-1-2">
+                    <span class="posted-on">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime='2009-07-29T00:00:00Z'>
+                            Wednesday, July 29, 2009
+                        </time>
+                    </span>
+                </div>
+                <div class="reading-time pure-u-1-2">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    8-minute read
+                </div>
+            </div>
+        </header>
+    
+        <p>Upon popular request, I&rsquo;ve decided to update the original tutorial for populating a LiveCycle PDF with PHP to apply to the new release of pdftk-php. The installation instructions should be mostly clear in the readme and in the inline comments in the example included with the script; this post is merely supplemental.</p>
+<h2 id="basic-usage">Basic usage</h2>
+<h3 id="initial-set-up">Initial set up</h3>
+<p><a href="http://github.com/andrewheiss/pdftk-php/tree/master" title="andrewheiss's pdftk-php at master - GitHub">Download the most recent version of pdftk-php from GitHub</a> and <a href="http://www.accesspdf.com/pdftk/" title="pdftk - the pdf toolkit">download and install pdftk</a> on your server.</p>
+<p>Unzip the download from GitHub and place the folder on your server. I&rsquo;ve placed mine in a folder called <code>pdftk-php</code>.</p>
+<p>Create a MySQL user and database and run the SQL found in <code>/example/database.sql</code> in a MySQL client (like phpMyAdmin) to create the sample database.</p>
+<p><img src="example_query_in_phpmyadmin.png" alt="Example Query in phpMyAdmin" title="Example query in phpMyAdmin"></p>
+<p>Modify the information in <code>example/_dbConfig.php</code> so that the application can connect to your database.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">$host <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;localhost&#34;</span>;
+$username <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;pdftk-user&#34;</span>;
+$password <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;supersecure&#34;</span>;
+$db_name <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;pdftk-php&#34;</span>;
+</code></pre></div><p>Browse to the example site (in my case, http://localhost/pdftk-php/example/index.php) and add some entries to populate the database a little.</p>
+<h3 id="set-up-the-script">Set up the script</h3>
+<p>Open <code>pdftk-php.php</code> and insert the full path to your working pdftk installation at the beginning part of the <code>passthru()</code> command near line 71. Here are some examples for different scenarios on server platforms:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#75715e">// On a typical Unix-based installation
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">passthru</span>(<span style="color:#e6db74">&#34;/usr/local/bin/pdftk ...&#34;</span>);
+
+<span style="color:#75715e">// On Windows, with an absolute path
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">passthru</span>(<span style="color:#e6db74">&#34;c:\pdftk\pdftk.exe ...&#34;</span>);
+
+<span style="color:#75715e">// On Windows, with a relative path (useful if you place pdftk.exe in the server folder structure)
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">passthru</span>(<span style="color:#e6db74">&#34;../pdftk.exe ...&#34;</span>);
+</code></pre></div><p>If you&rsquo;re on a Unix-based server and don&rsquo;t know where pdftk is, type one of the following commands, which should result in the absolute path to the program:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">which pdftk
+<span style="color:#75715e"># or</span>
+whereis pdftk
+</code></pre></div><p>In <code>example/download.php</code> verify that the path to the required <code>pdftk-php.php</code> is correct, near line 18. In the example, <code>pdftk-php.php</code> is located a directory below the example directory. If you like to store your included files elsewhere, make sure that you modify the <code>require()</code> path here.</p>
+<p><code>pdftk-php.php</code> needs to be able to write to a temporary directory on your server in order to create a temporary FDF file. This directory is specified near line 58, with the <code>tempnam()</code> function.</p>
+<p>If you are on a Windows server you should already be able to write to pretty much any directory (I think… I&rsquo;ve never worked with IIS permissions), so you should be good to go. If you are on a Unix-based server you&rsquo;ll need to be more explicit with directory permissions. To make things easier, create a temporary folder on your server and give it write permissions:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">cd pdftk-php
+mkdir tmp
+chmod <span style="color:#ae81ff">777</span> tmp
+</code></pre></div><p>Then set the path in <code>tempnam()</code> to the new temporary folder.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#75715e">// If at the same level as download.php
+</span><span style="color:#75715e"></span>$fdf_fn <span style="color:#f92672">=</span> <span style="color:#a6e22e">tempnam</span>(<span style="color:#e6db74">&#34;tmp&#34;</span>, <span style="color:#e6db74">&#34;fdf&#34;</span>);
+
+<span style="color:#75715e">// If one directory behind download.php
+</span><span style="color:#75715e"></span>$fdf_fn <span style="color:#f92672">=</span> <span style="color:#a6e22e">tempnam</span>(<span style="color:#e6db74">&#34;../tmp&#34;</span>, <span style="color:#e6db74">&#34;fdf&#34;</span>);
+
+<span style="color:#75715e">// You can also use an absolute path
+</span><span style="color:#75715e"></span>$fdf_fn <span style="color:#f92672">=</span> <span style="color:#a6e22e">tempnam</span>(<span style="color:#e6db74">&#34;/Library/WebServer/www/pdftk-php/tmp&#34;</span>, <span style="color:#e6db74">&#34;fdf&#34;</span>);
+</code></pre></div><h3 id="set-up-the-pdf">Set up the PDF</h3>
+<p>Create a fillable form in either Acrobat Professional or LiveCycle Designer, or use the included example PDF form. Give each field a unique and significant name so that you can work with the form more easily later on. You can modify field attributes by double clicking on the field using the Forms toolbar in Acrobat; in LiveCycle, use the Object panel.</p>
+<p><img src="acrobat_form_field_options.png" alt="Acrobat Form Field Options" title="Acrobat Form Field Options"></p>
+<p><img src="livecycle_form_field_options.png" alt="LiveCycle Form Field Options" title="LiveCycle Form Field Options"></p>
+<p>If you are using LiveCycle, you&rsquo;ll need to save the final PDF as a <strong>static</strong> form compatible with Acrobat 7. pdftk doesn&rsquo;t work with dynamic forms or PDFs from later versions of Acrobat.</p>
+<p><img src="livecycle_save_options.png" alt="LiveCycle Save Options" title="LiveCycle Save Options"></p>
+<h3 id="connect-pdf-to-script">Connect PDF to script</h3>
+<p><code>example/download.php</code> connects to your database, retrieves a row based on a passed GET variable, saves the data from the fetched row into variables, finally calling <code>pdftk-php.php</code>, which does the heavy lifting of creating an FDF file and injecting it into the PDF.</p>
+<p>Starting at around line 30 the script assigns the fetched values to variables. Each of those retrieved variables needs to be paired with a form field in your PDF (near line 39). In a basic Acrobat form this is simple:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">$fdf_data_strings<span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#39;firstname&#39;</span> <span style="color:#f92672">=&gt;</span> $pdf_firstname,  <span style="color:#e6db74">&#39;lastname&#39;</span> <span style="color:#f92672">=&gt;</span> $pdf_lastname, <span style="color:#e6db74">&#39;email&#39;</span> <span style="color:#f92672">=&gt;</span> $pdf_email);
+</code></pre></div><p>LiveCycle tends to complicate the form names slightly. You can use pdftk from the command line to retrieve the official form field names. Run this command from the directory containing your PDF file:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">pdftk form.pdf dump_data_fields &gt; form-fields.txt
+</code></pre></div><p>When you open the resultant <code>.txt</code> file you should see a report of all the fields</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">...
+---
+FieldType: Text
+FieldName: form1[0].#subform[0].firstname[0]
+FieldNameAlt: First name&amp;#9;
+FieldFlags: 0
+FieldJustification: Left
+---
+...
+</code></pre></div><p>Use those long, hairy <code>FieldName</code>s in the <code>$fdf_data_strings</code> array, like so:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">$fdf_data_strings<span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#39;form1[0].#subform[0].#area[0].FirstName[0]&#39;</span> <span style="color:#f92672">=&gt;</span> $pdf_firstname, <span style="color:#e6db74">&#39;form1[0].#subform[0].#area[0].LastName[0]&#39;</span> <span style="color:#f92672">=&gt;</span> $pdf_lastname, <span style="color:#e6db74">&#39;form1[0].#subform[0].#area[0].EMail[0]&#39;</span> <span style="color:#f92672">=&gt;</span> $pdf_email, );
+</code></pre></div><p>Finally, check the values of <code>$pdf_filename</code> and <code>$pdf_original</code> near lines 62 and 65.</p>
+<p>Go to http://localhost/pdftk-php/example/view.php and click on the download links for one of entries. You should be prompted to download a PDF file, dynamically generated using <code>pdftk-php.php</code>. Success!</p>
+<h2 id="advanced-customization">Advanced customization</h2>
+<h3 id="using-checkboxes-or-radio-buttons">Using checkboxes or radio buttons</h3>
+<p><code>$fdf_data_strings</code> works great for text fields, but can&rsquo;t handle radio buttons or check boxes. For that you&rsquo;ll need to use the <code>$fdf_data_names</code> array near line 49.</p>
+<p><em>NB: The logic for manipulating the form data in PHP and MySQL might be a little convoluted and could easily be optimized, but it works for clear demonstration purposes.</em></p>
+<p>To demonstrate this how to do this, we&rsquo;ll add a checkbox to our form and extend the database. Run this query in a MySQL client to add a couple columns to our table:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sql" data-lang="sql"><span style="color:#66d9ef">ALTER</span> <span style="color:#66d9ef">TABLE</span> <span style="color:#f92672">`</span>users<span style="color:#f92672">`</span> <span style="color:#66d9ef">ADD</span> <span style="color:#f92672">`</span>option1<span style="color:#f92672">`</span> TINYINT( <span style="color:#ae81ff">1</span> ) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span>, <span style="color:#66d9ef">ADD</span> <span style="color:#f92672">`</span>option2<span style="color:#f92672">`</span> TINYINT( <span style="color:#ae81ff">1</span> ) <span style="color:#66d9ef">NOT</span> <span style="color:#66d9ef">NULL</span> ;
+</code></pre></div><p>Open <code>/example/example.pdf</code> in Acrobat Professional and add two checkbox fields named <code>option1</code> and <code>option2</code>.</p>
+<p><img src="ridiculously_huge_checkboxes_better.png" alt="Huge Checkboxes" title="Ridiculously huge checkboxes"></p>
+<p>We need to modify our web form and the table that displays the data, just to make sure everything is getting saved to the database correctly.</p>
+<p>First, make a couple changes to <code>example/index.php</code> After the section near lines 104–107, add</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">p</span>&gt;
+    &lt;<span style="color:#f92672">label</span> <span style="color:#a6e22e">for</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;option1&#34;</span>&gt;Option 1&lt;/<span style="color:#f92672">label</span>&gt;
+    &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;checkbox&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;option1&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;1&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;option1&#34;</span> /&gt;
+&lt;/<span style="color:#f92672">p</span>&gt;
+&lt;<span style="color:#f92672">p</span>&gt;
+    &lt;<span style="color:#f92672">label</span> <span style="color:#a6e22e">for</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;option2&#34;</span>&gt;Option 2&lt;/<span style="color:#f92672">label</span>&gt;
+    &lt;<span style="color:#f92672">input</span> <span style="color:#a6e22e">type</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;checkbox&#34;</span> <span style="color:#a6e22e">name</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;option2&#34;</span> <span style="color:#a6e22e">value</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;1&#34;</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;option2&#34;</span> /&gt;
+&lt;/<span style="color:#f92672">p</span>&gt;
+</code></pre></div><p>Then, up near the top of <code>example/index.php</code> after line 34, add this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#66d9ef">if</span> ($_POST[<span style="color:#e6db74">&#39;option1&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) {
+    $option1 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+} <span style="color:#66d9ef">else</span> {
+    $option1 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+}
+
+<span style="color:#66d9ef">if</span> ($_POST[<span style="color:#e6db74">&#39;option2&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) {
+    $option2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+} <span style="color:#66d9ef">else</span> {
+    $option2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>This checks the value of the submitted checkboxes and sets the <code>$optionx</code> variables to either 1 or 0, which fit into the <code>TINYINT</code> columns in our table. You could use actual text as well and set the columns to <code>VARCHAR</code>.</p>
+<p>Change the SQL query from</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">$sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;INSERT INTO users (firstname, lastname, email) VALUES (&#39;</span><span style="color:#e6db74">$firstname</span><span style="color:#e6db74">&#39;, &#39;</span><span style="color:#e6db74">$lastname</span><span style="color:#e6db74">&#39;, &#39;</span><span style="color:#e6db74">$email</span><span style="color:#e6db74">&#39;)&#34;</span>;
+</code></pre></div><p>to</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php">$sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;INSERT INTO users (firstname, lastname, email, option1, option2) VALUES (&#39;</span><span style="color:#e6db74">$firstname</span><span style="color:#e6db74">&#39;, &#39;</span><span style="color:#e6db74">$lastname</span><span style="color:#e6db74">&#39;, &#39;</span><span style="color:#e6db74">$email</span><span style="color:#e6db74">&#39;, &#39;</span><span style="color:#e6db74">$option1</span><span style="color:#e6db74">&#39;, &#39;</span><span style="color:#e6db74">$option2</span><span style="color:#e6db74">&#39;)&#34;</span>;
+</code></pre></div><p>Go ahead and insert some dummy submissions with boxes checked and unchecked to make sure everything is working.</p>
+<p>Optionally we need to modify <code>example/view.php</code> to show the stored values. Add the following table header cells after line 29:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!-- Already here --&gt;</span>&lt;<span style="color:#f92672">th</span>&gt;E-mail Address&lt;/<span style="color:#f92672">th</span>&gt;
+   &lt;<span style="color:#f92672">th</span>&gt;Option 1&lt;/<span style="color:#f92672">th</span>&gt;
+   &lt;<span style="color:#f92672">th</span>&gt;Option 2&lt;/<span style="color:#f92672">th</span>&gt;
+<span style="color:#75715e">&lt;!-- Already here --&gt;</span>&lt;<span style="color:#f92672">th</span>&gt;Download PDF&lt;/<span style="color:#f92672">th</span>&gt;
+</code></pre></div><p>In the <code>while</code> loop a few lines later, add this code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#75715e">&lt;!-- Already here --&gt;</span>&lt;<span style="color:#f92672">td</span>&gt;<span style="color:#75715e">&lt;?php echo $user[&#34;lastname&#34;]; ?&gt;</span>&lt;/<span style="color:#f92672">td</span>&gt;
+&lt;<span style="color:#f92672">td</span>&gt;<span style="color:#75715e">&lt;?php echo ($user[&#39;option1&#39;] == 1) ? &#34;Yes&#34; : &#34;No&#34;; ?&gt;</span>&lt;/<span style="color:#f92672">td</span>&gt;
+&lt;<span style="color:#f92672">td</span>&gt;<span style="color:#75715e">&lt;?php echo ($user[&#39;option2&#39;] == 1) ? &#34;Yes&#34; : &#34;No&#34;; ?&gt;</span>&lt;/<span style="color:#f92672">td</span>&gt;
+<span style="color:#75715e">&lt;!-- Already here --&gt;</span>&lt;<span style="color:#f92672">td</span>&gt;<span style="color:#75715e">&lt;?php echo $user[&#34;email&#34;]; ?&gt;</span>&lt;/<span style="color:#f92672">td</span>&gt;
+</code></pre></div><p>This is just PHP ternary notation, which essentially says that if the value of <code>optionx</code> is equal to one, echo &ldquo;Yes,&rdquo; otherwise, echo &ldquo;No&rdquo;.</p>
+<p>Finally we need to modify <code>example/download.php</code> to handle our checkboxes. Like I said above, the <code>$fdf_data_names</code> variable handles checkbox and radio button data. In PDF forms, the two allowed values for checkboxes are &ldquo;Yes&rdquo; and &ldquo;Off&rdquo; (not really opposites, but oh well), so you&rsquo;ll need to set variables accordingly. Replace <code>$fdf_data_names = array();</code> near line 49, with this, which checks the values of <code>optionx</code> and sets <code>$pdf_optionx</code> to either &ldquo;Yes&rdquo; or &ldquo;Off&rdquo; and then defines the <code>$fdf_data_names</code> array appropriately:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-php" data-lang="php"><span style="color:#66d9ef">if</span> ($data[<span style="color:#e6db74">&#39;option1&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) {
+    $pdf_option1 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Yes&#34;</span>;
+} <span style="color:#66d9ef">else</span> {
+    $pdf_option1 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Off&#34;</span>;
+}
+
+<span style="color:#66d9ef">if</span> ($data[<span style="color:#e6db74">&#39;option2&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) {
+    $pdf_option2 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Yes&#34;</span>;
+} <span style="color:#66d9ef">else</span> {
+    $pdf_option2 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Off&#34;</span>;
+}
+
+$fdf_data_names <span style="color:#f92672">=</span> <span style="color:#66d9ef">array</span>(<span style="color:#e6db74">&#39;option1&#39;</span> <span style="color:#f92672">=&gt;</span> $pdf_option1, <span style="color:#e6db74">&#39;option2&#39;</span> <span style="color:#f92672">=&gt;</span> $pdf_option2);
+</code></pre></div><p>And that should do it! Visit http://localhost/pdftk-php/example/view.php and download one of the forms. The checkboxes should populate perfectly.</p>
+<h3 id="other-types-of-form-fields">Other types of form fields</h3>
+<p>Combo boxes and radio buttons act similarly to checkboxes. If you run the <code>dump_data_fields</code> command with pdftk again on a form with these more advanced options, you&rsquo;ll see a few differences in the results.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">FieldType: Text
+FieldName: email
+FieldFlags: 0
+FieldJustification: Left
+---
+FieldType: Button
+FieldName: option1
+FieldFlags: 0
+FieldValue: Yes
+FieldJustification: Left
+FieldStateOption: Off
+FieldStateOption: Yes
+---
+FieldType: Choice
+FieldName: favoriteColor
+FieldFlags: 131072
+FieldValue: blue
+FieldValueDefault: red
+FieldJustification: Left
+</code></pre></div><p>You can see the &ldquo;Yes&rdquo; vs. &ldquo;Off&rdquo; values in our checkbox (called &ldquo;Button&rdquo; in PDF lingo). Drop down lists (&ldquo;Choice&rdquo; in PDF-speak) have multiple values, specified by you when you create the field.</p>
+<p><img src="combo_box_properties.png" alt="Combo box properties" title="Sample combo box properties in Acrobat"></p>
+<p>Radio buttons are hybrids. They are considered &ldquo;Buttons,&rdquo; like checkboxes, but can have custom values, like drop down lists.</p>
+<p>Your final PHP script will need to take these different values into account and assign the correct values in the <code>$fdf_data_names</code> array.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>You can do a ton with the <code>pdftk-php.php</code> class once you get it set up initially and get past the slight learning curve. If you have any questions, feel free to ask in the comments. If you find any problems, comment here or <a href="http://github.com/andrewheiss/pdftk-php/issues" title="Issues - andrewheiss/pdftk-php - GitHub">open an issue at the GitHub project page</a>. Additionally, you can <a href="http://github.com/andrewheiss/pdftk-php/tree/master" title="andrewheiss's pdftk-php at master - GitHub">fork the project</a> and contribute.</p>
+<p>Good luck!</p>
+
+    
+        <footer>
+            <div class="tags">
+    <i class="fas fa-tags" aria-hidden="true"></i>&ensp;
+    <a href="/blog/tags/html/">html</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/pdftk/">pdftk</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/pdftk-php/">pdftk-php</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/php/">php</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/sh/">sh</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/sql/">sql</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/text/">text</a></div>
+
+        </footer>
+
+        <div id="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                 
+                var disqus_shortname = 'andrewheisscom';
+                var disqus_title = document.title;
+                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2009\/07\/29\/installing-pdftk-php\/';
+
+                 
+                (function () {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+        </div>
+    </article>
+</section>
+
+  
+
+        </div> 
+    </div> 
+    
+    <div id="footer">
+        <footer>
+    <ul class="links">
+        <li>
+            <a href="mailto:aheiss@gsu.edu" aria-label="E-mail"   >
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/andrewheiss" aria-label="Twitter"   >
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/andrewheiss" aria-label="GitHub"   >
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/andrewheiss" aria-label="YouTube"   >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://stackoverflow.com/users/120898/andrew" aria-label="StackOverflow"   >
+                <i class="fab fa-stack-overflow" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.heissatopia.com" aria-label="Heissatopia (family blog)"   >
+                <i class="fab fa-blogger" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/andrewheiss" aria-label="Facebook"   >
+                <i class="fab fa-facebook" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/in/andrewheiss" aria-label="LinkedIn"   >
+                <i class="fab fa-linkedin" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+
+    <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
+
+    <p class="pgp">
+        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
+    </p>
+
+    <p class="copyright">
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+            title="Creative Commons Attribution-ShareAlike 4.0 International license"><i class="fab fa-creative-commons"></i>
+        <i class="fab fa-creative-commons-by" title="Attribution"></i>
+        <i class="fab fa-creative-commons-share" title="Share alike"></i></a>
+        <span class="cc-year">&bull; 2007&ndash;2021</span>
+    </p>
+
+    <p class="colophon"><a href="https://github.com/andrewheiss/ath-hugo">Code for site</a></p>
+</footer>
+
+    </div>
+
+</body>
+
+</html>

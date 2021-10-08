@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+
+    <meta name="author" content="Andrew Heiss">
+    <meta name="description" content="Use R to correctly close backdoor confounding in panel data with marginal structural models and inverse probability weights with both GEE and multilevel models">
+    <meta name="keywords" content="r, tidyverse, regression, statistics, data visualization">
+    <meta name="generator" content="Hugo 0.88.1" />
+
+    <title>
+  Exploring R² and regression variance with Euler/Venn diagrams | Andrew Heiss
+</title>
+
+    <link rel="canonical" href="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+
+    <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
+    <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/nice-plot-1.png"/>
+    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:title" content="Exploring R² and regression variance with Euler/Venn diagrams"/>
+    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:description" content="Use R to correctly close backdoor confounding in panel data with marginal structural models and inverse probability weights with both GEE and multilevel models"/>
+
+
+    <meta property="og:title" content="Exploring R² and regression variance with Euler/Venn diagrams" />
+<meta property="og:description" content="Use R to correctly close backdoor confounding in panel data with marginal structural models and inverse probability weights with both GEE and multilevel models" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/" />
+<meta property="og:image" content="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/nice-plot-1.png" />
+<meta property="article:published_time" content="2021-08-21T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-08-21T00:00:00+00:00" />
+
+<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:section" content="blog" />
+<meta property="article:tag" content="r" />
+<meta property="article:tag" content="tidyverse" />
+<meta property="article:tag" content="regression" />
+<meta property="article:tag" content="statistics" />
+<meta property="article:tag" content="data visualization" />
+
+
+    <meta itemprop="name" content="Exploring R² and regression variance with Euler/Venn diagrams">
+<meta itemprop="description" content="Use R to correctly close backdoor confounding in panel data with marginal structural models and inverse probability weights with both GEE and multilevel models"><meta itemprop="datePublished" content="2021-08-21T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2021-08-21T00:00:00+00:00" />
+<meta itemprop="wordCount" content="4030"><meta itemprop="image" content="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/nice-plot-1.png">
+<meta itemprop="keywords" content="r,tidyverse,regression,statistics,data visualization," />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/pure-and-grids-responsive.min.css">
+    <link rel="stylesheet" href="/css/ath-hugo.min.c5619237d890aa972042ca0497d2594d6f3f34b1746c377f560f5096573fb6e3.css" integrity="sha256-xWGSN9iQqpcgQsoEl9JZTW8/NLF0bDd/Vg9Qllc/tuM=" crossorigin="anonymous" media="screen" />
+
+    <script src="https://kit.fontawesome.com/f9d343c40d.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=dLX2MbQJLG">
+    <link rel="manifest" href="/site.webmanifest?v=dLX2MbQJLG">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=dLX2MbQJLG" color="#cf4446">
+    <link rel="shortcut icon" href="/favicon.ico?v=dLX2MbQJLG">
+    <meta name="msapplication-TileColor" content="#170c3a">
+    <meta name="theme-color" content="#170c3a">
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-527449-5', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+
+    <div id="layout" class="pure-g">
+        <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
+            <header>
+                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
+                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+
+                <nav id="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cv/">CV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/research/">Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/teaching/">Teaching</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/talks/">Talks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/now/">Now</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uses/">Uses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+        </div> 
+    
+        <div id="content" class="pure-u-1 pure-u-md-3-4">
+        
+  <section>
+    <article class="content-single">
+        <header class="post-header">
+            <h1 class="post-title">Exploring R² and regression variance with Euler/Venn diagrams</h1>
+
+            <div class="post-meta pure-g">
+                <div class="pure-u-1-2">
+                    <span class="posted-on">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime='2021-08-21T00:00:00Z'>
+                            Saturday, August 21, 2021
+                        </time>
+                    </span>
+                </div>
+                <div class="reading-time pure-u-1-2">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    19-minute read
+                </div>
+            </div>
+        </header>
+    
+        <h2 id="contents----omit-in-toc---">Contents <!-- omit in toc --></h2>
+<ul>
+<li><a href="#regression-as-overlapping-circles">Regression as overlapping circles</a>
+<ul>
+<li><a href="#relationship-between-two-variables">Relationship between two variables</a></li>
+<li><a href="#relationship-between-three-variables">Relationship between three variables</a></li>
+<li><a href="#nicer-plot">Nicer plot</a></li>
+<li><a href="#multicollinearity">Multicollinearity</a></li>
+</ul>
+</li>
+<li><a href="#why-this-matters">Why this matters</a></li>
+<li><a href="#caveats">Caveats</a></li>
+<li><a href="#references">References</a></li>
+</ul>
+<hr>
+<p>Regression is the core of my <a href="https://statsf18.classes.andrewheiss.com/">statistics</a> and <a href="https://evalf21.classes.andrewheiss.com/">program evaluation/causal inference</a> courses. As I’ve taught different stats classes, I’ve found that one of the regression diagnostic statistics that students really glom onto is <code>\(R^2\)</code>. Unlike lots of regression diagnostics like AIC, BIC, and the joint F-statistic, <code>\(R^2\)</code> has a really intuitive interpretation—it’s the percent of variation in the outcome variable explained by all the explanatory variables. For instance, let’s explain global life expectancy using GDP per capita, based on data from <a href="https://www.gapminder.org/">the Gapminder project</a>. Here’s the basic model:</p>
+<p>$$
+\widehat{\text{Life expectancy}} = \beta_0 + \beta_1 \text{GDP per capita} + \epsilon
+$$</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(tidyverse)     <span style="color:#75715e"># For ggplot, dplyr, and friends</span>
+<span style="color:#a6e22e">library</span>(broom)         <span style="color:#75715e"># For converting models into data frames</span>
+<span style="color:#a6e22e">library</span>(gapminder)     <span style="color:#75715e"># For health and wealth data</span>
+<span style="color:#a6e22e">library</span>(faux)          <span style="color:#75715e"># For generating fake data</span>
+<span style="color:#a6e22e">library</span>(eulerr)        <span style="color:#75715e"># For creating Euler and Venn diagrams</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Just look at 2007</span>
+gapminder_2007 <span style="color:#f92672">&lt;-</span> gapminder <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(year <span style="color:#f92672">==</span> <span style="color:#ae81ff">2007</span>)
+
+super_naive_model <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(lifeExp <span style="color:#f92672">~</span> gdpPercap, data <span style="color:#f92672">=</span> gapminder_2007)
+<span style="color:#a6e22e">tidy</span>(super_naive_model)
+<span style="color:#75715e">## # A tibble: 2 x 5</span>
+<span style="color:#75715e">##   term         estimate std.error statistic   p.value</span>
+<span style="color:#75715e">##   &lt;chr&gt;           &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1 (Intercept) 59.6      1.01           59.0 9.89e-101</span>
+<span style="color:#75715e">## 2 gdpPercap    0.000637 0.0000583      10.9 1.69e- 20</span>
+<span style="color:#a6e22e">glance</span>(super_naive_model)
+<span style="color:#75715e">## # A tibble: 1 x 12</span>
+<span style="color:#75715e">##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC deviance</span>
+<span style="color:#75715e">##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1     0.461         0.457  8.90      120. 1.69e-20     1  -511. 1028. 1037.   11086.</span>
+<span style="color:#75715e">## # … with 2 more variables: df.residual &lt;int&gt;, nobs &lt;int&gt;</span>
+</code></pre></div><p>This is an awful model on theoretical grounds, but whatever. A $1 increase in GDP per capita is associated with a 0.001 year increase in life expectancy, on average. Look at all those diagnostics though—AIC? BIC? LogLik? Those are important, but definitely not intuitive. The <code>\(R^2\)</code> value, on the other hand, is nice and interpretable. GDP per capita explains 46.1% of the variation in life expectancy. That’s soundbite-worthy. Students love it.</p>
+<p>People also love to critique models based on it. In my program evaluation class, a model in one of my problem sets has an <code>\(R^2\)</code> of 0.02, and without fail, a majority of students dismiss it because of its low explanatory power. It only explains 2% of the variation in the outcome! It must be junk!</p>
+<p>But low <code>\(R^2\)</code>s aren’t necessarily bad. And while saying that a model explains X% of the variation in an outcome, what does that even mean in practice?</p>
+<p>So how the heck does <code>\(R^2\)</code> work anyway? I’ve struggled teaching this, but recently a friend mentioned that she teaches students to imagine <code>\(R^2\)</code> as a combination of overlapping circles, or a type of Venn diagram. I’d never heard of this approach before, so I went down a really interesting rabbit hole to discover that this approach has actually been used for decades! Let’s go down that rabbit hole together!</p>
+<h2 id="regression-as-overlapping-circles">Regression as overlapping circles</h2>
+<p>The earliest example I found is <a href="#ref-CohenCohen:1975">Cohen and Cohen</a> (<a href="#ref-CohenCohen:1975">1975</a>), who proposed visualizing the shared variance between 2–3 variables as a “ballantine” graph (apparently named after <a href="https://en.wikipedia.org/wiki/P._Ballantine_and_Sons_Brewing_Company">an ale logo</a>?), or what we call nowadays a Venn or Euler diagram. Others refined their approach, like <a href="#ref-Hunt:1986">Hunt</a> (<a href="#ref-Hunt:1986">1986</a>) who provides all sorts of fancy geometric equations to make them accurate (and provides some neat vintage Pascal code in the appendix!), and <a href="#ref-Ip:2001">Ip</a> (<a href="#ref-Ip:2001">2001</a>), who shows a bunch of different examples and highlights some of the limitations of using this approach.</p>
+<p>For this ongoing example, we’ll simulate some correlated data using <a href="https://debruine.github.io/faux/">the <strong>faux</strong> package</a>. We could use real data, but as you’ll see, these diagrams are pretty finicky and fragile and generally need very tame data to work. Here we’ll create data with three variables that are normally distributed with these parameters:</p>
+<ul>
+<li><code>Y</code>: mean = 10, sd = 2</li>
+<li><code>X1</code>: mean = 9, sd = 1.7</li>
+<li><code>X2</code>: mean = 9, sd = 1.3</li>
+</ul>
+<p>We’ll make <code>Y</code> and <code>X1</code> be correlated at r = 0.5, <code>Y</code> and <code>X2</code> correlated at r = 0.3, and <code>X1</code> and <code>X2</code> correlated at r = 0.4:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">set.seed</span>(<span style="color:#ae81ff">1234</span>)
+df <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">rnorm_multi</span>(n <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>,
+                  mu <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">9</span>),
+                  sd <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1.7</span>, <span style="color:#ae81ff">1.3</span>),
+                  r <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">0.3</span>, <span style="color:#ae81ff">0.4</span>),
+                  varnames <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y&#34;</span>, <span style="color:#e6db74">&#34;X1&#34;</span>, <span style="color:#e6db74">&#34;X2&#34;</span>),
+                  empirical <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)
+
+<span style="color:#75715e"># Look at the first few rows</span>
+<span style="color:#a6e22e">head</span>(df)
+<span style="color:#75715e">##       Y    X1    X2</span>
+<span style="color:#75715e">## 1  8.22  6.73  8.38</span>
+<span style="color:#75715e">## 2 10.17  9.36 10.12</span>
+<span style="color:#75715e">## 3 12.03 10.32  9.86</span>
+<span style="color:#75715e">## 4  5.41  5.80  8.38</span>
+<span style="color:#75715e">## 5 10.10 10.08 10.09</span>
+<span style="color:#75715e">## 6 11.13  9.11  9.94</span>
+
+<span style="color:#75715e"># Check if the correlations worked</span>
+<span style="color:#a6e22e">cor</span>(df)
+<span style="color:#75715e">##        Y    X1    X2</span>
+<span style="color:#75715e">## Y  1.000 0.453 0.373</span>
+<span style="color:#75715e">## X1 0.453 1.000 0.468</span>
+<span style="color:#75715e">## X2 0.373 0.468 1.000</span>
+<span style="color:#75715e"># Close enough!</span>
+</code></pre></div><p>In these regression diagrams, each variable is shown as a circle sized according to its variance, or:</p>
+<p>$$
+\operatorname{var} = \sigma^2 = \frac{\sum (\color{gray}{\overbrace{\color{black}{x_i}}^{\substack{\text{Single} \ \text{value}}}} - \color{gray}{\overbrace{\color{black}{\bar{x}}}^{\substack{\text{Mean of} \ \text{all values}}}\color{black}{)^2}}}{\color{gray}{\underbrace{\color{black}{n}}_{\substack{\text{Sample} \ \text{size}}}}-1}
+$$</p>
+<p>According to <a href="#ref-Ip:2001">Ip</a> (<a href="#ref-Ip:2001">2001</a>), you can also size the circles based on just the numerator of that equation, or the sum-of-squares, which is the same value proportionally number (it’s just not divided by <code>\(n-1\)</code>). It’s also easier to work with when plotting, so that’s what we’ll use throughout this example.</p>
+<p>$$
+\color{gray}{\overbrace{\color{black}{{\scriptstyle\sum} (x_i - \bar{x})^2}}^{\text{Sum of squares}}}
+$$</p>
+<p>We can even make a little function to calculate the sum of squares for us:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Sum of squares, or the numerator of the variance equation</span>
+ss <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(x) {
+  <span style="color:#a6e22e">sum</span>((x <span style="color:#f92672">-</span> <span style="color:#a6e22e">mean</span>(x))^2)
+}
+</code></pre></div><p>Enough math, though—let’s make some plots! We’ll use <a href="https://cran.r-project.org/web/packages/eulerr/vignettes/introduction.html">the <strong>eulerr</strong> package</a> for this, since (1) it calculates proportional overlaps between circles (that’s the key technical difference between Venn and Euler diagram—Venn diagrams are supposed to have equally sized overlapping areas), and (2) it uses grid graphics, so it fits nicely in the ggplot ecosystem.</p>
+<h3 id="relationship-between-two-variables">Relationship between two variables</h3>
+<p>First let’s just look at the relationship between <code>Y</code> and <code>X1</code>. We’ll use the sum of squares to calculate the size for each circle:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">ss_y <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ss</span>(df<span style="color:#f92672">$</span>Y)
+ss_x1 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ss</span>(df<span style="color:#f92672">$</span>X1)
+
+<span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y&#34;</span> <span style="color:#f92672">=</span> ss_y,
+             <span style="color:#e6db74">&#34;X1&#34;</span> <span style="color:#f92672">=</span> ss_x1)),
+     quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/unrelated-vars-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>Just looking at this plot, we can see that <code>Y</code> has more variation than <code>X1</code>. Neat.</p>
+<p>These two variables are related to each other though and have some covariance. We can calculate the shared covariance using <a href="https://en.wikipedia.org/wiki/Analysis_of_variance">ANOVA</a>. Ordinarily you need to feed R’s <code>anova()</code> function an <code>lm()</code> object to calculate different variance statistics (e.g. <code>anova(lm(Y ~ X1, data = df))</code>), but to save some typing, you can also use the <code>aov()</code> function to skip the intermediate <code>lm()</code> step. The nice thing about using the sum of squares values for these diagrams rather than variance values is that <code>aov()</code> reports its results as sums of squares, so we can use those results directly.</p>
+<p>Let’s see how much of the variation between <code>Y</code> and <code>X1</code> is shared:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">aov</span>(Y <span style="color:#f92672">~</span> X1, data <span style="color:#f92672">=</span> df)
+<span style="color:#75715e">## Call:</span>
+<span style="color:#75715e">##    aov(formula = Y ~ X1, data = df)</span>
+<span style="color:#75715e">## </span>
+<span style="color:#75715e">## Terms:</span>
+<span style="color:#75715e">##                  X1 Residuals</span>
+<span style="color:#75715e">## Sum of Squares   82       318</span>
+<span style="color:#75715e">## Deg. of Freedom   1        98</span>
+<span style="color:#75715e">## </span>
+<span style="color:#75715e">## Residual standard error: 1.8</span>
+<span style="color:#75715e">## Estimated effects may be unbalanced</span>
+</code></pre></div><p>If we look at the sum of squares row, we can see that 81.98 sum-of-squares units (whatever those mean) are shared between the two variables, with 317.87 not shared (or residual). To plot this overlap, we need to do a little bit of set theory math. We can’t just tell <code>Y</code> to be 399 units big—we need to subtract the shared space from both <code>Y</code> and <code>X1</code>. We’ll extract the sum of squares value from <code>aov()</code> (using <code>broom::tidy()</code> to make this easier):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">ss_both_y_x1 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">aov</span>(Y <span style="color:#f92672">~</span> X1, data <span style="color:#f92672">=</span> df) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">tidy</span>() <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(term <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;X1&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">pull</span>(sumsq)
+ss_both_y_x1
+<span style="color:#75715e">## [1] 82</span>
+
+<span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y&#34;</span> <span style="color:#f92672">=</span> ss_y <span style="color:#f92672">-</span> ss_both_y_x1,
+             <span style="color:#e6db74">&#34;X1&#34;</span> <span style="color:#f92672">=</span> ss_x1 <span style="color:#f92672">-</span> ss_both_y_x1,
+             <span style="color:#e6db74">&#34;Y&amp;X1&#34;</span> <span style="color:#f92672">=</span> ss_both_y_x1)),
+     quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-basic-overlap-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>Now we can visualize the covariance between these two variables! Let’s get rid of the raw numbers and add some letters for the different segments:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y&#34;</span> <span style="color:#f92672">=</span> ss_y <span style="color:#f92672">-</span> ss_both_y_x1,
+             <span style="color:#e6db74">&#34;X1&#34;</span> <span style="color:#f92672">=</span> ss_x1 <span style="color:#f92672">-</span> ss_both_y_x1,
+             <span style="color:#e6db74">&#34;Y&amp;X1&#34;</span> <span style="color:#f92672">=</span> ss_both_y_x1)),
+     quantities <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;A&#34;</span>, <span style="color:#e6db74">&#34;B&#34;</span>, <span style="color:#e6db74">&#34;C&#34;</span>))
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-basic-overlap-labels-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>Area C here represents the amount of variation in <code>Y</code> explained by <code>X1</code>, while Area A represents the unexplained portion of <code>Y</code>. In regression language, A is basically the error term:</p>
+<p>$$
+\hat{Y} = \beta_0 + \beta_1 X_1 + \color{gray}{\overbrace{\epsilon}^{\color{black}{\text{A}}}}
+$$</p>
+<p>The great thing about visualizing this is that C also represents the <code>\(R^2\)</code>! In general, <code>\(R^2\)</code> is the ratio between explained and total variance:</p>
+<p>$$
+R^2 = \frac{\text{Explained variance in }Y}{\text{Total variance in }Y}
+$$</p>
+<p>Based on this diagram, we can write this as:</p>
+<p>$$
+R^2 = \frac{C}{A + C}
+$$</p>
+<p>Using actual numbers, we get</p>
+<p>$$
+R^2 = \frac{81.98}{317.87 + 81.98} = 0.205
+$$</p>
+<p>We can do this more precisely with code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">part_a <span style="color:#f92672">&lt;-</span> ss_y <span style="color:#f92672">-</span> ss_both_y_x1
+part_c <span style="color:#f92672">&lt;-</span> ss_both_y_x1
+
+part_c <span style="color:#f92672">/</span> (part_a <span style="color:#f92672">+</span> part_c)
+<span style="color:#75715e">## [1] 0.205</span>
+</code></pre></div><p>According to this, <code>X1</code> explains 20.5% of the variation in <code>Y</code>. That’s apparent visually—the overlapping space covers about 20% of the total <code>Y</code> circle.</p>
+<p>Let’s run a regression model and check the <code>\(R^2\)</code> value to see if it’s the same:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">lm</span>(Y <span style="color:#f92672">~</span> X1, data <span style="color:#f92672">=</span> df) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">glance</span>() <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">pull</span>(r.squared)
+<span style="color:#75715e">## [1] 0.205</span>
+</code></pre></div><p>Incredible!! It’s the same! That’s so cool.</p>
+<h3 id="relationship-between-three-variables">Relationship between three variables</h3>
+<p>Where this gets even more useful is when we look at the overlapping space between three different variables. It’s also a little more complicated, since we need to calculate a bunch of different shared variances and do some set theory calculations to find the exact size of these different slivers of the diagram. Here’s a general diagram of what we’ll be calculating (this is unrelated to the data we’ve been working with and doesn’t use any actual numbers—it’s just a reference so we can find which shared variances we need to calculate):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,
+             <span style="color:#e6db74">&#34;X1&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,
+             <span style="color:#e6db74">&#34;X2&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,
+             <span style="color:#e6db74">&#34;X1&amp;Y&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
+             <span style="color:#e6db74">&#34;X2&amp;Y&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
+             <span style="color:#e6db74">&#34;X1&amp;X2&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
+             <span style="color:#e6db74">&#34;Y&amp;X1&amp;X2&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>)),
+     quantities <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#66d9ef">LETTERS</span>[1<span style="color:#f92672">:</span><span style="color:#ae81ff">7</span>]))
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-generic-3-rings-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>This looks complicated, but the same principles apply. The entire circles for <code>Y</code>, <code>X1</code>, and <code>X2</code> represent each variable’s total variance. Overlapping areas represent shared variance. For instance, the combination of D and G here (or <code>\(A \cap B\)</code>) is the covariance that we calculated previously. The <code>\(R^2\)</code> is still here too—the total explained variance in <code>Y</code> is the combination of D, E, and G, while A is the residual unexplained variance. That means we can calculate <code>\(R^2\)</code> like this:</p>
+<p>$$
+\frac{D + E + G}{A + D + E + G}
+$$</p>
+<p>This visualization also helps with the intuition of <code>\(R^2\)</code>. Generally when you add additional variables to a regression model, the <code>\(R^2\)</code> increases. That’s because you’re adding another circle to the diagram and absorbing more of the variation in the outcome. For instance, even though the numbers in this diagram aren’t to scale at all, you can see that (D + G) (the <code>\(R^2\)</code> that we calculated in the two-variable diagram) is smaller than (D + E + G). There’s more explained variance here.</p>
+<p>To calculate the actual values for each of these segments, we’ll use <code>aov()</code> again to find the shared variance. This will involve a lot of different calculations and some algebra to isolate each segment. This table will help us keep everything straight:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Segment</th>
+<th style="text-align:left">Explanation</th>
+<th style="text-align:left">Code or algebra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">A + D + E + G</td>
+<td style="text-align:left">Total variation in <code>Y</code></td>
+<td style="text-align:left"><code>ss(df$Y)</code> or <code>aov(Y ~ 1)</code></td>
+</tr>
+<tr>
+<td style="text-align:left">B + D + F + G</td>
+<td style="text-align:left">Total variation in <code>X1</code></td>
+<td style="text-align:left"><code>ss(df$X1)</code> or <code>aov(X1 ~ 1)</code></td>
+</tr>
+<tr>
+<td style="text-align:left">C + E + F + G</td>
+<td style="text-align:left">Total variation in <code>X2</code></td>
+<td style="text-align:left"><code>ss(df$X2)</code> or <code>aov(X2 ~ 1)</code></td>
+</tr>
+<tr>
+<td style="text-align:left">A</td>
+<td style="text-align:left">Unexplained variation in <code>Y</code> after accounting for <code>X1</code> and <code>X2</code></td>
+<td style="text-align:left">Residuals from <code>aov(Y ~ X2 + X1)</code></td>
+</tr>
+<tr>
+<td style="text-align:left">B</td>
+<td style="text-align:left">Unexplained variation in <code>X1</code> after accounting for <code>Y</code> and <code>X2</code></td>
+<td style="text-align:left">Residuals from <code>aov(X1 ~ Y + X2)</code></td>
+</tr>
+<tr>
+<td style="text-align:left">C</td>
+<td style="text-align:left">Unexplained variation in <code>X2</code> after accounting for <code>Y</code> and <code>X1</code></td>
+<td style="text-align:left">Residuals from <code>aov(X2 ~ Y + X1)</code></td>
+</tr>
+<tr>
+<td style="text-align:left">D + G</td>
+<td style="text-align:left">Variance shared by <code>Y</code> and <code>X1</code></td>
+<td style="text-align:left"><code>X1</code> in <code>aov(Y ~ X1)</code></td>
+</tr>
+<tr>
+<td style="text-align:left">E + G</td>
+<td style="text-align:left">Variance shared by <code>Y</code> and <code>X2</code></td>
+<td style="text-align:left"><code>X2</code> in <code>aov(Y ~ X2)</code></td>
+</tr>
+<tr>
+<td style="text-align:left">D + G</td>
+<td style="text-align:left">Variance shared by <code>X1</code> and <code>X2</code></td>
+<td style="text-align:left"><code>X2</code> in <code>aov(X1 ~ X2)</code></td>
+</tr>
+<tr>
+<td style="text-align:left">D</td>
+<td style="text-align:left">Variance <em>only</em> between <code>Y</code> and <code>X1</code>, without influence from <code>X2</code></td>
+<td style="text-align:left">(A + D + E + G) − A − (E + G)</td>
+</tr>
+<tr>
+<td style="text-align:left">E</td>
+<td style="text-align:left">Variance <em>only</em> between <code>Y</code> and <code>X2</code>, without influence from <code>X1</code></td>
+<td style="text-align:left">(C + E + F + G) − C − (F + G)</td>
+</tr>
+<tr>
+<td style="text-align:left">F</td>
+<td style="text-align:left">Variance <em>only</em> between <code>X1</code> and <code>X2</code>, without influence from <code>Y</code></td>
+<td style="text-align:left">(B + D + F + G) − B − (D + G)</td>
+</tr>
+<tr>
+<td style="text-align:left">G</td>
+<td style="text-align:left">Variance shared by <code>Y</code>, <code>X1</code>, and <code>X2</code></td>
+<td style="text-align:left">(D + G) − D</td>
+</tr>
+</tbody>
+</table>
+<p>PHEW. That’s <em>a lot</em>. Here’s all the code for it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">y_total <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ss</span>(df<span style="color:#f92672">$</span>Y)    <span style="color:#75715e"># A + D + E + G</span>
+x1_total <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ss</span>(df<span style="color:#f92672">$</span>X1)  <span style="color:#75715e"># B + D + F + G</span>
+x2_total <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ss</span>(df<span style="color:#f92672">$</span>X2)  <span style="color:#75715e"># C + E + F + G</span>
+
+<span style="color:#75715e"># A</span>
+y_alone <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">aov</span>(Y <span style="color:#f92672">~</span> X2 <span style="color:#f92672">+</span> X1, data <span style="color:#f92672">=</span> df) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">tidy</span>() <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(term <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Residuals&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">pull</span>(sumsq)
+
+<span style="color:#75715e"># B</span>
+x1_alone <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">aov</span>(X1 <span style="color:#f92672">~</span> Y <span style="color:#f92672">+</span> X2, data <span style="color:#f92672">=</span> df) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">tidy</span>() <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(term <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Residuals&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">pull</span>(sumsq)
+
+<span style="color:#75715e"># C</span>
+x2_alone <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">aov</span>(X2 <span style="color:#f92672">~</span> Y <span style="color:#f92672">+</span> X1, data <span style="color:#f92672">=</span> df) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">tidy</span>() <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(term <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;Residuals&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">pull</span>(sumsq)
+
+<span style="color:#75715e"># D + G</span>
+y_plus_x1 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">aov</span>(Y <span style="color:#f92672">~</span> X1, data <span style="color:#f92672">=</span> df) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">tidy</span>() <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(term <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;X1&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">pull</span>(sumsq)
+
+<span style="color:#75715e"># E + G</span>
+y_plus_x2 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">aov</span>(Y <span style="color:#f92672">~</span> X2, data <span style="color:#f92672">=</span> df) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">tidy</span>() <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(term <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;X2&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">pull</span>(sumsq)
+
+<span style="color:#75715e"># F + G</span>
+x1_plus_x2 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">aov</span>(X1 <span style="color:#f92672">~</span> X2, data <span style="color:#f92672">=</span> df) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">tidy</span>() <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(term <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;X2&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">pull</span>(sumsq)
+
+<span style="color:#75715e"># D = (A + D + E + G) − A − (E + G)</span>
+y_x1_alone <span style="color:#f92672">&lt;-</span> y_total <span style="color:#f92672">-</span> y_alone <span style="color:#f92672">-</span> y_plus_x2
+
+<span style="color:#75715e"># E = (A + D + E + G) − A − (D + G)</span>
+y_x2_alone <span style="color:#f92672">&lt;-</span> y_total <span style="color:#f92672">-</span> y_alone <span style="color:#f92672">-</span> y_plus_x1
+
+<span style="color:#75715e"># G = (D + G) − D</span>
+y_x1_x2_alone <span style="color:#f92672">&lt;-</span> y_plus_x1 <span style="color:#f92672">-</span> y_x1_alone
+
+<span style="color:#75715e"># F = (F + G) - G</span>
+x1_x2_alone <span style="color:#f92672">&lt;-</span> x1_plus_x2 <span style="color:#f92672">-</span> y_x1_x2_alone
+</code></pre></div><p>Again, that’s super complex, but it’s really just a ton of set theory algebra.</p>
+<p>Now that we have all these little pieces, let’s plot them!</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">all_pieces <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y&#34;</span> <span style="color:#f92672">=</span> y_alone,
+                <span style="color:#e6db74">&#34;X1&#34;</span> <span style="color:#f92672">=</span> x1_alone,
+                <span style="color:#e6db74">&#34;X2&#34;</span> <span style="color:#f92672">=</span> x2_alone,
+                <span style="color:#e6db74">&#34;X1&amp;Y&#34;</span> <span style="color:#f92672">=</span> y_x1_alone,
+                <span style="color:#e6db74">&#34;X2&amp;Y&#34;</span> <span style="color:#f92672">=</span> y_x2_alone,
+                <span style="color:#e6db74">&#34;X1&amp;X2&#34;</span> <span style="color:#f92672">=</span> x1_x2_alone,
+                <span style="color:#e6db74">&#34;Y&amp;X1&amp;X2&#34;</span> <span style="color:#f92672">=</span> y_x1_x2_alone)
+all_pieces
+<span style="color:#75715e">##       Y      X1      X2    X1&amp;Y    X2&amp;Y   X1&amp;X2 Y&amp;X1&amp;X2 </span>
+<span style="color:#75715e">##   304.6   201.6   123.6    39.7    13.3    21.5    42.3</span>
+
+<span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(all_pieces),
+     quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">LETTERS</span>[1<span style="color:#f92672">:</span><span style="color:#ae81ff">7</span>])
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-complex-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>These circles are now all proportional to the actual values in the data. Both <code>X1</code> and <code>X2</code> explain some of the variation in <code>Y</code>, but not a ton (and <code>X1</code> explains more than <code>X2</code>). The explained variance is represented by the area D + E + G, which means we can now calculate the actual <code>\(R^2\)</code>:</p>
+<p>$$
+R^2 = \frac{D + E + G}{A + D + E + G} = \frac{39.69 + 13.27 + 42.29}{304.6 + 39.69 + 13.27 + 42.29} = 0.238
+$$</p>
+<p>Or with code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">(y_x1_alone <span style="color:#f92672">+</span> y_x2_alone <span style="color:#f92672">+</span> y_x1_x2_alone) <span style="color:#f92672">/</span>
+  (y_alone <span style="color:#f92672">+</span> y_x1_alone <span style="color:#f92672">+</span> y_x2_alone <span style="color:#f92672">+</span> y_x1_x2_alone)
+<span style="color:#75715e">## [1] 0.238</span>
+</code></pre></div><p>Let’s confirm it with a regression model:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">lm</span>(Y <span style="color:#f92672">~</span> X1 <span style="color:#f92672">+</span> X2, data <span style="color:#f92672">=</span> df) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">glance</span>() <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">pull</span>(r.squared)
+<span style="color:#75715e">## [1] 0.238</span>
+</code></pre></div><p>AMAZING. It’s the same. It worked!</p>
+<h3 id="nicer-plot">Nicer plot</h3>
+<p>With everything nice and proportional, let’s make this plot a little fancier for teaching purposes. Since <strong>eulerr</strong> uses grid-based graphics, we can use it with <a href="https://patchwork.data-imaginist.com/"><strong>patchwork</strong></a> to add annotations (or combine it with other ggplot objects if we really wanted to):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(patchwork)  <span style="color:#75715e"># For combining ggplot and grid elements</span>
+<span style="color:#a6e22e">library</span>(grid)       <span style="color:#75715e"># For making custom grid grobs</span>
+<span style="color:#a6e22e">library</span>(latex2exp)  <span style="color:#75715e"># For writing LaTeX-like text with grid plots</span>
+
+nice_plot <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(all_pieces),
+                  quantities <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(labels <span style="color:#f92672">=</span> <span style="color:#66d9ef">LETTERS</span>[1<span style="color:#f92672">:</span><span style="color:#ae81ff">7</span>],
+                                    fontfamily <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Roboto Condensed Light&#34;</span>,
+                                    fontsize <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span>),
+                  fills <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(fill <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;#7FDBFF&#34;</span>, <span style="color:#e6db74">&#34;grey30&#34;</span>, <span style="color:#e6db74">&#34;grey80&#34;</span>,
+                                        <span style="color:#e6db74">&#34;#FF851B&#34;</span>, <span style="color:#e6db74">&#34;#FF851B&#34;</span>, <span style="color:#e6db74">&#34;grey50&#34;</span>, <span style="color:#e6db74">&#34;#FF851B&#34;</span>),
+                               alpha <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">0.35</span>)),
+                  labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(fontfamily <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Roboto Condensed&#34;</span>,
+                                fontface <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bold&#34;</span>, fontsize <span style="color:#f92672">=</span> <span style="color:#ae81ff">20</span>))
+
+math_part <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">textGrob</span>(<span style="color:#a6e22e">TeX</span>(<span style="color:#e6db74">&#34;R^2 = \\frac{D + E + G}{A + D + E + G}&#34;</span>),
+                      gp <span style="color:#f92672">=</span> <span style="color:#a6e22e">gpar</span>(fontfamily <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Roboto Condensed&#34;</span>,
+                                col <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;grey50&#34;</span>, fontsize <span style="color:#f92672">=</span> <span style="color:#ae81ff">13</span>))
+
+<span style="color:#75715e"># Ordinarily patchwork works just fine with grid grob objects, like the results</span>
+<span style="color:#75715e"># from plot.euler(), but *not* when they&#39;re the first element in patchwork chain</span>
+<span style="color:#75715e"># of plots. To make grob objects work nicely with patchwork, we need to wrap</span>
+<span style="color:#75715e"># them in wrap_elements()</span>
+<span style="color:#a6e22e">wrap_elements</span>(nice_plot) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">inset_element</span>(math_part,
+                left <span style="color:#f92672">=</span> <span style="color:#ae81ff">-0.04</span>, bottom <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.72</span>, right <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.3</span>, top <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.85</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">plot_annotation</span>(
+    title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;R² represented as an Euler diagram&#34;</span>,
+    subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Orange area (D + E + G) shows the total variance in\noutcome Y that is jointly explained by X1 and X2&#34;</span>,
+    caption <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Circles sized according to each variable&#39;s sum of squares; size of overlapping areas\nis not 100% correct due to limitations in available geometric space&#34;</span>,
+    theme <span style="color:#f92672">=</span> <span style="color:#a6e22e">theme</span>(plot.title <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(size <span style="color:#f92672">=</span> <span style="color:#ae81ff">20</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Roboto Condensed&#34;</span>, face <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bold&#34;</span>),
+                  plot.subtitle <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(size <span style="color:#f92672">=</span> <span style="color:#ae81ff">15</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Roboto Condensed&#34;</span>),
+                  plot.caption <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(size <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Roboto Condensed Light&#34;</span>, hjust <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>))
+  )
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/nice-plot-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<h3 id="multicollinearity">Multicollinearity</h3>
+<p>Another neat feature of this kind of diagram is that it helps visualize <a href="https://en.wikipedia.org/wiki/Multicollinearity">multicollinearity</a>, or the issues that arise when you control for explanatory variables that explain the same kind of variation in the outcome. Multicollinearity leads to strange coefficient estimates and variance inflation because mathematically the regression model has no way of telling which of the highly correlated explanatory variables explain which parts of the outcome.</p>
+<p>In the diagram, areas D and E are uniquely accounted for by <code>X1</code> and <code>X2</code> respectively, but G is is overlapped, making it impossible to know if <code>X1</code> or <code>X2</code> explains that portion of the variation in <code>Y</code>. Similarly, area F shows the variation shared by both <code>X1</code> and <code>X2</code>, and again it’s impossible to know which parts are unique. As a result, the area (F + G) represents the total multicollinearity in the model:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(all_pieces),
+     quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">LETTERS</span>[1<span style="color:#f92672">:</span><span style="color:#ae81ff">7</span>],
+     fills <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#a6e22e">rep</span>(<span style="color:#e6db74">&#34;white&#34;</span>, <span style="color:#ae81ff">5</span>), <span style="color:#a6e22e">rep</span>(<span style="color:#e6db74">&#34;#FF4136&#34;</span>, <span style="color:#ae81ff">2</span>)))
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-multicollinearity-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<h2 id="why-this-matters">Why this matters</h2>
+<p>One really neat thing about thinking about <code>\(R^2\)</code> this way is that it highlights a key difference in the purposes of regression: prediction and estimation.</p>
+<p>With prediction, the goal of the regression model is to predict the outcome as accurately as possible. This is what Netflix does when guessing what show you might want to watch next, or what the <a href="https://earlywarningproject.ushmm.org/">US Holocaust Museum does to predict genocide and human rights abuses</a>. You throw in as many control variables as you can in order to create a model that explains variation in Y as accurately as possible. As a result, these kinds of models will typically have a high <code>\(R^2\)</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Next show\non Netflix&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>,
+             <span style="color:#e6db74">&#34;X1&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,
+             <span style="color:#e6db74">&#34;X2&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">6</span>,
+             <span style="color:#e6db74">&#34;X3&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,
+             <span style="color:#e6db74">&#34;X4&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">6</span>,
+             <span style="color:#e6db74">&#34;X5&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">6</span>,
+             <span style="color:#e6db74">&#34;X1&amp;Next show\non Netflix&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
+             <span style="color:#e6db74">&#34;X2&amp;Next show\non Netflix&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,
+             <span style="color:#e6db74">&#34;X3&amp;Next show\non Netflix&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,
+             <span style="color:#e6db74">&#34;X4&amp;Next show\non Netflix&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
+             <span style="color:#e6db74">&#34;X5&amp;Next show\non Netflix&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,
+             <span style="color:#e6db74">&#34;X1&amp;X2&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
+             <span style="color:#e6db74">&#34;Next show\non Netflix&amp;X1&amp;X2&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>)))
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-diagram-prediction-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>Look at that squishy little area of Y that’s not explained by any of the other variables. Neato.</p>
+<p>In the realm of causal inference in social science, or with estimation in general, the focus of the analysis is on <em>a single X variable</em> , like whether or not people in the sample participated in a social program. You might include a bunch of control variables if you identification strategy tells you do: an interaction term for time and group if you’re using <a href="https://evalf21.classes.andrewheiss.com/example/diff-in-diff/">difference-in-differences</a>, an indicator showing if people are above/below a threshold if you’re using <a href="https://evalf21.classes.andrewheiss.com/example/rdd/">regression discontinuity</a>, an instrument if you’re using <a href="https://evalf21.classes.andrewheiss.com/example/iv/">instrumental variables</a>, confounding control variables if you’re using <a href="https://evalf21.classes.andrewheiss.com/example/matching-ipw/">inverse probability weighting and a DAG</a>, or nothing(!) if you’re using a <a href="https://evalf21.classes.andrewheiss.com/example/rcts/">randomized controlled trial</a> (like you can really just run <code>lm(Y ~ treatment)</code>!). Each of these types of models will inevitably return an <code>\(R^2\)</code> value, since that what regression does, but we care less about that when estimating causal effects. All we care about is the accuracy of one little sliver of the diagram—that single policy lever that we might have control over to influence the larger outcome.</p>
+<p>For instance, let’s say you’re a new little nonprofit who created a cool new program to help reduce childhood poverty within your city. You want to know if that program does anything to poverty more generally. You have lots of donor money so you decide to run a carefully designed randomized trial. You run a regression model and get a tiny <code>\(R^2\)</code> value, like 0.015. You panic because that means your experiment only explains 1.5% of the variation in poverty, and that seems really bad and low!</p>
+<p>But that’s actually totally fine. The goal with the experiment is <em>not</em> to explain all the factors that create poverty—there are far too many to include in a regression model. The goal here is to have an accurate estimate of how much your single program affects poverty. There’s <em>no way</em> your little program is going to explain 80% of the variation in poverty. If you had a high <code>\(R^2\)</code>, I’d be incredibly worried! (Unless you really discovered a program that is a true silver bullet for poverty!)</p>
+<p>Looking at an Euler diagram demonstrates this more easily. All we care about in this experiment is that little sliver. Is it accurate? Does the treatment move the needle on poverty in any way? If so, great!</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Poverty&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>,
+             <span style="color:#e6db74">&#34;Program&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
+             <span style="color:#e6db74">&#34;Poverty&amp;Program&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.25</span>)),
+     fills <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;white&#34;</span>, <span style="color:#e6db74">&#34;grey75&#34;</span>, <span style="color:#e6db74">&#34;#FF851B&#34;</span>))
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-diagram-estimation-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>So don’t dismiss models immediately just because of a low <code>\(R^2\)</code>! The purpose of the models matters!</p>
+<h2 id="caveats">Caveats</h2>
+<p>There are a few important caveats to keep in mind with these diagrams:</p>
+<p><strong>1: This is inefficient</strong></p>
+<p>Calculating each of these plot segments by hand is tedious and there will inevitably be typos and errors (there are probably errors in this very post!). Also, due to how ANOVA works, the order of the variables you specify matters <em>a lot</em>: <code>aov(Y ~ X1 + X2)</code> and <code>aov(Y ~ X2 + X1)</code> give completely different sum of squares for the joint variation of <code>Y</code>, <code>X1</code>, and <code>X2</code>. That in turn changes the sizes of the segments.</p>
+<p>When writing this, I spent way too much time playing with covariance matrices, partial correlation matrices, and variance-covariance matrices to see if I could calculate these areas more mathematically using the guts of regression and ANOVA, but it was too tricky. Smarter people than me will need to figure it out.</p>
+<p><strong>2: This doesn’t work in all cases</strong></p>
+<p>It’s possible to have negative areas, depending on the data you have, and negative areas are unplottable (<a href="#ref-Ip:2001">Ip</a> (<a href="#ref-Ip:2001">2001</a>) shows an example of this at the end of his article). In order to use this kind of diagram when teaching, you have to use carefully constructed data—you can’t just throw any model into a chart like this. Also, when working with actual numbers, you’re generally limited to just one or two explanatory variables. Any more and the math gets too complex.</p>
+<p><strong>3: This isn’t 100% accurate</strong></p>
+<p>The geometry behind creating these Euler diagrams is complex and doesn’t always work perfectly. Let’s plot the actual values of the sum of squares for each segment:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(all_pieces),
+     quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-complex-values-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>That central piece where <code>Y</code>, <code>X1</code>, and <code>X2</code> is 42, but it’s smaller any of the other intersections, which all have smaller sum-of-squares values. Yikes!</p>
+<p>The <strong>eulerr</strong> package provides a way of diagnosing how bad things are by either inspecting the results of <code>euler()</code> directly, or looking at the residuals and errors with <code>error_plot()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">euler</span>(all_pieces)
+<span style="color:#75715e">##         original fitted residuals regionError</span>
+<span style="color:#75715e">## Y          304.6  303.9     0.742       0.001</span>
+<span style="color:#75715e">## X1         201.6  200.3     1.326       0.001</span>
+<span style="color:#75715e">## X2         123.6  121.3     2.319       0.002</span>
+<span style="color:#75715e">## Y&amp;X1        39.7   47.6    -7.953       0.011</span>
+<span style="color:#75715e">## Y&amp;X2        13.3   26.5   -13.236       0.018</span>
+<span style="color:#75715e">## X1&amp;X2       21.5   33.0   -11.541       0.016</span>
+<span style="color:#75715e">## Y&amp;X1&amp;X2     42.3   10.7    31.558       0.042</span>
+<span style="color:#75715e">## </span>
+<span style="color:#75715e">## diagError: 0.042 </span>
+<span style="color:#75715e">## stress:    0.009</span>
+
+<span style="color:#a6e22e">error_plot</span>(<span style="color:#a6e22e">euler</span>(all_pieces),
+           quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)
+</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-errors-1.png" width="75%" style="display: block; margin: auto;" /></p>
+<p>That central piece is underrepresented, while the other intersections are overrepresented. Alas.</p>
+<h2 id="references">References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-CohenCohen:1975" class="csl-entry">
+<p>Cohen, Jacob, and Patricia Cohen. 1975. <em>Applied Multiple Regression/Correlation Analysis for the Behavioral Sciences</em>. New Jersey: Lawrence Erlbaum Associates.</p>
+</div>
+<div id="ref-Hunt:1986" class="csl-entry">
+<p>Hunt, Earl. 1986. “The Design of Ballantines.” <em>Behavior Research Methods, Instruments, &amp; Computers</em> 28 (May): 277–84. <a href="https://doi.org/10.3758/BF03204399">https://doi.org/10.3758/BF03204399</a>.</p>
+</div>
+<div id="ref-Ip:2001" class="csl-entry">
+<p>Ip, Edward H. S. 2001. “Visualizing Multiple Regression.” <em>Journal of Statistics Education</em> 9 (1). <a href="https://doi.org/10.1080/10691898.2001.11910646">https://doi.org/10.1080/10691898.2001.11910646</a>.</p>
+</div>
+</div>
+
+    
+        <footer>
+            <div class="tags">
+    <i class="fas fa-tags" aria-hidden="true"></i>&ensp;
+    <a href="/blog/tags/r/">r</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/tidyverse/">tidyverse</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/regression/">regression</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/statistics/">statistics</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/data-visualization/">data visualization</a></div>
+
+        </footer>
+
+        <div id="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                 
+                var disqus_shortname = 'andrewheisscom';
+                var disqus_title = document.title;
+                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2021\/08\/21\/r2-euler\/';
+
+                 
+                (function () {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+        </div>
+    </article>
+</section>
+
+  
+
+<script src="/js/math-code.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+<script>
+    MathJax = {
+        tex: {
+            inlineMath: [
+                ['$', '$'], ['\\(', '\\)']
+            ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        }
+    };
+</script>
+
+        </div> 
+    </div> 
+    
+    <div id="footer">
+        <footer>
+    <ul class="links">
+        <li>
+            <a href="mailto:aheiss@gsu.edu" aria-label="E-mail"   >
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/andrewheiss" aria-label="Twitter"   >
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/andrewheiss" aria-label="GitHub"   >
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/andrewheiss" aria-label="YouTube"   >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://stackoverflow.com/users/120898/andrew" aria-label="StackOverflow"   >
+                <i class="fab fa-stack-overflow" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.heissatopia.com" aria-label="Heissatopia (family blog)"   >
+                <i class="fab fa-blogger" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/andrewheiss" aria-label="Facebook"   >
+                <i class="fab fa-facebook" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/in/andrewheiss" aria-label="LinkedIn"   >
+                <i class="fab fa-linkedin" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+
+    <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
+
+    <p class="pgp">
+        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
+    </p>
+
+    <p class="copyright">
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+            title="Creative Commons Attribution-ShareAlike 4.0 International license"><i class="fab fa-creative-commons"></i>
+        <i class="fab fa-creative-commons-by" title="Attribution"></i>
+        <i class="fab fa-creative-commons-share" title="Share alike"></i></a>
+        <span class="cc-year">&bull; 2007&ndash;2021</span>
+    </p>
+
+    <p class="colophon"><a href="https://github.com/andrewheiss/ath-hugo">Code for site</a></p>
+</footer>
+
+    </div>
+
+</body>
+
+</html>

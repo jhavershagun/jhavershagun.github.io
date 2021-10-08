@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+
+    <meta name="author" content="Andrew Heiss">
+    <meta name="description" content="Extend broom&#39;s tidy() and glance() to work with lists of multiply imputed regression models">
+    <meta name="keywords" content="r, imputation, tidyverse, markdown">
+    <meta name="generator" content="Hugo 0.88.1" />
+
+    <title>
+  Show multiply imputed results in a side-by-side regression table with broom and huxtable | Andrew Heiss
+</title>
+
+    <link rel="canonical" href="https://www.andrewheiss.com/blog/2018/03/08/amelia-broom-huxtable/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+
+    <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
+    <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png?v=1"/>
+    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:title" content="Show multiply imputed results in a side-by-side regression table with broom and huxtable"/>
+    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:description" content="Extend broom&#39;s tidy() and glance() to work with lists of multiply imputed regression models"/>
+
+
+    <meta property="og:title" content="Show multiply imputed results in a side-by-side regression table with broom and huxtable" />
+<meta property="og:description" content="Extend broom&#39;s tidy() and glance() to work with lists of multiply imputed regression models" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.andrewheiss.com/blog/2018/03/08/amelia-broom-huxtable/" />
+<meta property="og:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta property="article:published_time" content="2018-03-08T00:00:00+00:00" />
+<meta property="article:modified_time" content="2018-03-08T00:00:00+00:00" />
+
+<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:section" content="blog" />
+<meta property="article:tag" content="r" />
+<meta property="article:tag" content="imputation" />
+<meta property="article:tag" content="tidyverse" />
+<meta property="article:tag" content="markdown" />
+
+
+    <meta itemprop="name" content="Show multiply imputed results in a side-by-side regression table with broom and huxtable">
+<meta itemprop="description" content="Extend broom&#39;s tidy() and glance() to work with lists of multiply imputed regression models"><meta itemprop="datePublished" content="2018-03-08T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2018-03-08T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1490"><meta itemprop="image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta itemprop="keywords" content="r,imputation,tidyverse,markdown," />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/pure-and-grids-responsive.min.css">
+    <link rel="stylesheet" href="/css/ath-hugo.min.c5619237d890aa972042ca0497d2594d6f3f34b1746c377f560f5096573fb6e3.css" integrity="sha256-xWGSN9iQqpcgQsoEl9JZTW8/NLF0bDd/Vg9Qllc/tuM=" crossorigin="anonymous" media="screen" />
+
+    <script src="https://kit.fontawesome.com/f9d343c40d.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=dLX2MbQJLG">
+    <link rel="manifest" href="/site.webmanifest?v=dLX2MbQJLG">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=dLX2MbQJLG" color="#cf4446">
+    <link rel="shortcut icon" href="/favicon.ico?v=dLX2MbQJLG">
+    <meta name="msapplication-TileColor" content="#170c3a">
+    <meta name="theme-color" content="#170c3a">
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-527449-5', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+
+    <div id="layout" class="pure-g">
+        <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
+            <header>
+                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
+                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+
+                <nav id="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cv/">CV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/research/">Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/teaching/">Teaching</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/talks/">Talks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/now/">Now</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uses/">Uses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+        </div> 
+    
+        <div id="content" class="pure-u-1 pure-u-md-3-4">
+        
+  <section>
+    <article class="content-single">
+        <header class="post-header">
+            <h1 class="post-title">Show multiply imputed results in a side-by-side regression table with broom and huxtable</h1>
+
+            <div class="post-meta pure-g">
+                <div class="pure-u-1-2">
+                    <span class="posted-on">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime='2018-03-08T00:00:00Z'>
+                            Thursday, March 8, 2018
+                        </time>
+                    </span>
+                </div>
+                <div class="reading-time pure-u-1-2">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    7-minute read
+                </div>
+            </div>
+        </header>
+    
+        <p><span class="small">(<a href="https://github.com/andrewheiss/amelia-broom-huxtable">See this notebook on GitHub</a>)</span></p>
+<hr>
+<p><em>tl;dr</em>: Use the functions in <a href="broomify-amelia.R"><code>broomify-amelia.R</code></a> to use <code>broom::tidy()</code>, <code>broom::glance()</code>, and <code>huxtable::huxreg()</code> on lists of multiply imputed models.</p>
+<hr>
+<p>The whole reason I went into the rabbit hole of the mechanics of merging imputed regression results <a href="https://www.andrewheiss.com/blog/2018/03/07/amelia-tidy-melding/">in the previous post</a> was so I could easily report these results in papers and writeups. In political science and economics (and probably other social science disciplines), it&rsquo;s fairly standard to report many regression models in a side-by-side table, with a column for each model and rows for each coefficient. R packages like <a href="https://cran.r-project.org/package=stargazer"><code>stargazer</code></a> and <a href="https://cran.r-project.org/package=huxtable"><code>huxtable</code></a> make this fairly straightforward.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(tidyverse)
+<span style="color:#a6e22e">library</span>(Amelia)
+<span style="color:#a6e22e">library</span>(stargazer)
+<span style="color:#a6e22e">library</span>(huxtable)
+<span style="color:#a6e22e">library</span>(broom)
+
+<span style="color:#75715e"># Use the africa dataset from Ameila</span>
+<span style="color:#a6e22e">data</span>(africa)
+
+<span style="color:#75715e"># Build some example models</span>
+model_original1 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(gdp_pc <span style="color:#f92672">~</span> trade <span style="color:#f92672">+</span> civlib, data <span style="color:#f92672">=</span> africa)
+model_original2 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(gdp_pc <span style="color:#f92672">~</span> trade <span style="color:#f92672">+</span> civlib <span style="color:#f92672">+</span> infl, data <span style="color:#f92672">=</span> africa)
+</code></pre></div><p>Stargazer takes a list of models:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">stargazer</span>(model_original1, model_original2, type <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;text&#34;</span>)
+<span style="color:#75715e">## </span>
+<span style="color:#75715e">## ====================================================================</span>
+<span style="color:#75715e">##                                   Dependent variable:               </span>
+<span style="color:#75715e">##                     ------------------------------------------------</span>
+<span style="color:#75715e">##                                          gdp_pc                     </span>
+<span style="color:#75715e">##                               (1)                      (2)          </span>
+<span style="color:#75715e">## --------------------------------------------------------------------</span>
+<span style="color:#75715e">## trade                      18.000***                18.500***       </span>
+<span style="color:#75715e">##                             (1.270)                  (1.200)        </span>
+<span style="color:#75715e">##                                                                     </span>
+<span style="color:#75715e">## civlib                    -665.000***              -589.000***      </span>
+<span style="color:#75715e">##                            (185.000)                (176.000)       </span>
+<span style="color:#75715e">##                                                                     </span>
+<span style="color:#75715e">## infl                                                -6.340***       </span>
+<span style="color:#75715e">##                                                      (1.620)        </span>
+<span style="color:#75715e">##                                                                     </span>
+<span style="color:#75715e">## Constant                    136.000                 166.000*        </span>
+<span style="color:#75715e">##                            (100.000)                (94.900)        </span>
+<span style="color:#75715e">##                                                                     </span>
+<span style="color:#75715e">## --------------------------------------------------------------------</span>
+<span style="color:#75715e">## Observations                  115                      115          </span>
+<span style="color:#75715e">## R2                           0.653                    0.695         </span>
+<span style="color:#75715e">## Adjusted R2                  0.647                    0.687         </span>
+<span style="color:#75715e">## Residual Std. Error    352.000 (df = 112)      332.000 (df = 111)   </span>
+<span style="color:#75715e">## F Statistic         106.000*** (df = 2; 112) 84.500*** (df = 3; 111)</span>
+<span style="color:#75715e">## ====================================================================</span>
+<span style="color:#75715e">## Note:                                    *p&lt;0.1; **p&lt;0.05; ***p&lt;0.01</span>
+</code></pre></div><p>As does huxtable&rsquo;s <code>huxreg()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">huxreg</span>(model_original1, model_original2) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">print_screen</span>()
+<span style="color:#75715e">##                    ────────────────────────────────────────────────────</span>
+<span style="color:#75715e">##                                                  (1)              (2)  </span>
+<span style="color:#75715e">##                                     ───────────────────────────────────</span>
+<span style="color:#75715e">##                      (Intercept)         136.063          166.435      </span>
+<span style="color:#75715e">##                                         (100.409)         (94.871)     </span>
+<span style="color:#75715e">##                      trade                18.027 ***       18.494 ***  </span>
+<span style="color:#75715e">##                                           (1.272)          (1.204)     </span>
+<span style="color:#75715e">##                      civlib             -665.428 ***     -588.722 **   </span>
+<span style="color:#75715e">##                                         (185.436)        (175.717)     </span>
+<span style="color:#75715e">##                      infl                                  -6.336 ***  </span>
+<span style="color:#75715e">##                                                            (1.620)     </span>
+<span style="color:#75715e">##                                     ───────────────────────────────────</span>
+<span style="color:#75715e">##                      N                   115              115          </span>
+<span style="color:#75715e">##                      R2                    0.653            0.695      </span>
+<span style="color:#75715e">##                      logLik             -836.136         -828.709      </span>
+<span style="color:#75715e">##                      AIC                1680.272         1667.418      </span>
+<span style="color:#75715e">##                    ────────────────────────────────────────────────────</span>
+<span style="color:#75715e">##                      *** p &lt; 0.001; ** p &lt; 0.01; * p &lt; 0.05.           </span>
+<span style="color:#75715e">## </span>
+<span style="color:#75715e">## Column names: names, model1, model2</span>
+</code></pre></div><p><a href="https://cran.r-project.org/web/packages/stargazer/vignettes/stargazer.pdf">Stargazer has support for a ton of different model types</a> (see <code>?stargazer</code> for details), but they&rsquo;re all hardcoded into stargazer&rsquo;s internal code and adding more is tricky. <a href="https://hughjonesd.github.io/huxtable/">Huxtable</a>, on the other hand, doesn&rsquo;t rely on hardcoded model processing, but instead will display any model that works with <code>broom::tidy()</code> and <code>broom::glance()</code>. The <a href="https://cran.r-project.org/package=broom"><code>broom</code> package</a> supports way more models than stargazer (including models created with <a href="https://cran.r-project.org/package=rstan"><code>rstan</code></a> and <a href="https://cran.r-project.org/package=rstanarm"><code>rstanarm</code></a>!), and because of this, huxtable is far more extensible—if you can create a <code>tidy()</code> and a <code>glance()</code> function for a type of model, huxtable can use it.</p>
+<p>Also, stargazer was written before <a href="https://rmarkdown.rstudio.com/">R Markdown</a> was really a thing, so it has excellent support for HTML and LaTeX output, but that&rsquo;s it. Including stargazer tables in an R Markdown document is a hassle, especially if you want to be able to convert it to Word (<a href="https://github.com/andrewheiss/edb-social-pressure/blob/master/bin/stargazer2docx.py">I&rsquo;ve written a Python script for doing this</a>—that&rsquo;s how much extra work it takes). Huxtable, though, was written after the R Markdown and tidyverse revolutions, so it supports piping <em>and</em> can output to HTML, LaTeX, <em>and</em> Markdown (with <code>huxtable::print_md()</code>).</p>
+<p>This history is important because it means that models based on multiple imputation <strong>will not work with stargazer.</strong> Melding all the coefficients across imputations creates nice data frames of model results, but it doesn&rsquo;t create a model that stargazer can work with. This is unfortunate, especially given <a href="https://github.com/search?l=&amp;q=stargazer+user%3Aandrewheiss&amp;ref=advsearch&amp;type=Code&amp;utf8=%E2%9C%93">how much I use stargazer</a>. However, if we could make a <code>tidy()</code> and a <code>glance()</code> function that could work with a list of multiply imputed models, huxtable would solve all our problems.</p>
+<p>So here&rsquo;s how to solve all your problems :)</p>
+<p>First, we&rsquo;ll impute the missing data in the Africa data set, nest the imputed data in a larger data frame, and run a model on each imputed dataset:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">set.seed</span>(<span style="color:#ae81ff">1234</span>)
+imp_amelia <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">amelia</span>(x <span style="color:#f92672">=</span> africa, m <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>, cs <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;country&#34;</span>, ts <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;year&#34;</span>, 
+                     logs <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;gdp_pc&#34;</span>, p2s <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>)
+
+models_imputed_df <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">bind_rows</span>(<span style="color:#a6e22e">unclass</span>(imp_amelia<span style="color:#f92672">$</span>imputations), .id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;m&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">group_by</span>(m) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">nest</span>() <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(model <span style="color:#f92672">=</span> data <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">map</span>(<span style="color:#f92672">~</span> <span style="color:#a6e22e">lm</span>(gdp_pc <span style="color:#f92672">~</span> trade <span style="color:#f92672">+</span> civlib, data <span style="color:#f92672">=</span> .)))
+
+models_imputed_df
+<span style="color:#75715e">## # A tibble: 5 x 3</span>
+<span style="color:#75715e">## # Groups:   m [5]</span>
+<span style="color:#75715e">##   m     data               model </span>
+<span style="color:#75715e">##   &lt;chr&gt; &lt;list&gt;             &lt;list&gt;</span>
+<span style="color:#75715e">## 1 imp1  &lt;tibble [120 × 7]&gt; &lt;lm&gt;  </span>
+<span style="color:#75715e">## 2 imp2  &lt;tibble [120 × 7]&gt; &lt;lm&gt;  </span>
+<span style="color:#75715e">## 3 imp3  &lt;tibble [120 × 7]&gt; &lt;lm&gt;  </span>
+<span style="color:#75715e">## 4 imp4  &lt;tibble [120 × 7]&gt; &lt;lm&gt;  </span>
+<span style="color:#75715e">## 5 imp5  &lt;tibble [120 × 7]&gt; &lt;lm&gt;</span>
+</code></pre></div><p>Before we do anything with the models in <code>models_imputed_df$model</code>, first we can define a few functions to extend broom. R&rsquo;s S3 object system means that a function named <code>whatever.blah()</code> will automatically work when called on objects with the class <code>blah</code>. This is how broom generally works—there are functions named <code>tidy.anova()</code>, <code>tidy.glm()</code>, <code>tidy.lm()</code>, etc. that will do the correct tidying when run on <code>anova</code>, <code>glm</code>, and <code>lm</code> objects. Huxtable also takes advantage of this S3 object system—it will call the appropriate tidy and glance functions based on the class of the models passed to it.</p>
+<p>To make a list of models work with broom, we need to invent a new class of model. In this example I&rsquo;ve named it <code>melded</code>, but it could be anything. Here are three functions designed to work on <code>melded</code> objects (the code for these is largely based on <a href="https://www.andrewheiss.com/blog/2018/03/07/amelia-tidy-melding/">the previous post about melding coefficients</a>). These functions are also found in <a href="broomify-amelia.R"><code>broomify-amelia.R</code></a>, which you can add to your project (maybe someday this could be an actual package, but I don&rsquo;t see a reason for it yet).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">tidy.melded <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(x, conf.int <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, conf.level <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.95</span>) {
+  <span style="color:#75715e"># Get the df from one of the models</span>
+  model_degrees_freedom <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">glance</span>(x[[1]])<span style="color:#f92672">$</span>df.residual
+  
+  <span style="color:#75715e"># Create matrices of the estimates and standard errors</span>
+  params <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tibble</span>(models <span style="color:#f92672">=</span> <span style="color:#a6e22e">unclass</span>(x)) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">mutate</span>(m <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#a6e22e">n</span>(),
+           tidied <span style="color:#f92672">=</span> models <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">map</span>(tidy)) <span style="color:#f92672">%&gt;%</span> 
+    <span style="color:#a6e22e">unnest</span>(tidied) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">select</span>(m, term, estimate, std.error) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">gather</span>(key, value, estimate, std.error) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">mutate</span>(term <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(term)) <span style="color:#f92672">%&gt;%</span>  <span style="color:#75715e"># Order the terms so that spread() keeps them in order</span>
+    <span style="color:#a6e22e">spread</span>(term, value)
+  
+  just_coefs <span style="color:#f92672">&lt;-</span> params <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">filter</span>(key <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;estimate&#34;</span>) <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">select</span>(<span style="color:#f92672">-</span>m, <span style="color:#f92672">-</span>key)
+  just_ses <span style="color:#f92672">&lt;-</span> params <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">filter</span>(key <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;std.error&#34;</span>) <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">select</span>(<span style="color:#f92672">-</span>m, <span style="color:#f92672">-</span>key)
+  
+  <span style="color:#75715e"># Meld the coefficients with Rubin&#39;s rules</span>
+  coefs_melded <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">mi.meld</span>(just_coefs, just_ses)
+  
+  <span style="color:#75715e"># Create tidy output</span>
+  output <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">as.data.frame</span>(<span style="color:#a6e22e">cbind</span>(<span style="color:#a6e22e">t</span>(coefs_melded<span style="color:#f92672">$</span>q.mi),
+                                <span style="color:#a6e22e">t</span>(coefs_melded<span style="color:#f92672">$</span>se.mi))) <span style="color:#f92672">%&gt;%</span>
+    magrittr<span style="color:#f92672">::</span><span style="color:#a6e22e">set_colnames</span>(<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;estimate&#34;</span>, <span style="color:#e6db74">&#34;std.error&#34;</span>)) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">mutate</span>(term <span style="color:#f92672">=</span> <span style="color:#a6e22e">rownames</span>(.)) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">select</span>(term, <span style="color:#a6e22e">everything</span>()) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">mutate</span>(statistic <span style="color:#f92672">=</span> estimate <span style="color:#f92672">/</span> std.error,
+           p.value <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">pt</span>(<span style="color:#a6e22e">abs</span>(statistic), model_degrees_freedom, lower.tail <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>))
+  
+  <span style="color:#75715e"># Add confidence intervals if needed</span>
+  <span style="color:#a6e22e">if </span>(conf.int <span style="color:#f92672">&amp;</span> conf.level) {
+    <span style="color:#75715e"># Convert conf.level to tail values (0.025 when it&#39;s 0.95)</span>
+    a <span style="color:#f92672">&lt;-</span> (<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> conf.level) <span style="color:#f92672">/</span> <span style="color:#ae81ff">2</span>
+    
+    output <span style="color:#f92672">&lt;-</span> output <span style="color:#f92672">%&gt;%</span> 
+      <span style="color:#a6e22e">mutate</span>(conf.low <span style="color:#f92672">=</span> estimate <span style="color:#f92672">+</span> std.error <span style="color:#f92672">*</span> <span style="color:#a6e22e">qt</span>(a, model_degrees_freedom),
+             conf.high <span style="color:#f92672">=</span> estimate <span style="color:#f92672">+</span> std.error <span style="color:#f92672">*</span> <span style="color:#a6e22e">qt</span>((<span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> a), model_degrees_freedom))
+  }
+  
+  <span style="color:#75715e"># tidy objects only have a data.frame class, not tbl_df or anything else</span>
+  <span style="color:#a6e22e">class</span>(output) <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;data.frame&#34;</span>
+  output
+}
+
+glance.melded <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(x) {
+  <span style="color:#75715e"># Because the properly melded parameters and the simple average of the</span>
+  <span style="color:#75715e"># parameters of these models are roughly the same (see</span>
+  <span style="color:#75715e"># https://www.andrewheiss.com/blog/2018/03/07/amelia-tidy-melding/), for the</span>
+  <span style="color:#75715e"># sake of simplicty we just take the average here</span>
+  output <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tibble</span>(models <span style="color:#f92672">=</span> <span style="color:#a6e22e">unclass</span>(x)) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">mutate</span>(glance <span style="color:#f92672">=</span> models <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">map</span>(glance)) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">unnest</span>(glance) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">summarize_at</span>(<span style="color:#a6e22e">vars</span>(r.squared, adj.r.squared, sigma, statistic, p.value, df, 
+                      logLik, AIC, BIC, deviance, df.residual),
+                 <span style="color:#a6e22e">list</span>(mean)) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">mutate</span>(m <span style="color:#f92672">=</span> <span style="color:#a6e22e">as.integer</span>(<span style="color:#a6e22e">length</span>(x)))
+  
+  <span style="color:#75715e"># glance objects only have a data.frame class, not tbl_df or anything else</span>
+  <span style="color:#a6e22e">class</span>(output) <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;data.frame&#34;</span>
+  output
+}
+
+nobs.melded <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(x, <span style="color:#66d9ef">...</span>) {
+  <span style="color:#75715e"># Take the number of observations from the first model</span>
+  <span style="color:#a6e22e">nobs</span>(x[[1]])
+}
+</code></pre></div><p>With these three functions, we can now use <code>glance()</code> and <code>tidy()</code> on a list of models with the class <code>melded</code>, like so:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Extract the models into a vector and make it a &#34;melded&#34; class</span>
+models_imputed <span style="color:#f92672">&lt;-</span> models_imputed_df<span style="color:#f92672">$</span>model
+<span style="color:#75715e"># Without this, R won&#39;t use our custom tidy.melded() or glance.melded() functions</span>
+<span style="color:#a6e22e">class</span>(models_imputed) <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;melded&#34;</span>
+<span style="color:#a6e22e">glance</span>(models_imputed)
+<span style="color:#75715e">##   r.squared adj.r.squared sigma statistic  p.value df logLik  AIC  BIC deviance</span>
+<span style="color:#75715e">## 1     0.657         0.651   348       112 9.68e-28  2   -871 1750 1761 14154815</span>
+<span style="color:#75715e">##   df.residual m</span>
+<span style="color:#75715e">## 1         117 5</span>
+<span style="color:#a6e22e">tidy</span>(models_imputed)
+<span style="color:#75715e">##          term estimate std.error statistic  p.value</span>
+<span style="color:#75715e">## 1 (Intercept)    120.6     96.67      1.25 2.15e-01</span>
+<span style="color:#75715e">## 2       trade     18.1      1.24     14.63 3.45e-28</span>
+<span style="color:#75715e">## 3      civlib   -637.8    181.13     -3.52 6.13e-04</span>
+</code></pre></div><p>Even better, though, is that we can use these imputed models in a huxtable regression table. And, because I included a column named <code>m</code> in <code>glance.melded()</code>, we can also include it in the regression output!</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">huxreg</span>(model_original1, model_original2, models_imputed,
+       statistics <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(N <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;nobs&#34;</span>, R2 <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;r.squared&#34;</span>, `Adj R2` <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;adj.r.squared&#34;</span>, 
+                      <span style="color:#e6db74">&#34;logLik&#34;</span>, <span style="color:#e6db74">&#34;AIC&#34;</span>, <span style="color:#e6db74">&#34;m&#34;</span>)) <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">print_screen</span>()
+<span style="color:#75715e">##                ────────────────────────────────────────────────────────────</span>
+<span style="color:#75715e">##                                         (1)            (2)            (3)  </span>
+<span style="color:#75715e">##                              ──────────────────────────────────────────────</span>
+<span style="color:#75715e">##                  (Intercept)    136.063        166.435        120.591      </span>
+<span style="color:#75715e">##                                (100.409)       (94.871)       (96.669)     </span>
+<span style="color:#75715e">##                  trade           18.027 ***     18.494 ***     18.089 ***  </span>
+<span style="color:#75715e">##                                  (1.272)        (1.204)        (1.237)     </span>
+<span style="color:#75715e">##                  civlib        -665.428 ***   -588.722 **    -637.832 ***  </span>
+<span style="color:#75715e">##                                (185.436)      (175.717)      (181.130)     </span>
+<span style="color:#75715e">##                  infl                           -6.336 ***                 </span>
+<span style="color:#75715e">##                                                 (1.620)                    </span>
+<span style="color:#75715e">##                              ──────────────────────────────────────────────</span>
+<span style="color:#75715e">##                  N              115            115            120          </span>
+<span style="color:#75715e">##                  R2               0.653          0.695          0.657      </span>
+<span style="color:#75715e">##                  Adj R2           0.647          0.687          0.651      </span>
+<span style="color:#75715e">##                  logLik        -836.136       -828.709       -870.954      </span>
+<span style="color:#75715e">##                  AIC           1680.272       1667.418       1749.908      </span>
+<span style="color:#75715e">##                  m                                              5.000      </span>
+<span style="color:#75715e">##                ────────────────────────────────────────────────────────────</span>
+<span style="color:#75715e">##                  *** p &lt; 0.001; ** p &lt; 0.01; * p &lt; 0.05.                   </span>
+<span style="color:#75715e">## </span>
+<span style="color:#75715e">## Column names: names, model1, model2, model3</span>
+</code></pre></div>
+    
+        <footer>
+            <div class="tags">
+    <i class="fas fa-tags" aria-hidden="true"></i>&ensp;
+    <a href="/blog/tags/r/">r</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/imputation/">imputation</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/tidyverse/">tidyverse</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/markdown/">markdown</a></div>
+
+        </footer>
+
+        <div id="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                 
+                var disqus_shortname = 'andrewheisscom';
+                var disqus_title = document.title;
+                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2018\/03\/08\/amelia-broom-huxtable\/';
+
+                 
+                (function () {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+        </div>
+    </article>
+</section>
+
+  
+
+<script src="/js/math-code.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+<script>
+    MathJax = {
+        tex: {
+            inlineMath: [
+                ['$', '$'], ['\\(', '\\)']
+            ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        }
+    };
+</script>
+
+        </div> 
+    </div> 
+    
+    <div id="footer">
+        <footer>
+    <ul class="links">
+        <li>
+            <a href="mailto:aheiss@gsu.edu" aria-label="E-mail"   >
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/andrewheiss" aria-label="Twitter"   >
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/andrewheiss" aria-label="GitHub"   >
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/andrewheiss" aria-label="YouTube"   >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://stackoverflow.com/users/120898/andrew" aria-label="StackOverflow"   >
+                <i class="fab fa-stack-overflow" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.heissatopia.com" aria-label="Heissatopia (family blog)"   >
+                <i class="fab fa-blogger" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/andrewheiss" aria-label="Facebook"   >
+                <i class="fab fa-facebook" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/in/andrewheiss" aria-label="LinkedIn"   >
+                <i class="fab fa-linkedin" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+
+    <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
+
+    <p class="pgp">
+        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
+    </p>
+
+    <p class="copyright">
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+            title="Creative Commons Attribution-ShareAlike 4.0 International license"><i class="fab fa-creative-commons"></i>
+        <i class="fab fa-creative-commons-by" title="Attribution"></i>
+        <i class="fab fa-creative-commons-share" title="Share alike"></i></a>
+        <span class="cc-year">&bull; 2007&ndash;2021</span>
+    </p>
+
+    <p class="colophon"><a href="https://github.com/andrewheiss/ath-hugo">Code for site</a></p>
+</footer>
+
+    </div>
+
+</body>
+
+</html>

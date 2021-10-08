@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+
+    <meta name="author" content="Andrew Heiss">
+    <meta name="description" content="Use algebra and calculus with R and yacas to find Chidi&#39;s optimal level of pizza and frozen yogurt consumption given his budget and utility function.">
+    <meta name="keywords" content="r, ggplot, tidyverse, yacas, economics">
+    <meta name="generator" content="Hugo 0.88.1" />
+
+    <title>
+  Chidi&#39;s budget and utility: doing algebra and calculus with R and yacas | Andrew Heiss
+</title>
+
+    <link rel="canonical" href="https://www.andrewheiss.com/blog/2019/02/16/algebra-calculus-r-yacas/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+
+    <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
+    <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png?v=1"/>
+    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:title" content="Chidi&#39;s budget and utility: doing algebra and calculus with R and yacas"/>
+    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:description" content="Use algebra and calculus with R and yacas to find Chidi&#39;s optimal level of pizza and frozen yogurt consumption given his budget and utility function."/>
+
+
+    <meta property="og:title" content="Chidi&#39;s budget and utility: doing algebra and calculus with R and yacas" />
+<meta property="og:description" content="Use algebra and calculus with R and yacas to find Chidi&#39;s optimal level of pizza and frozen yogurt consumption given his budget and utility function." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.andrewheiss.com/blog/2019/02/16/algebra-calculus-r-yacas/" />
+<meta property="og:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta property="article:published_time" content="2019-02-16T00:00:00+00:00" />
+<meta property="article:modified_time" content="2019-02-16T00:00:00+00:00" />
+
+<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:section" content="blog" />
+<meta property="article:tag" content="r" />
+<meta property="article:tag" content="ggplot" />
+<meta property="article:tag" content="tidyverse" />
+<meta property="article:tag" content="yacas" />
+<meta property="article:tag" content="economics" />
+
+
+    <meta itemprop="name" content="Chidi&#39;s budget and utility: doing algebra and calculus with R and yacas">
+<meta itemprop="description" content="Use algebra and calculus with R and yacas to find Chidi&#39;s optimal level of pizza and frozen yogurt consumption given his budget and utility function."><meta itemprop="datePublished" content="2019-02-16T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2019-02-16T00:00:00+00:00" />
+<meta itemprop="wordCount" content="3580"><meta itemprop="image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta itemprop="keywords" content="r,ggplot,tidyverse,yacas,economics," />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/pure-and-grids-responsive.min.css">
+    <link rel="stylesheet" href="/css/ath-hugo.min.c5619237d890aa972042ca0497d2594d6f3f34b1746c377f560f5096573fb6e3.css" integrity="sha256-xWGSN9iQqpcgQsoEl9JZTW8/NLF0bDd/Vg9Qllc/tuM=" crossorigin="anonymous" media="screen" />
+
+    <script src="https://kit.fontawesome.com/f9d343c40d.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=dLX2MbQJLG">
+    <link rel="manifest" href="/site.webmanifest?v=dLX2MbQJLG">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=dLX2MbQJLG" color="#cf4446">
+    <link rel="shortcut icon" href="/favicon.ico?v=dLX2MbQJLG">
+    <meta name="msapplication-TileColor" content="#170c3a">
+    <meta name="theme-color" content="#170c3a">
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-527449-5', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+
+    <div id="layout" class="pure-g">
+        <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
+            <header>
+                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
+                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+
+                <nav id="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cv/">CV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/research/">Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/teaching/">Teaching</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/talks/">Talks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/now/">Now</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uses/">Uses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+        </div> 
+    
+        <div id="content" class="pure-u-1 pure-u-md-3-4">
+        
+  <section>
+    <article class="content-single">
+        <header class="post-header">
+            <h1 class="post-title">Chidi&rsquo;s budget and utility: doing algebra and calculus with R and yacas</h1>
+
+            <div class="post-meta pure-g">
+                <div class="pure-u-1-2">
+                    <span class="posted-on">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime='2019-02-16T00:00:00Z'>
+                            Saturday, February 16, 2019
+                        </time>
+                    </span>
+                </div>
+                <div class="reading-time pure-u-1-2">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    17-minute read
+                </div>
+            </div>
+        </header>
+    
+        <p><span class="small">(<a href="https://github.com/andrewheiss/algebra-calculus-r-yacas">See this notebook on GitHub</a>)</span></p>
+<hr>
+<p>A year ago, <a href="blog/2018/02/15/derivatives-r-fun/">I wrote about how to use R to solve a typical microeconomics problem</a>: finding the optimal price and quantity of some product given its demand and cost. Doing this involves setting the first derivatives of two functions equal to each other and using algebra to find where they cross. I showed how to use neat functions like <code>Deriv::Deriv()</code> and <code>splinefun()</code> and make fancy plots showing supply and demand and it’s pretty cool. I wrote it mostly because I was teaching an introductory microeconomics course and wanted an easy, generalizable, and manual math-less way to make these plots for my students’ exercises and problem sets, and it works great.</p>
+<p>I’m teaching microeconomics again this year and decided to tackle a trickier problem that involves curvier curves, more variables, and more math. And the results are even cooler and open the door for more doing math and symbolic algebra directly with R.</p>
+<p>Another typical microeconomics problem is to find the optimal level of consumption of two goods, given their prices, your budget, and your preferences for those goods. It involves (1) constructing a budget line that shows the feasible level of consumption, (2) drawing indifference curves that show the combination of goods that give you the same amount of happiness, or utility, or utils, and (3) finding which indifference curve is tangent line and where that happens. The point where the budget matches the indifference curve is the optimal utility maximizing point. The more mathy approach is that we need to find where the slope of the budget line, or <em>marginal rate of transformation</em> (MRT) is equal to the slope of the indifference curve, or <em>marginal rate of substitution</em> (MRS).</p>
+<p>For this situation, imagine a mild-mannered professor named <a href="https://thegoodplace.fandom.com/wiki/Chidi_Anagonye">Chidi Anagonye</a> who is crippled with decision anxiety (he is also dead). He has to choose the best combination of pizza and frozen yogurt, but doesn’t know what to do! Here’s the information he has:</p>
+<ul>
+<li>He has a budget of $45 and must spend it all.</li>
+<li>Slices of Hawaiian pizza cost $3. We’ll abbreviate this as \(x\).</li>
+<li>Bowls of frozen yogurt cost $1.50. We’ll abbreviate this as \(y\).</li>
+<li>The happiness Chidi gets from eating pizza and frozen yogurt can be modeled with this utility function:</li>
+</ul>
+<p>$$
+U(x, y) = x^2\ 0.25y
+$$</p>
+<p>Armed with only this information, we can find the optimal number of pizza slices and bowls of yogurt. So buckle up, <a href="https://www.youtube.com/watch?v=2c-AawAKZ14">my little chili babies</a>. Let’s do this with R!</p>
+<ul>
+<li><a href="#step-0-a-brief-note-about-math-in-r">Step 0: A brief note about math in R</a></li>
+<li><a href="#step-1-plot-a-budget-line">Step 1: Plot a budget line</a></li>
+<li><a href="#step-2-plot-utility-and-indifference-curves">Step 2: Plot utility and indifference curves</a></li>
+<li><a href="#step-3-find-where-the-indifference-curve-and-budget-line-are-tangent">Step 3: Find where the indifference curve and budget line are tangent</a></li>
+<li><a href="#tldr-complete-example">tl;dr complete example</a></li>
+</ul>
+<h2 id="step-0-a-brief-note-about-math-in-r">Step 0: A brief note about math in R</h2>
+<p>R is phenomenal software for statistics and graphics and all sorts of other things, but it was not invented to do higher level algebra and calculus. Expensive programs like <a href="https://en.wikipedia.org/wiki/MATLAB">MATLAB</a> and <a href="https://en.wikipedia.org/wiki/Wolfram_Mathematica">Mathematica</a> were invented for this kind of complicated numerical computing (and Wolfram Alpha is really neat! Try searching for <a href="https://www.wolframalpha.com/input/?i=derive+3x%5E2">“derive 3x^2”</a> there and see what happens!). There are also a bunch of open source <a href="https://en.wikipedia.org/wiki/Computer_algebra_system">computer algebra systems</a> (CAS) that let you do mathy things with formulas, like <a href="https://en.wikipedia.org/wiki/SageMath">SageMath</a>, <a href="https://en.wikipedia.org/wiki/SymPy">SymPy</a>, and <a href="http://www.yacas.org/">Yacas</a>.</p>
+<p>Many of these CAS libraries have interfaces with R, like <a href="https://cran.r-project.org/web/packages/rSymPy/index.html"><strong>rSymPy</strong></a> and <a href="https://cran.r-project.org/web/packages/Ryacas/index.html"><strong>Ryacas</strong></a>. However, they’re fairly undocumented and <strong>rSymPy</strong> hasn’t been updated since 2010. Additionally, <strong>rSymPy</strong> requires <strong>rJava</strong> (for whatever reason), which is a gigantic headache to install. <strong>Ryacas</strong>, on the other hand, doesn’t have a ton of dependencies, is actively maintained, and is <em>slightly</em> better documented.</p>
+<p>There are like <a href="https://cran.r-project.org/web/packages/Ryacas/vignettes/getting-started.html">a billion examples of how to use <strong>Ryacas</strong> here</a> or <a href="https://stackoverflow.com/questions/47474121/how-to-rearrange-the-complex-algebraic-equation-in-r">on StackOverflow</a>, but here are just a few tiny examples to show what it can do:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(Ryacas)
+
+<span style="color:#75715e"># Define some variables to work with</span>
+x <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Sym</span>(<span style="color:#e6db74">&#34;x&#34;</span>)
+y <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Sym</span>(<span style="color:#e6db74">&#34;y&#34;</span>)
+
+<span style="color:#75715e"># Write a formula as a string or R expression</span>
+<span style="color:#a6e22e">yacas</span>(<span style="color:#e6db74">&#34;x^2 + 5&#34;</span>)
+<span style="color:#75715e">## expression(x^2 + 5)</span>
+
+<span style="color:#a6e22e">yacas</span>(x^2 <span style="color:#f92672">+</span> <span style="color:#ae81ff">5</span>)
+<span style="color:#75715e">## expression(x^2 + 5)</span>
+
+<span style="color:#75715e"># Find the derivative of a complicated formula</span>
+<span style="color:#a6e22e">yacas</span>(<span style="color:#a6e22e">deriv</span>(x^2 <span style="color:#f92672">*</span> (<span style="color:#ae81ff">5</span><span style="color:#f92672">*</span>y)^3), x)
+<span style="color:#75715e">## expression(2 * (x * (5 * y)^3))</span>
+
+<span style="color:#75715e"># Find the derivative of an R function (!!!)</span>
+neat_function <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(x, y) x^2 <span style="color:#f92672">*</span> (<span style="color:#ae81ff">5</span><span style="color:#f92672">*</span>y)^3
+<span style="color:#a6e22e">yacas</span>(<span style="color:#a6e22e">deriv</span>(<span style="color:#a6e22e">neat_function</span>(x, y), x))  <span style="color:#75715e"># d/dx</span>
+<span style="color:#75715e">## expression(2 * (x * (5 * y)^3))</span>
+
+<span style="color:#a6e22e">yacas</span>(<span style="color:#a6e22e">deriv</span>(<span style="color:#a6e22e">neat_function</span>(x, y), y))  <span style="color:#75715e"># d/dy</span>
+<span style="color:#75715e">## expression(x^2 * (15 * (5 * y)^2))</span>
+
+<span style="color:#75715e"># Solve a complicated formula</span>
+<span style="color:#a6e22e">Solve</span>(x^2 <span style="color:#f92672">+</span> (<span style="color:#ae81ff">5</span><span style="color:#f92672">*</span>y) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>, y)
+<span style="color:#75715e">## Yacas vector:</span>
+<span style="color:#75715e">## [1] y == -(x^2/5)</span>
+
+<span style="color:#75715e"># Write these yacas things as LaTeX</span>
+<span style="color:#a6e22e">cat</span>(<span style="color:#a6e22e">TeXForm</span>(<span style="color:#a6e22e">yacas</span>(<span style="color:#a6e22e">neat_function</span>(x, y))))
+<span style="color:#75715e">## x ^{2} \left( 5 y\right)  ^{3}</span>
+</code></pre></div><p>What’s really neat about <strong>Ryacas</strong> is that because it returns expressions, you can use them as pseudo functions within R using <code>Eval()</code>. You can even build wrapper functions with <code>Eval()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">deriv_neat_function <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(my_y, my_x) {
+  derived <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">yacas</span>(<span style="color:#a6e22e">deriv</span>(<span style="color:#a6e22e">neat_function</span>(x, y), x))
+  <span style="color:#a6e22e">Eval</span>(derived, <span style="color:#a6e22e">list</span>(x <span style="color:#f92672">=</span> my_x, y <span style="color:#f92672">=</span> my_y))
+}
+
+<span style="color:#a6e22e">deriv_neat_function</span>(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>)
+<span style="color:#75715e">## [1] 500</span>
+</code></pre></div><p>Again, this is just scratching the surface of what <strong>Ryacas</strong> can do. There are also more powerful CAS libraries, like Python’s <a href="https://www.sympy.org/en/index.html">SymPy</a>, though it doesn’t currently have a nice interface with R (but you could theoretically use <a href="https://rstudio.github.io/reticulate/"><strong>reticulate</strong></a> to feed R objects directly to Python, do mathy things with them, and return them to R).</p>
+<h2 id="step-1-plot-a-budget-line">Step 1: Plot a budget line</h2>
+<p>With that mathy stuff out of the way, we can finally start figuring out Chidi’s optimal level of consumption. First, we’ll load our libraries, create a custom ggplot theme, and set up some variables to work with <strong>Ryacas</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(tidyverse)
+<span style="color:#a6e22e">library</span>(Ryacas)
+
+<span style="color:#75715e"># Make a few minor adjustments to theme_classic()</span>
+<span style="color:#75715e"># I&#39;m using Encode Sans Condensed: https://fonts.google.com/specimen/Encode+Sans+Condensed</span>
+theme_econ <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>() {
+  <span style="color:#a6e22e">theme_classic</span>(base_family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Encode Sans Condensed&#34;</span>) <span style="color:#f92672">+</span> 
+    <span style="color:#a6e22e">theme</span>(axis.title.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(margin <span style="color:#f92672">=</span> <span style="color:#a6e22e">margin</span>(t <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>)),
+          axis.title.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(margin <span style="color:#f92672">=</span> <span style="color:#a6e22e">margin</span>(r <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>)),
+          axis.title <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Encode Sans Condensed Medium&#34;</span>))
+}
+
+<span style="color:#75715e"># Make all labels automatically use Encode Sans</span>
+<span style="color:#a6e22e">update_geom_defaults</span>(<span style="color:#e6db74">&#34;label&#34;</span>, <span style="color:#a6e22e">list</span>(family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Encode Sans Condensed Bold&#34;</span>))
+
+<span style="color:#75715e"># Yacas variables</span>
+x <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Sym</span>(<span style="color:#e6db74">&#34;x&#34;</span>)
+y <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Sym</span>(<span style="color:#e6db74">&#34;y&#34;</span>)
+U <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Sym</span>(<span style="color:#e6db74">&#34;U&#34;</span>)
+</code></pre></div><p>To build the budget line, we need to figure out how many pizzas and yogurts Chidi would buy if he spent all his money on each item. We can do this with some simple math:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">total_budget <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">45</span>
+price_x <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">3</span>
+price_y <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">1.5</span>
+
+n_pizza <span style="color:#f92672">&lt;-</span> total_budget <span style="color:#f92672">/</span> price_x
+n_pizza
+<span style="color:#75715e">## [1] 15</span>
+
+n_yogurt <span style="color:#f92672">&lt;-</span> total_budget <span style="color:#f92672">/</span> price_y
+n_yogurt
+<span style="color:#75715e">## [1] 30</span>
+
+slope <span style="color:#f92672">&lt;-</span> <span style="color:#f92672">-</span>n_yogurt <span style="color:#f92672">/</span> n_pizza
+slope
+<span style="color:#75715e">## [1] -2</span>
+</code></pre></div><p>That’s 15 pizzas or 30 yogurts. We can use this information to build a formula. Since we can draw a line using the $y = mx + b$ form, we need to figure out the slope ($m$) and y-intercept ($b$). The y-intercept here is 30, or the number of yogurts he’d eat if x is 0, and the slope is the number of yogurts divided by the number of pizzas, or -2. That means the budget line is:</p>
+<p>$$
+y = -2x + 30
+$$</p>
+<p>We’ll write this as an R function, and then we can use <code>stat_function()</code> in <strong>ggplot2</strong> to plot it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">budget <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(x) (slope <span style="color:#f92672">*</span> x) <span style="color:#f92672">+</span> n_yogurt
+
+<span style="color:#a6e22e">ggplot</span>() <span style="color:#f92672">+</span> 
+  <span style="color:#75715e"># Draw the line</span>
+  <span style="color:#a6e22e">stat_function</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">tibble</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">:</span><span style="color:#ae81ff">15</span>), <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> x),
+                fun <span style="color:#f92672">=</span> budget, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#638ccc&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Add a label</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;label&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">budget</span>(<span style="color:#ae81ff">2.5</span>), 
+           label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Budget&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#638ccc&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Slices of pizza&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Bowls of frozen yogurt&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Make the axes go all the way to zero</span>
+  <span style="color:#a6e22e">scale_x_continuous</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>), breaks <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">15</span>, <span style="color:#ae81ff">5</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_y_continuous</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>), breaks <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">10</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(xlim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">16</span>), ylim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">32</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_econ</span>()
+</code></pre></div><figure><img src="plot-budget-1.png"
+         alt="Budget line"/>
+</figure>
+
+<p>Any point along that line will use up Chidi’s entire budget. He can’t afford any point above the line, and he’s not efficiently spending his money if he chooses any point below the line (like 5 pizzas and 10 yogurts, for instance).</p>
+<h2 id="step-2-plot-utility-and-indifference-curves">Step 2: Plot utility and indifference curves</h2>
+<p>Like we said at the beginning, Chidi gets utility (or happiness points) from his consumption of pizza and yogurt, based on this formula:</p>
+<p>$$
+U(x, y) = x^2\ 0.25y
+$$</p>
+<p>We can write this as an R function and use it to figure out how happy he’d be with any given amount of pizza and yogurt:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">utility_u <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(x, y) x^2 <span style="color:#f92672">*</span> (<span style="color:#ae81ff">0.25</span> <span style="color:#f92672">*</span> y)
+
+<span style="color:#75715e"># 5 pizzas, 5 yogurt</span>
+<span style="color:#a6e22e">utility_u</span>(<span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">5</span>)
+<span style="color:#75715e">## [1] 31.25</span>
+</code></pre></div><p>He gets 31.25 happiness points from 5 slices of pizza and 5 bowls of frozen yogurt. Neat.</p>
+<p>If we rearrange this utility formula to be in terms of $y$, we can plot the function to show the combinations of pizza and yogurt that would provide the same level of happiness. Ordinarily, you have to do this by hand with algebra, but the tediousness of that is <a href="https://twitter.com/andrewheiss/status/1096537965784748032">what led me down this mathy rabbit hole</a>. We can use <strong>Ryacas</strong> to rearrange this for us! With the <code>Solve()</code> function, we can set Chidi’s utility function to $U$ and solve for $y$ and yacas will rearrange everything for us:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">utility_solved <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Solve</span>(<span style="color:#a6e22e">utility_u</span>(x, y) <span style="color:#f92672">==</span> U, y)
+utility_solved
+<span style="color:#75715e">## Yacas vector:</span>
+<span style="color:#75715e">## [1] y == U/(0.25 * x^2)</span>
+</code></pre></div><p>$$
+\left( y = \frac{U}{0.25 x ^{2}} \right)
+$$</p>
+<p>And with <code>Eval()</code>, we can use this as a function and figure out values of $y$ given different $x$s and $U$s. It’s even vectorized so you can feed it lots of numbers:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">Eval</span>(utility_solved, <span style="color:#a6e22e">list</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>, U <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>))
+<span style="color:#75715e">## [1] &#34;( y == 1.6 )&#34;</span>
+
+<span style="color:#75715e"># It&#39;s already vectorized</span>
+<span style="color:#a6e22e">Eval</span>(utility_solved, <span style="color:#a6e22e">list</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">5</span>, U <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>))
+<span style="color:#75715e">## [1] &#34;( y == 40 )&#34;               &#34;( y == 10 )&#34;              </span>
+<span style="color:#75715e">## [3] &#34;( y == 4.44444444444444 )&#34; &#34;( y == 2.5 )&#34;             </span>
+<span style="color:#75715e">## [5] &#34;( y == 1.6 )&#34;</span>
+</code></pre></div><p>We can make this more general by wrapping a function around it, which lets us pass any $x$ or $U$ we want. More importantly, we convert the text that <code>Eval()</code> returns into a number with <code>str_extract()</code>, which uses a regular expression to pull out the number in the string (including decimals and negative signs).</p>
+<p>Note how the arguments for the function aren’t just <code>x</code> and <code>U</code>, but <code>my_x</code> and <code>my_u</code> instead. That’s because of environment issues—using the same <code>x</code> and <code>U</code> variable names causes conflicts, since it’s not clear if the arguments or the global <code>x</code> and <code>U</code> we set earlier get passed to <code>Solve()</code> or <code>Eval()</code>. To avoid this namespace clash, we rename the arguments.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">utility_y <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(my_x, my_U) {
+  solved <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Solve</span>(<span style="color:#a6e22e">utility_u</span>(x, y) <span style="color:#f92672">==</span> U, y)
+  solution <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Eval</span>(solved, <span style="color:#a6e22e">list</span>(x <span style="color:#f92672">=</span> my_x, U <span style="color:#f92672">=</span> my_U))
+  <span style="color:#75715e"># Regex incantation to extract numbers</span>
+  <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">str_extract</span>(solution, <span style="color:#e6db74">&#34;-?[0-9]\\d*(\\.\\d+)?&#34;</span>))
+}
+
+<span style="color:#75715e"># We could avoid regexes by digging into the deeply nested list that yacas()</span>
+<span style="color:#75715e"># returns, but doing that doesn&#39;t handle negatives very well</span>
+<span style="color:#75715e"># See https://stackoverflow.com/q/8480778/120898</span>
+<span style="color:#75715e"># unlist(as.list(yacas(solution)$text[[1]][[3]]))</span>
+
+<span style="color:#a6e22e">utility_y</span>(<span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">10</span>)
+<span style="color:#75715e">## [1] 1.6</span>
+
+<span style="color:#75715e"># Still vectorized</span>
+<span style="color:#a6e22e">utility_y</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">10</span>)
+<span style="color:#75715e">## [1] 40.000000 10.000000  4.444444  2.500000  1.600000</span>
+</code></pre></div><p>Now that we’ve created this y-based function, we can plot it with <code>stat_function()</code>. Here are a few different indifference curves for different levels of utility:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>() <span style="color:#f92672">+</span> 
+  <span style="color:#75715e"># Budget line</span>
+  <span style="color:#a6e22e">stat_function</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">tibble</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">:</span><span style="color:#ae81ff">15</span>), <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> x),
+                fun <span style="color:#f92672">=</span> budget, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#638ccc&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;label&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">budget</span>(<span style="color:#ae81ff">2.5</span>), 
+           label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Budget&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#638ccc&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># U = 10</span>
+  <span style="color:#a6e22e">stat_function</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">tibble</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">15</span>), <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> x),
+                fun <span style="color:#f92672">=</span> utility_y, args <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(my_U <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>),
+                color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#ab62c0&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;label&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">utility_y</span>(<span style="color:#ae81ff">2.5</span>, <span style="color:#ae81ff">10</span>), 
+           label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;U = 10&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#ab62c0&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># U = 100</span>
+  <span style="color:#a6e22e">stat_function</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">tibble</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">15</span>), <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> x),
+                fun <span style="color:#f92672">=</span> utility_y, args <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(my_U <span style="color:#f92672">=</span> <span style="color:#ae81ff">100</span>),
+                color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#ca5670&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;label&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#ae81ff">7</span>, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">utility_y</span>(<span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">100</span>), 
+           label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;U = 100&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#ca5670&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># U = 500</span>
+  <span style="color:#a6e22e">stat_function</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">tibble</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">15</span>), <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> x),
+                fun <span style="color:#f92672">=</span> utility_y, args <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(my_U <span style="color:#f92672">=</span> <span style="color:#ae81ff">500</span>),
+                color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#c57c3c&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;label&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#ae81ff">12.5</span>, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">utility_y</span>(<span style="color:#ae81ff">12.5</span>, <span style="color:#ae81ff">500</span>), 
+           label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;U = 500&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#c57c3c&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Slices of pizza&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Bowls of frozen yogurt&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_x_continuous</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>), breaks <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">15</span>, <span style="color:#ae81ff">5</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_y_continuous</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>), breaks <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">10</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(xlim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">16</span>), ylim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">32</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_econ</span>()
+</code></pre></div><figure><img src="plot-indifference-1.png"
+         alt="Three indifference curves"/>
+</figure>
+
+<p>Every combination of pizza and yogurt on these indifference curves generates the same level of utility. Cool cool cool.</p>
+<h2 id="step-3-find-where-the-indifference-curve-and-budget-line-are-tangent">Step 3: Find where the indifference curve and budget line are tangent</h2>
+<p>However, we still don’t know what the best level of consumption is. To find that, we need to figure out the point where an indifference curve is tangent to the budget line. Based on the graph, it’s a combination of $x$ and $y$ that yields somewhere between 100 and 500 utils, but that’s a wide range. The mathy way to find this point is to set the slope of the budget line (the marginal rate of transformation) equal to the slope of the indifference curve (the marginal rate of substitution) and solve for $x$ and $y$. In economics, “marginal” means slope, or first derivative, so we need to differentiate our formulas.</p>
+<p>In addition to rearranging formulas, we can use <strong>Ryacas</strong> to derive functions. <a href="https://www.andrewheiss.com/blog/2018/02/15/derivatives-r-fun/">Last year I showed how to use the <strong>Deriv</strong> package to calculate the derivative of a function in R</a>. Those formulas only had one variable to worry about. This utility function has two, which means we need to take the partial derivative with respect to $x$ ($\partial u / \partial x$) and divide it by the partial derivative with respect to $y$ ($\partial u / \partial y$).</p>
+<p>From my minimal tinkering, neither the base R derivative functions nor <code>Deriv::Deriv()</code> can handle partial derivatives well, but <code>Ryacas::deriv()</code> does. Also, since it returns expressions, we can do math (like division!) with the partial derivatives. Here I find each of the partial derivatives and then use <code>Simplify()</code> to clean up their ratio:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Partial derivative with respect to x</span>
+mu_x <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">deriv</span>(<span style="color:#a6e22e">utility_u</span>(x, y), x)
+mu_x
+<span style="color:#75715e">## expression(2 * (x * (0.25 * y)))</span>
+</code></pre></div><p>$$
+\partial u / \partial x = 2 x 0.25 y
+$$</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Partial derivative with respect to y</span>
+mu_y <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">deriv</span>(<span style="color:#a6e22e">utility_u</span>(x, y), y)
+mu_y
+<span style="color:#75715e">## expression(0.25 * x^2)</span>
+</code></pre></div><p>$$
+\partial u / \partial y = 0.25 x ^{2}
+$$</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Cleaned up version</span>
+<span style="color:#a6e22e">Simplify</span>(mu_x <span style="color:#f92672">/</span> mu_y)
+<span style="color:#75715e">## expression(0.5 * y/(0.25 * x))</span>
+</code></pre></div><p>$$
+\frac{\partial u / \partial x}{\partial u / \partial y} = \frac{2 x 0.25 y}{0.25 x ^{2}} = \frac{0.5 y}{0.25 x}
+$$</p>
+<p>This marginal rate of substitution is the slope of the indifference curve at any combination of $x$ and $y$, but it doesn’t incorporate any information about the prices. Before we can find where happiness meets the budget, we have to incorporate prices into the marginal utility, or marginal rate of substitution. Because of calculus proofs that are beyond my skill, the marginal rate of substitution can also be written as a ratio of prices, or $\frac{\text{Price}_x}{\text{Price}_y}$. If we set marginal utility equal to this price ratio and rearrange the formula to be in terms of y, we’ll have the official price-attuned marginal rate of substitution (or slope of the indifference curve).</p>
+<p>To do this with R, we can use <code>Solve()</code> again, only this time we can set the equation equal to the price ratio:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># For unknown reasons, yacas works better with (3 / 1.5) instead of 2, so we</span>
+<span style="color:#75715e"># build the string with price_x and price_y instead of price_x/price_y</span>
+<span style="color:#a6e22e">Solve</span>(<span style="color:#a6e22e">paste</span>(<span style="color:#a6e22e">Simplify</span>(mu_x <span style="color:#f92672">/</span> mu_y), <span style="color:#e6db74">&#34;==&#34;</span>, price_x, <span style="color:#e6db74">&#34;/&#34;</span>, price_y), y)
+<span style="color:#75715e">## Yacas vector:</span>
+<span style="color:#75715e">## [1] y == -(-0.75 * x/0.75)</span>
+</code></pre></div><p>$$
+\left( y =  - \frac{-0.75 x}{0.75} \right)
+$$</p>
+<p>As before, we can turn this solved formula into a function so that we can find the slope of the indifference curve at any x.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">marginal_utility <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(my_x) {
+  mux_muy <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Simplify</span>(<span style="color:#a6e22e">deriv</span>(<span style="color:#a6e22e">utility_u</span>(x, y), x) <span style="color:#f92672">/</span> <span style="color:#a6e22e">deriv</span>(<span style="color:#a6e22e">utility_u</span>(x, y), y))
+  mux_muy_price <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Solve</span>(<span style="color:#a6e22e">paste</span>(mux_muy, <span style="color:#e6db74">&#34;==&#34;</span>, price_x, <span style="color:#e6db74">&#34;/&#34;</span>, price_y), y)
+  solution <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Eval</span>(mux_muy_price, <span style="color:#a6e22e">list</span>(x <span style="color:#f92672">=</span> my_x))
+  <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">str_extract</span>(solution, <span style="color:#e6db74">&#34;-?[0-9]\\d*(\\.\\d+)?&#34;</span>))
+}
+</code></pre></div><p>If we set this formula equal to the budget line and solve for x and y individually, we’ll find the optimal mix of pizza and yogurt. Instead of doing this by hand with algebra, we can use the built-in <code>uniroot()</code> function to see where the two functions are the same. We have to feed <code>uniroot()</code> a range to look in—here I chose 0–100. There’s probably a way to do this with <strong>Ryacas</strong>, but I didn’t want to figure it out. And besides, I already made the <code>marginal_utility()</code> function be an official R function, so I figured I could use it like one here.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Find best x</span>
+optimal_x <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">uniroot</span>(<span style="color:#a6e22e">function</span>(x) <span style="color:#a6e22e">budget</span>(x) <span style="color:#f92672">-</span> <span style="color:#a6e22e">marginal_utility</span>(x), <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">100</span>))<span style="color:#f92672">$</span>root
+optimal_x
+<span style="color:#75715e">## [1] 10</span>
+
+<span style="color:#75715e"># Plug best x into the budget function to find best y</span>
+optimal_y <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">budget</span>(optimal_x)  <span style="color:#75715e"># or marginal_utility(optimal_x)</span>
+optimal_y
+<span style="color:#75715e">## [1] 10</span>
+
+<span style="color:#75715e"># Plug optimal x and y into utility function to find maximum utils given the budget</span>
+max_utility <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">utility_u</span>(optimal_x, optimal_y)
+max_utility
+<span style="color:#75715e">## [1] 250</span>
+</code></pre></div><p>There! We have an answer. The optimal level of consumption is 10 slices of pizza and 10 bowls of frozen yogurt, which yields 250 utils of happiness.</p>
+<p>With these final numbers and derived functions, we can combine all this information into a final plot, which shows that the indifference curve for 250 utils is exactly tangent to the budget line at (10, 10). MAGIC.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>() <span style="color:#f92672">+</span> 
+  <span style="color:#75715e"># Budget line</span>
+  <span style="color:#a6e22e">stat_function</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">tibble</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">:</span><span style="color:#ae81ff">15</span>), <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> x),
+                fun <span style="color:#f92672">=</span> budget, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#638ccc&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;label&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">budget</span>(<span style="color:#ae81ff">2.5</span>), 
+           label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Budget&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#638ccc&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Best indifference curve</span>
+  <span style="color:#a6e22e">stat_function</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">tibble</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">15</span>), <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> x),
+                fun <span style="color:#f92672">=</span> utility_y, args <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(my_U <span style="color:#f92672">=</span> max_utility),
+                color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#ca5670&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;label&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#ae81ff">7</span>, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">utility_y</span>(<span style="color:#ae81ff">7</span>, max_utility), 
+           label <span style="color:#f92672">=</span> <span style="color:#a6e22e">paste0</span>(<span style="color:#e6db74">&#34;U = &#34;</span>, max_utility), color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#ca5670&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Dotted lines to show x and y</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;segment&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, y <span style="color:#f92672">=</span> optimal_y, xend <span style="color:#f92672">=</span> optimal_x, yend <span style="color:#f92672">=</span> optimal_y,
+           linetype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;dashed&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;grey50&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;segment&#34;</span>, x <span style="color:#f92672">=</span> optimal_x, y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, xend <span style="color:#f92672">=</span> optimal_x, yend <span style="color:#f92672">=</span> optimal_y,
+           linetype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;dashed&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;grey50&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Dot at optimal point</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;point&#34;</span>, x <span style="color:#f92672">=</span> optimal_x, y <span style="color:#f92672">=</span> optimal_y, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Slices of pizza&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Bowls of frozen yogurt&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_x_continuous</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>), breaks <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">15</span>, <span style="color:#ae81ff">5</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_y_continuous</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>), breaks <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">10</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(xlim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">16</span>), ylim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">32</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_econ</span>()
+</code></pre></div><figure><img src="plot-everything-1.png"
+         alt="Utility, budget, and optimal point"/>
+</figure>
+
+<p>And there we go. <a href="https://www.youtube.com/watch?v=2c-AawAKZ14&amp;feature=youtu.be&amp;t=128">You all get As. Or Fs. And there is no test. And you all failed it. And you all got As. Who cares. Goodbye.</a></p>
+<h2 id="tldr-complete-example">tl;dr complete example</h2>
+<p>That was a lot of annotated code. Here’s a complete example without all the explanation.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(tidyverse)
+<span style="color:#a6e22e">library</span>(Ryacas)
+
+<span style="color:#a6e22e">update_geom_defaults</span>(<span style="color:#e6db74">&#34;label&#34;</span>, <span style="color:#a6e22e">list</span>(family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Encode Sans Condensed Bold&#34;</span>))
+
+<span style="color:#75715e"># Define some variables to work with</span>
+x <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Sym</span>(<span style="color:#e6db74">&#34;x&#34;</span>)
+y <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Sym</span>(<span style="color:#e6db74">&#34;y&#34;</span>)
+U <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Sym</span>(<span style="color:#e6db74">&#34;U&#34;</span>)
+
+
+<span style="color:#75715e"># Prices and budget -------------------------------------------------------</span>
+total_budget <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">45</span>
+price_x <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">3</span>
+price_y <span style="color:#f92672">&lt;-</span> <span style="color:#ae81ff">1.5</span>
+
+<span style="color:#75715e"># Build budget line</span>
+n_pizza <span style="color:#f92672">&lt;-</span> total_budget <span style="color:#f92672">/</span> price_x
+n_yogurt <span style="color:#f92672">&lt;-</span> total_budget <span style="color:#f92672">/</span> price_y
+slope <span style="color:#f92672">&lt;-</span> <span style="color:#f92672">-</span>n_yogurt <span style="color:#f92672">/</span> n_pizza
+
+budget <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(x) (slope <span style="color:#f92672">*</span> x) <span style="color:#f92672">+</span> n_yogurt
+
+
+<span style="color:#75715e"># Utility and indifference ------------------------------------------------</span>
+<span style="color:#75715e"># U = x^2 0.25y</span>
+utility_u <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(x, y) x^2 <span style="color:#f92672">*</span> (<span style="color:#ae81ff">0.25</span> <span style="color:#f92672">*</span> y)
+
+<span style="color:#75715e"># Rewrite as y = something</span>
+utility_y <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(my_x, my_U) {
+  solved <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Solve</span>(<span style="color:#a6e22e">utility_u</span>(x, y) <span style="color:#f92672">==</span> U, y)
+  solution <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Eval</span>(solved, <span style="color:#a6e22e">list</span>(x <span style="color:#f92672">=</span> my_x, U <span style="color:#f92672">=</span> my_U))
+  <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">str_extract</span>(solution, <span style="color:#e6db74">&#34;-?[0-9]\\d*(\\.\\d+)?&#34;</span>))
+}
+
+<span style="color:#75715e"># Marginal rate of substitution</span>
+marginal_utility <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(my_x) {
+  mux_muy <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Simplify</span>(<span style="color:#a6e22e">deriv</span>(<span style="color:#a6e22e">utility_u</span>(x, y), x) <span style="color:#f92672">/</span> <span style="color:#a6e22e">deriv</span>(<span style="color:#a6e22e">utility_u</span>(x, y), y))
+  mux_muy_price <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Solve</span>(<span style="color:#a6e22e">paste</span>(mux_muy, <span style="color:#e6db74">&#34;==&#34;</span>, price_x, <span style="color:#e6db74">&#34;/&#34;</span>, price_y), y)
+  solution <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">Eval</span>(mux_muy_price, <span style="color:#a6e22e">list</span>(x <span style="color:#f92672">=</span> my_x))
+  <span style="color:#a6e22e">as.numeric</span>(<span style="color:#a6e22e">str_extract</span>(solution, <span style="color:#e6db74">&#34;-?[0-9]\\d*(\\.\\d+)?&#34;</span>))
+}
+
+
+<span style="color:#75715e"># Optimal points ----------------------------------------------------------</span>
+<span style="color:#75715e"># Find best x</span>
+optimal_x <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">uniroot</span>(<span style="color:#a6e22e">function</span>(x) <span style="color:#a6e22e">budget</span>(x) <span style="color:#f92672">-</span> <span style="color:#a6e22e">marginal_utility</span>(x), <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">100</span>))<span style="color:#f92672">$</span>root
+
+<span style="color:#75715e"># Plug best x into the budget function to find best y</span>
+optimal_y <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">budget</span>(optimal_x)
+
+<span style="color:#75715e"># Plug optimal x and y into utility function to find maximum utils given the budget</span>
+max_utility <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">utility_u</span>(optimal_x, optimal_y)
+
+
+<span style="color:#75715e"># Plot everything ---------------------------------------------------------</span>
+<span style="color:#a6e22e">ggplot</span>() <span style="color:#f92672">+</span> 
+  <span style="color:#75715e"># Budget line</span>
+  <span style="color:#a6e22e">stat_function</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">tibble</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">:</span><span style="color:#ae81ff">15</span>), <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> x),
+                fun <span style="color:#f92672">=</span> budget, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#638ccc&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;label&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">budget</span>(<span style="color:#ae81ff">2.5</span>), 
+           label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Budget&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#638ccc&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Best indifference curve</span>
+  <span style="color:#a6e22e">stat_function</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">tibble</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">15</span>), <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> x),
+                fun <span style="color:#f92672">=</span> utility_y, args <span style="color:#f92672">=</span> <span style="color:#a6e22e">list</span>(my_U <span style="color:#f92672">=</span> max_utility),
+                color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#ca5670&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;label&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#ae81ff">7</span>, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">utility_y</span>(<span style="color:#ae81ff">7</span>, max_utility), 
+           label <span style="color:#f92672">=</span> <span style="color:#a6e22e">paste0</span>(<span style="color:#e6db74">&#34;U = &#34;</span>, max_utility), color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#ca5670&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Dotted lines to show x and y</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;segment&#34;</span>, x <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, y <span style="color:#f92672">=</span> optimal_y, xend <span style="color:#f92672">=</span> optimal_x, yend <span style="color:#f92672">=</span> optimal_y,
+           linetype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;dashed&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;grey50&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;segment&#34;</span>, x <span style="color:#f92672">=</span> optimal_x, y <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, xend <span style="color:#f92672">=</span> optimal_x, yend <span style="color:#f92672">=</span> optimal_y,
+           linetype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;dashed&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;grey50&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Dot at optimal point</span>
+  <span style="color:#a6e22e">annotate</span>(geom <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;point&#34;</span>, x <span style="color:#f92672">=</span> optimal_x, y <span style="color:#f92672">=</span> optimal_y, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">3</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Slices of pizza&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Bowls of frozen yogurt&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_x_continuous</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>), breaks <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">15</span>, <span style="color:#ae81ff">5</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_y_continuous</span>(expand <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>), breaks <span style="color:#f92672">=</span> <span style="color:#a6e22e">seq</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">10</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(xlim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">16</span>), ylim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">32</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_classic</span>(base_family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Encode Sans Condensed&#34;</span>) <span style="color:#f92672">+</span> 
+  <span style="color:#a6e22e">theme</span>(axis.title.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(margin <span style="color:#f92672">=</span> <span style="color:#a6e22e">margin</span>(t <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>)),
+        axis.title.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(margin <span style="color:#f92672">=</span> <span style="color:#a6e22e">margin</span>(r <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>)),
+        axis.title <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Encode Sans Condensed Medium&#34;</span>))
+</code></pre></div><figure><img src="complete-example-1.png"
+         alt="Complete example"/>
+</figure>
+
+
+    
+        <footer>
+            <div class="tags">
+    <i class="fas fa-tags" aria-hidden="true"></i>&ensp;
+    <a href="/blog/tags/r/">r</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/ggplot/">ggplot</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/tidyverse/">tidyverse</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/yacas/">yacas</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/economics/">economics</a></div>
+
+        </footer>
+
+        <div id="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                 
+                var disqus_shortname = 'andrewheisscom';
+                var disqus_title = document.title;
+                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2019\/02\/16\/algebra-calculus-r-yacas\/';
+
+                 
+                (function () {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+        </div>
+    </article>
+</section>
+
+  
+
+<script src="/js/math-code.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+<script>
+    MathJax = {
+        tex: {
+            inlineMath: [
+                ['$', '$'], ['\\(', '\\)']
+            ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        }
+    };
+</script>
+
+        </div> 
+    </div> 
+    
+    <div id="footer">
+        <footer>
+    <ul class="links">
+        <li>
+            <a href="mailto:aheiss@gsu.edu" aria-label="E-mail"   >
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/andrewheiss" aria-label="Twitter"   >
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/andrewheiss" aria-label="GitHub"   >
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/andrewheiss" aria-label="YouTube"   >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://stackoverflow.com/users/120898/andrew" aria-label="StackOverflow"   >
+                <i class="fab fa-stack-overflow" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.heissatopia.com" aria-label="Heissatopia (family blog)"   >
+                <i class="fab fa-blogger" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/andrewheiss" aria-label="Facebook"   >
+                <i class="fab fa-facebook" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/in/andrewheiss" aria-label="LinkedIn"   >
+                <i class="fab fa-linkedin" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+
+    <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
+
+    <p class="pgp">
+        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
+    </p>
+
+    <p class="copyright">
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+            title="Creative Commons Attribution-ShareAlike 4.0 International license"><i class="fab fa-creative-commons"></i>
+        <i class="fab fa-creative-commons-by" title="Attribution"></i>
+        <i class="fab fa-creative-commons-share" title="Share alike"></i></a>
+        <span class="cc-year">&bull; 2007&ndash;2021</span>
+    </p>
+
+    <p class="colophon"><a href="https://github.com/andrewheiss/ath-hugo">Code for site</a></p>
+</footer>
+
+    </div>
+
+</body>
+
+</html>

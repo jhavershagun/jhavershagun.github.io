@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+
+    <meta name="author" content="Andrew Heiss">
+    <meta name="description" content="Use ggplot to do fun and fancy things with Minard&#39;s famous plot of Napoleon&#39;s 1812 retreat from Russia.">
+    <meta name="keywords" content="r, ggplot, dataviz">
+    <meta name="generator" content="Hugo 0.88.1" />
+
+    <title>
+  Exploring Minard&#39;s 1812 plot with ggplot2 | Andrew Heiss
+</title>
+
+    <link rel="canonical" href="https://www.andrewheiss.com/blog/2017/08/10/exploring-minards-1812-plot-with-ggplot2/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+
+    <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
+    <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://www.andrewheiss.com/blog/2017/08/10/exploring-minards-1812-plot-with-ggplot2/combined-simple-1.png"/>
+    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:title" content="Exploring Minard&#39;s 1812 plot with ggplot2"/>
+    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:description" content="Use ggplot to do fun and fancy things with Minard&#39;s famous plot of Napoleon&#39;s 1812 retreat from Russia."/>
+
+
+    <meta property="og:title" content="Exploring Minard&#39;s 1812 plot with ggplot2" />
+<meta property="og:description" content="Use ggplot to do fun and fancy things with Minard&#39;s famous plot of Napoleon&#39;s 1812 retreat from Russia." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.andrewheiss.com/blog/2017/08/10/exploring-minards-1812-plot-with-ggplot2/" />
+<meta property="og:image" content="https://www.andrewheiss.com/blog/2017/08/10/exploring-minards-1812-plot-with-ggplot2/combined-simple-1.png" />
+<meta property="article:published_time" content="2017-08-10T00:00:00+00:00" />
+<meta property="article:modified_time" content="2017-08-10T00:00:00+00:00" />
+
+<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:section" content="blog" />
+<meta property="article:tag" content="r" />
+<meta property="article:tag" content="ggplot" />
+<meta property="article:tag" content="dataviz" />
+
+
+    <meta itemprop="name" content="Exploring Minard&#39;s 1812 plot with ggplot2">
+<meta itemprop="description" content="Use ggplot to do fun and fancy things with Minard&#39;s famous plot of Napoleon&#39;s 1812 retreat from Russia."><meta itemprop="datePublished" content="2017-08-10T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2017-08-10T00:00:00+00:00" />
+<meta itemprop="wordCount" content="2451"><meta itemprop="image" content="https://www.andrewheiss.com/blog/2017/08/10/exploring-minards-1812-plot-with-ggplot2/combined-simple-1.png">
+<meta itemprop="keywords" content="r,ggplot,dataviz," />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/pure-and-grids-responsive.min.css">
+    <link rel="stylesheet" href="/css/ath-hugo.min.c5619237d890aa972042ca0497d2594d6f3f34b1746c377f560f5096573fb6e3.css" integrity="sha256-xWGSN9iQqpcgQsoEl9JZTW8/NLF0bDd/Vg9Qllc/tuM=" crossorigin="anonymous" media="screen" />
+
+    <script src="https://kit.fontawesome.com/f9d343c40d.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=dLX2MbQJLG">
+    <link rel="manifest" href="/site.webmanifest?v=dLX2MbQJLG">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=dLX2MbQJLG" color="#cf4446">
+    <link rel="shortcut icon" href="/favicon.ico?v=dLX2MbQJLG">
+    <meta name="msapplication-TileColor" content="#170c3a">
+    <meta name="theme-color" content="#170c3a">
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-527449-5', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+
+    <div id="layout" class="pure-g">
+        <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
+            <header>
+                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
+                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+
+                <nav id="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cv/">CV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/research/">Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/teaching/">Teaching</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/talks/">Talks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/now/">Now</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uses/">Uses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+        </div> 
+    
+        <div id="content" class="pure-u-1 pure-u-md-3-4">
+        
+  <section>
+    <article class="content-single">
+        <header class="post-header">
+            <h1 class="post-title">Exploring Minard&rsquo;s 1812 plot with ggplot2</h1>
+
+            <div class="post-meta pure-g">
+                <div class="pure-u-1-2">
+                    <span class="posted-on">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime='2017-08-10T00:00:00Z'>
+                            Thursday, August 10, 2017
+                        </time>
+                    </span>
+                </div>
+                <div class="reading-time pure-u-1-2">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    12-minute read
+                </div>
+            </div>
+        </header>
+    
+        <p>For whatever reason, I decided to start reading Tolstoy&rsquo;s <em>War and Peace</em> (via Audible) the week I had to turn in my dissertation. I still have a dozen or so hours to go, but the book has been incredible. I had no idea what it was about going into it, and was delighted to find that the &ldquo;war&rdquo; parts of the book deal with the Napolonic wars—both his 1804–1805 campaign in the <a href="https://en.wikipedia.org/wiki/War_of_the_Third_Coalition">War of the Third Coalition</a> (like the <a href="https://en.wikipedia.org/wiki/Battle_of_Austerlitz">Battle of Austerlitz</a>), and his <a href="https://en.wikipedia.org/wiki/French_invasion_of_Russia">1812 campaign to invade Russia</a>, from whence we get <a href="https://en.wikipedia.org/wiki/1812_Overture">Tchaikovsky&rsquo;s <em>1812 Overture</em></a>. I knew <em>nothing</em> about these wars and Tolstoy&rsquo;s descriptions are incredible and gripping.</p>
+<p>It&rsquo;s been especially exciting because I&rsquo;m preparing a course on data visualization this fall and had been looking forward to using <a href="https://en.wikipedia.org/wiki/Charles_Joseph_Minard#Work">Charles Minard&rsquo;s famous plot</a> about Napoleon&rsquo;s 1812 winter retreat from Moscow, where the Grande Armée dropped from 422,000 to 10,000 troops.</p>
+<p><img src="Minard.png" alt="Original Minard plot"></p>
+<p>Edward Tufte has said that Minard&rsquo;s plot &ldquo;may well be the best statistical graphic ever drawn&rdquo; because it manages to pack a ton of information into one dense figure. The plot contains six variables, each mapped to a different aesthetic:</p>
+
+
+
+
+
+<table class="pure-table pure-table-horizontal">
+<thead>
+<tr>
+<th>Information</th>
+<th>Aesthetic</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Size of Napoleon&rsquo;s Grande Armée</td>
+<td>Width of path</td>
+</tr>
+<tr>
+<td>Longitude of the army&rsquo;s position</td>
+<td>x-axis</td>
+</tr>
+<tr>
+<td>Latitude of the army&rsquo;s position</td>
+<td>y-axis</td>
+</tr>
+<tr>
+<td>Direction of the army&rsquo;s movement</td>
+<td>Color of path</td>
+</tr>
+<tr>
+<td>Date of points along retreat path</td>
+<td>Text below plot</td>
+</tr>
+<tr>
+<td>Temperature during the army&rsquo;s retreat</td>
+<td>Line below plot</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>Designers and statisticians have recreated this plot dozens of times—there are <a href="http://www.datavis.ca/gallery/re-minard.php">galleries of attempts</a> all around the internet. It&rsquo;s even included in Hadley Wickham&rsquo;s <a href="http://vita.had.co.nz/papers/layered-grammar.pdf">original article introducting <code>ggplot2</code></a>. Creating the plot in R is fairly trivial and <a href="http://www.datavis.ca/gallery/minard/ggplot2/minard.r">requires minimal code</a>, thanks to ggplot&rsquo;s clear grammar for data graphics.</p>
+<p>In the seven years since Hadley&rsquo;s original article, ggplot and R have matured significantly (thanks, in large part, due to the <a href="http://www.tidyverse.org/">tidyverse</a>). With these improvements, we can add fancier elements to the basic ggplot Minard plot and play around with some fun R features.</p>
+<h2 id="getting-started">Getting started</h2>
+<p>First, we load the necessary libraries and data (data available at <a href="http://www.datavis.ca/gallery/re-minard.php">Michael Friendly&rsquo;s Minard gallery</a> or in the <a href="https://github.com/andrewheiss/fancy-minard/tree/master/input/minard">GitHub repository for this notebook</a>.)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(tidyverse)
+<span style="color:#a6e22e">library</span>(lubridate)
+<span style="color:#a6e22e">library</span>(ggmap)
+<span style="color:#a6e22e">library</span>(ggrepel)
+<span style="color:#a6e22e">library</span>(gridExtra)
+<span style="color:#a6e22e">library</span>(pander)
+
+cities <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">read.table</span>(<span style="color:#e6db74">&#34;input/minard/cities.txt&#34;</span>,
+                     header <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>, stringsAsFactors <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)
+
+troops <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">read.table</span>(<span style="color:#e6db74">&#34;input/minard/troops.txt&#34;</span>,
+                     header <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>, stringsAsFactors <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)
+
+temps <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">read.table</span>(<span style="color:#e6db74">&#34;input/minard/temps.txt&#34;</span>,
+                    header <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>, stringsAsFactors <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(date <span style="color:#f92672">=</span> <span style="color:#a6e22e">dmy</span>(date))  <span style="color:#75715e"># Convert string to actual date</span>
+</code></pre></div><h2 id="geography">Geography</h2>
+<p>The troops data includes five variables about troop movement: location, number of survivors, direction (advancing or retreating) and group (since Napoleon had generals commanding different elements of the army).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">troops <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">head</span>() <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">pandoc.table</span>()
+</code></pre></div>
+
+
+
+
+<table class="pure-table pure-table-horizontal">
+<thead>
+<tr>
+<th style="text-align:center">long</th>
+<th style="text-align:center">lat</th>
+<th style="text-align:center">survivors</th>
+<th style="text-align:center">direction</th>
+<th style="text-align:center">group</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">24</td>
+<td style="text-align:center">54.9</td>
+<td style="text-align:center">340000</td>
+<td style="text-align:center">A</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">24.5</td>
+<td style="text-align:center">55</td>
+<td style="text-align:center">340000</td>
+<td style="text-align:center">A</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">25.5</td>
+<td style="text-align:center">54.5</td>
+<td style="text-align:center">340000</td>
+<td style="text-align:center">A</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">26</td>
+<td style="text-align:center">54.7</td>
+<td style="text-align:center">320000</td>
+<td style="text-align:center">A</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">27</td>
+<td style="text-align:center">54.8</td>
+<td style="text-align:center">300000</td>
+<td style="text-align:center">A</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">28</td>
+<td style="text-align:center">54.9</td>
+<td style="text-align:center">280000</td>
+<td style="text-align:center">A</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>Each of these variables maps well into ggplot&rsquo;s aesthetic-based paradigm. If we include just geographic and group information (so there are separate lines for the different divisions), we get a basic skeleton of the original plot:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(troops, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, group <span style="color:#f92672">=</span> group)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_path</span>()
+</code></pre></div><p><img src="troops-1-1.png" alt="Troops, line"></p>
+<p>We can map data to other aesthetics, like color and size:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(troops, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, group <span style="color:#f92672">=</span> group,
+                   color <span style="color:#f92672">=</span> direction, size <span style="color:#f92672">=</span> survivors)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_path</span>()
+</code></pre></div><p><img src="troops-2-1.png" alt="Troops, line with color and thickness"></p>
+<p>The individual segments of the path don&rsquo;t fit together very well and leave big gaps. We can fix that by adding a rounded line ending to each segment.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(troops, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, group <span style="color:#f92672">=</span> group,
+                   color <span style="color:#f92672">=</span> direction, size <span style="color:#f92672">=</span> survivors)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_path</span>(lineend <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;round&#34;</span>)
+</code></pre></div><p><img src="troops-3-1.png" alt="Troops, line with color and thickness and rounded ends"></p>
+<p>The size of the path hides the drama of the plot. Napoleon started the 1812 campaign with 422,000 troops and returned with only 10,000. ggplot automatically makes discrete categories for the <code>survivors</code> variable, resulting in three not-very-granular categories. We can adjust the scale to allow for more categories, thus showing more variation in size and highlighting the devasation of the army:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(troops, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, group <span style="color:#f92672">=</span> group,
+                   color <span style="color:#f92672">=</span> direction, size <span style="color:#f92672">=</span> survivors)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_path</span>(lineend <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;round&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_size</span>(range <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">15</span>))
+</code></pre></div><p><img src="troops-4-1.png" alt="Troops, big lines"></p>
+<p>Finally, we can remove the labels, legends, and change the colors to match <span style="color:#DFC17E;">the shade of brown</span> from Minard&rsquo;s original plot (which I figured out with Photoshop&rsquo;s eyedropper tool).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(troops, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, group <span style="color:#f92672">=</span> group,
+                   color <span style="color:#f92672">=</span> direction, size <span style="color:#f92672">=</span> survivors)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_path</span>(lineend <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;round&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_size</span>(range <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">15</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_colour_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;#DFC17E&#34;</span>, <span style="color:#e6db74">&#34;#252523&#34;</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">guides</span>(color <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, size <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)
+</code></pre></div><p><img src="troops-5-1.png" alt="Troops, correct colors"></p>
+<p>One of the amazing things about this plot is that it is actually a map—the x and y axes show the longitude and latitude of the troops. This means we can overlay geographic details, like cities. The cities in the original data can easily be added with <code>geom_point()</code> and <code>geom_text()</code>. We use <code>vjust</code> in <code>geom_text()</code> to move the labels down away from their points.</p>
+<p>(Now that we&rsquo;re adding graphical layers from different sources, it&rsquo;s good to move the aesthetics defined in <code>aes()</code> to the layers where they&rsquo;re actually used.)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_path</span>(data <span style="color:#f92672">=</span> troops, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, group <span style="color:#f92672">=</span> group,
+                               color <span style="color:#f92672">=</span> direction, size <span style="color:#f92672">=</span> survivors),
+            lineend <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;round&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_point</span>(data <span style="color:#f92672">=</span> cities, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_text</span>(data <span style="color:#f92672">=</span> cities, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, label <span style="color:#f92672">=</span> city), vjust <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_size</span>(range <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">15</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_colour_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;#DFC17E&#34;</span>, <span style="color:#e6db74">&#34;#252523&#34;</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">guides</span>(color <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, size <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)
+</code></pre></div><p><img src="troops-map-1-1.png" alt="Troops, with city names"></p>
+<p>Alternatively, we can use <code>geom_text_repel</code> from the <a href="https://github.com/slowkow/ggrepel"><code>ggrepel</code> package</a> to automatically move the labels away from points and to ensure none of the labels overlap. We can also adjust the labels so they&rsquo;re easier to read (using <a href="https://fonts.google.com/specimen/Open+Sans">Open Sans</a>).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_path</span>(data <span style="color:#f92672">=</span> troops, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, group <span style="color:#f92672">=</span> group,
+                               color <span style="color:#f92672">=</span> direction, size <span style="color:#f92672">=</span> survivors),
+            lineend <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;round&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_point</span>(data <span style="color:#f92672">=</span> cities, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat),
+             color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#DC5B44&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_text_repel</span>(data <span style="color:#f92672">=</span> cities, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, label <span style="color:#f92672">=</span> city),
+                  color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#DC5B44&#34;</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Bold&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_size</span>(range <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">15</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_colour_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;#DFC17E&#34;</span>, <span style="color:#e6db74">&#34;#252523&#34;</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">guides</span>(color <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, size <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>)
+</code></pre></div><p><img src="troops-map-2-1.png" alt="Troops, with nicer city names"></p>
+<p>Also, because this is a map, we can overlay it on other maps. It&rsquo;s fairly easy to get map data from Google or from the <a href="https://www.openstreetmap.org/">OpenStreetMap project</a> (through the <a href="http://maps.stamen.com/">Stamen project</a>) with the <a href="https://github.com/dkahle/ggmap"><code>ggmap</code> package</a>. There are some weird quirks you have to deal with, though:</p>
+<ul>
+<li>
+<p>You can supply <code>ggmap</code> with a four-number bounding box to get a specific region of a map. OpenStreetMap makes this really easy to do. Vavigate to the area you want to map at openstreetmap.org and click on &ldquo;Export&rdquo; in the top toolbar. The left sidebar should show the latitudes and longitudes for the current view. If you click on &ldquo;Manually select a different area,&rdquo; you can create your own bounding box.</p>
+<p><img src="bounding-box.png" alt="OpenStreetMap screenshot"></p>
+</li>
+<li>
+<p>OpenStreetMap is the only data source ggmap uses that can use exact bounding boxes. When you use Google as a source, Google will find the center of the bounding box and estimate the region you want, and it&rsquo;s often wrong and will get too much of the map (or too little). OpenStreetMap is thus better for getting exact areas.</p>
+</li>
+<li>
+<p>BUUUUUT <a href="https://github.com/dkahle/ggmap/issues/117">OpenStreetMap no longer allows ggmap to access its API</a>, which stinks. Fortunatley, the <a href="http://maps.stamen.com/">Stamen project</a> <em>does</em> work with <code>ggmap</code>, and it&rsquo;s based on OpenStreetMap data, so all is well(ish).</p>
+</li>
+</ul>
+<p>With those caveats, we can get map tiles from Stamen with <code>get_stamenmap()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">march.1812.europe <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(left <span style="color:#f92672">=</span> <span style="color:#ae81ff">-13.10</span>, bottom <span style="color:#f92672">=</span> <span style="color:#ae81ff">35.75</span>, right <span style="color:#f92672">=</span> <span style="color:#ae81ff">41.04</span>, top <span style="color:#f92672">=</span> <span style="color:#ae81ff">61.86</span>)
+
+<span style="color:#75715e"># &#34;zoom&#34; ranges from 3 (continent) to 21 (building)</span>
+<span style="color:#75715e"># &#34;where&#34; is a path to a folder where the downloaded tiles are cached</span>
+march.1812.europe.map <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">get_stamenmap</span>(bbox <span style="color:#f92672">=</span> march.1812.europe, zoom <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>,
+                                       maptype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;terrain&#34;</span>, where <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;cache&#34;</span>)
+</code></pre></div><p>Once we have the tiles, the <code>ggmap()</code> function plots them nicely:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggmap</span>(march.1812.europe.map)
+</code></pre></div><p><img src="show-europe-only-1.png" alt="Map of Europe"></p>
+<p>We can even use Stamen&rsquo;s fancier map types, like watercolor:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">march.1812.europe.map.wc <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">get_stamenmap</span>(bbox <span style="color:#f92672">=</span> march.1812.europe, zoom <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>,
+                                          maptype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;watercolor&#34;</span>, where <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;cache&#34;</span>)
+<span style="color:#a6e22e">ggmap</span>(march.1812.europe.map.wc)
+</code></pre></div><p><img src="get-tiles-wc-1.png" alt="Watercolor map of Europe"></p>
+<p>Now we can overlay the Minard plot to see where the march took place in relation to the rest of Europe:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggmap</span>(march.1812.europe.map.wc) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_path</span>(data <span style="color:#f92672">=</span> troops, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, group <span style="color:#f92672">=</span> group,
+                               color <span style="color:#f92672">=</span> direction, size <span style="color:#f92672">=</span> survivors),
+            lineend <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;round&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_size</span>(range <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">5</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_colour_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;#DFC17E&#34;</span>, <span style="color:#e6db74">&#34;#252523&#34;</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">guides</span>(color <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, size <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_nothing</span>()  <span style="color:#75715e"># This is a special theme that comes with ggmap</span>
+</code></pre></div><p><img src="europe-minard-1.png" alt="Watercolor map with troops"></p>
+<p>We can also zoom in on just northeastern Europe and add the cities back in. We&rsquo;ll save this plot to an object (<code>march.1812.plot</code>) so we can use it later.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">march.1812.ne.europe <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(left <span style="color:#f92672">=</span> <span style="color:#ae81ff">23.5</span>, bottom <span style="color:#f92672">=</span> <span style="color:#ae81ff">53.4</span>, right <span style="color:#f92672">=</span> <span style="color:#ae81ff">38.1</span>, top <span style="color:#f92672">=</span> <span style="color:#ae81ff">56.3</span>)
+
+march.1812.ne.europe.map <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">get_stamenmap</span>(bbox <span style="color:#f92672">=</span> march.1812.ne.europe, zoom <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>,
+                                          maptype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;terrain-background&#34;</span>, where <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;cache&#34;</span>)
+
+march.1812.plot <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggmap</span>(march.1812.ne.europe.map) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_path</span>(data <span style="color:#f92672">=</span> troops, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, group <span style="color:#f92672">=</span> group,
+                               color <span style="color:#f92672">=</span> direction, size <span style="color:#f92672">=</span> survivors),
+            lineend <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;round&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_point</span>(data <span style="color:#f92672">=</span> cities, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat),
+             color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#DC5B44&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_text_repel</span>(data <span style="color:#f92672">=</span> cities, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, label <span style="color:#f92672">=</span> city),
+                  color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#DC5B44&#34;</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Bold&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_size</span>(range <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">10</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_colour_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;#DFC17E&#34;</span>, <span style="color:#e6db74">&#34;#252523&#34;</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">guides</span>(color <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, size <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_nothing</span>()
+
+march.1812.plot
+</code></pre></div><p><img src="russia-minard-1.png" alt="Troops with map background"></p>
+<p>Magic!</p>
+<h2 id="temperatures-and-time">Temperatures and time</h2>
+<p>So far we have four of the variables from Minard&rsquo;s original plot—we&rsquo;re still missing the temperatures during the retreat and the days of the retreat. Minard put this infomration in a separate plot under the map, which is fairly easy to do with <a href="https://cran.r-project.org/web/packages/gridExtra/index.html"><code>gridExtra</code></a>.</p>
+<p>First we have to create the panel, which is a basic line graph with longitude along the x-axis and temperature along the y-axis, with text added at each point.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot</span>(data <span style="color:#f92672">=</span> temps, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> temp)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_line</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_text</span>(<span style="color:#a6e22e">aes</span>(label <span style="color:#f92672">=</span> temp), vjust <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.5</span>)
+</code></pre></div><p><img src="temps-1-1.png" alt="Temperatures"></p>
+<p>We can create a new variable for nicer labels, combining temperature with the date. We&rsquo;ll also clean up the theme, move the axis label to the right, and only include major horizontal gridlines. When we overlay the two plots, we have to make sure the x-axes align, so we need to use the same x-axis limits used in <code>march.1812.plot</code>. Those limits are buried inside the plot object, the parts of which can be accessed with <code>ggplot_build()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">ggplot_build</span>(march.1812.plot)<span style="color:#f92672">$</span>layout<span style="color:#f92672">$</span>panel_ranges[[1]]<span style="color:#f92672">$</span>x.range
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">## [1] 23.5 38.1</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">temps.nice <span style="color:#f92672">&lt;-</span> temps <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(nice.label <span style="color:#f92672">=</span> <span style="color:#a6e22e">paste0</span>(temp, <span style="color:#e6db74">&#34;°, &#34;</span>, month, <span style="color:#e6db74">&#34;. &#34;</span>, day))
+
+temps.1812.plot <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(data <span style="color:#f92672">=</span> temps.nice, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> temp)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_line</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_label</span>(<span style="color:#a6e22e">aes</span>(label <span style="color:#f92672">=</span> nice.label),
+            family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Bold&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;° Celsius&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_x_continuous</span>(limits <span style="color:#f92672">=</span> <span style="color:#a6e22e">ggplot_build</span>(march.1812.plot)<span style="color:#f92672">$</span>layout<span style="color:#f92672">$</span>panel_ranges[[1]]<span style="color:#f92672">$</span>x.range) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_y_continuous</span>(position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;right&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(ylim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">-35</span>, <span style="color:#ae81ff">5</span>)) <span style="color:#f92672">+</span>  <span style="color:#75715e"># Add some space above/below</span>
+  <span style="color:#a6e22e">theme_bw</span>(base_family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Light&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        panel.grid.minor.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        panel.grid.minor.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        axis.text.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(), axis.ticks <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        panel.border <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+temps.1812.plot
+</code></pre></div><p><img src="temps-2-1.png" alt="Temperatures, cleaner"></p>
+<h2 id="combining-the-plots">Combining the plots</h2>
+<p>Finally, we use functions in <code>gridExtra</code> to combine the two plots. The easiest way to combine plot objects with <code>gridExtra</code> is to use <code>grid.arrange()</code>, but doing so doesn&rsquo;t align the axes of the plot. For instance, look at these two example plots—they&rsquo;re no longer comparable vertically because the left side of the bottom plot extends to the edge of the plot, expanding under the long axis label in the top plot:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">example.data <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">data_frame</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">10</span>, y <span style="color:#f92672">=</span> <span style="color:#a6e22e">rnorm</span>(<span style="color:#ae81ff">10</span>))
+
+plot1 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(example.data, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> x, y <span style="color:#f92672">=</span> y)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_line</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;This is a really\nreally really really\nreally tall label&#34;</span>)
+
+plot2 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(example.data, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> x, y <span style="color:#f92672">=</span> y)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_line</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>)
+
+<span style="color:#a6e22e">grid.arrange</span>(plot1, plot2)
+</code></pre></div><p><img src="align-example-1.png" alt="Combined plots"></p>
+<p>Instead of using <code>grid.arrange</code>, we can use <code>gridExtra</code>’s special version of <code>rbind()</code> (or <code>cbind()</code>) for <code>ggplotGrob</code> objects:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot.both <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">rbind</span>(<span style="color:#a6e22e">ggplotGrob</span>(plot1),
+                   <span style="color:#a6e22e">ggplotGrob</span>(plot2))
+
+grid<span style="color:#f92672">::</span><span style="color:#a6e22e">grid.newpage</span>()
+grid<span style="color:#f92672">::</span><span style="color:#a6e22e">grid.draw</span>(plot.both)
+</code></pre></div><p><img src="align-example-good-1.png" alt="Combined with gtable"></p>
+<p>Now that we can align plots correctly, we can combine the map and the temperature:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">both.1812.plot <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">rbind</span>(<span style="color:#a6e22e">ggplotGrob</span>(march.1812.plot),
+                        <span style="color:#a6e22e">ggplotGrob</span>(temps.1812.plot))
+
+grid<span style="color:#f92672">::</span><span style="color:#a6e22e">grid.newpage</span>()
+grid<span style="color:#f92672">::</span><span style="color:#a6e22e">grid.draw</span>(both.1812.plot)
+</code></pre></div><p><img src="align-minard-1.png" alt="All combined"></p>
+<p>They&rsquo;re aligned, but there&rsquo;s an obvious problem—the map is way too small and the temperatures are too tall. With <code>grid.arrange</code> it&rsquo;s possible to pass a vector of relative panel heights, which would let us shrink the bottom panel. While using <code>gtable::rbind()</code> does let us align the two plots, it doesn&rsquo;t provide an easy way to mess with panel heights. Following <a href="https://stackoverflow.com/questions/24331107/the-perils-of-aligning-plots-in-ggplot/24333504#24333504">this StackOverflow answer</a>, though, we can mess with the ggplot object and adjust the panels manually.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Identify which layout elements are panels</span>
+panels <span style="color:#f92672">&lt;-</span> both.1812.plot<span style="color:#f92672">$</span>layout<span style="color:#f92672">$</span>t<span style="color:#a6e22e">[grep</span>(<span style="color:#e6db74">&#34;panel&#34;</span>, both.1812.plot<span style="color:#f92672">$</span>layout<span style="color:#f92672">$</span>name)]
+
+<span style="color:#75715e"># Normally we can pass a vector of null units that represent relative heights.</span>
+<span style="color:#75715e"># For instance, `unit(c(3, 1), &#34;null&#34;)` would make the top panel 3 times as</span>
+<span style="color:#75715e"># tall as the bottom.</span>
+
+<span style="color:#75715e"># But, the map here uses coord_equal() to show the correct dimensions of the</span>
+<span style="color:#75715e"># map, and this messes with the panel height for whatever reason. So instead,</span>
+<span style="color:#75715e"># we extract the original map panel height, which is really small, and then</span>
+<span style="color:#75715e"># make the bottom panel smaller in the same scale.</span>
+map.panel.height <span style="color:#f92672">&lt;-</span> both.1812.plot<span style="color:#f92672">$</span>heights[panels][1]
+
+<span style="color:#75715e"># See, super small</span>
+map.panel.height
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e">## [1] 0.345197879241894null</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Apply new panel heights to object</span>
+both.1812.plot<span style="color:#f92672">$</span>heights[panels] <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">unit</span>(<span style="color:#a6e22e">c</span>(map.panel.height, <span style="color:#ae81ff">0.1</span>), <span style="color:#e6db74">&#34;null&#34;</span>)
+
+grid<span style="color:#f92672">::</span><span style="color:#a6e22e">grid.newpage</span>()
+grid<span style="color:#f92672">::</span><span style="color:#a6e22e">grid.draw</span>(both.1812.plot)
+</code></pre></div><p><img src="adjust-panels-1.png" alt="Combined with correct heights"></p>
+<p>We can follow the same process to create a backgroundless version of the map:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># No map this time</span>
+march.1812.plot.simple <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_path</span>(data <span style="color:#f92672">=</span> troops, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, group <span style="color:#f92672">=</span> group,
+                               color <span style="color:#f92672">=</span> direction, size <span style="color:#f92672">=</span> survivors),
+            lineend <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;round&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_point</span>(data <span style="color:#f92672">=</span> cities, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat),
+             color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#DC5B44&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_text_repel</span>(data <span style="color:#f92672">=</span> cities, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> lat, label <span style="color:#f92672">=</span> city),
+                  color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#DC5B44&#34;</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Bold&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_size</span>(range <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.5</span>, <span style="color:#ae81ff">10</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_colour_manual</span>(values <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;#DFC17E&#34;</span>, <span style="color:#e6db74">&#34;#252523&#34;</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">guides</span>(color <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>, size <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_nothing</span>()
+
+<span style="color:#75715e"># Change the x-axis limits to match the simple map</span>
+temps.1812.plot <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ggplot</span>(data <span style="color:#f92672">=</span> temps.nice, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> long, y <span style="color:#f92672">=</span> temp)) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_line</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_label</span>(<span style="color:#a6e22e">aes</span>(label <span style="color:#f92672">=</span> nice.label),
+            family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Bold&#34;</span>, size <span style="color:#f92672">=</span> <span style="color:#ae81ff">2.5</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;° Celsius&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_x_continuous</span>(limits <span style="color:#f92672">=</span> <span style="color:#a6e22e">ggplot_build</span>(march.1812.plot.simple)<span style="color:#f92672">$</span>layout<span style="color:#f92672">$</span>panel_ranges[[1]]<span style="color:#f92672">$</span>x.range) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">scale_y_continuous</span>(position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;right&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(ylim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">-35</span>, <span style="color:#ae81ff">5</span>)) <span style="color:#f92672">+</span>  <span style="color:#75715e"># Add some space above/below</span>
+  <span style="color:#a6e22e">theme_bw</span>(base_family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Light&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(panel.grid.major.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        panel.grid.minor.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        panel.grid.minor.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        axis.text.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(), axis.ticks <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>(),
+        panel.border <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
+
+<span style="color:#75715e"># Combine the two plots</span>
+both.1812.plot.simple <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">rbind</span>(<span style="color:#a6e22e">ggplotGrob</span>(march.1812.plot.simple),
+                               <span style="color:#a6e22e">ggplotGrob</span>(temps.1812.plot))
+
+<span style="color:#75715e"># Adjust panels</span>
+panels <span style="color:#f92672">&lt;-</span> both.1812.plot.simple<span style="color:#f92672">$</span>layout<span style="color:#f92672">$</span>t<span style="color:#a6e22e">[grep</span>(<span style="color:#e6db74">&#34;panel&#34;</span>, both.1812.plot.simple<span style="color:#f92672">$</span>layout<span style="color:#f92672">$</span>name)]
+
+<span style="color:#75715e"># Because this plot doesn&#39;t use coord_equal, since it&#39;s not a map, we can use</span>
+<span style="color:#75715e"># whatever relative numbers we want, like a 3:1 ratio</span>
+both.1812.plot.simple<span style="color:#f92672">$</span>heights[panels] <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">unit</span>(<span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">1</span>), <span style="color:#e6db74">&#34;null&#34;</span>)
+
+grid<span style="color:#f92672">::</span><span style="color:#a6e22e">grid.newpage</span>()
+grid<span style="color:#f92672">::</span><span style="color:#a6e22e">grid.draw</span>(both.1812.plot.simple)
+</code></pre></div><p><img src="combined-simple-1.png" alt="Recreation of Minard&rsquo;s plot"></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Recreating Minard&rsquo;s famous 1812 plot is relatively easy to do with ggplot. Adding fancy bells and whistles like maps and aligned panels is a little trickier, but the end result is worth the extra effort.</p>
+
+    
+        <footer>
+            <div class="tags">
+    <i class="fas fa-tags" aria-hidden="true"></i>&ensp;
+    <a href="/blog/tags/r/">r</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/ggplot/">ggplot</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/dataviz/">dataviz</a></div>
+
+        </footer>
+
+        <div id="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                 
+                var disqus_shortname = 'andrewheisscom';
+                var disqus_title = document.title;
+                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2017\/08\/10\/exploring-minards-1812-plot-with-ggplot2\/';
+
+                 
+                (function () {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+        </div>
+    </article>
+</section>
+
+  
+
+        </div> 
+    </div> 
+    
+    <div id="footer">
+        <footer>
+    <ul class="links">
+        <li>
+            <a href="mailto:aheiss@gsu.edu" aria-label="E-mail"   >
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/andrewheiss" aria-label="Twitter"   >
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/andrewheiss" aria-label="GitHub"   >
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/andrewheiss" aria-label="YouTube"   >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://stackoverflow.com/users/120898/andrew" aria-label="StackOverflow"   >
+                <i class="fab fa-stack-overflow" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.heissatopia.com" aria-label="Heissatopia (family blog)"   >
+                <i class="fab fa-blogger" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/andrewheiss" aria-label="Facebook"   >
+                <i class="fab fa-facebook" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/in/andrewheiss" aria-label="LinkedIn"   >
+                <i class="fab fa-linkedin" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+
+    <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
+
+    <p class="pgp">
+        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
+    </p>
+
+    <p class="copyright">
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+            title="Creative Commons Attribution-ShareAlike 4.0 International license"><i class="fab fa-creative-commons"></i>
+        <i class="fab fa-creative-commons-by" title="Attribution"></i>
+        <i class="fab fa-creative-commons-share" title="Share alike"></i></a>
+        <span class="cc-year">&bull; 2007&ndash;2021</span>
+    </p>
+
+    <p class="colophon"><a href="https://github.com/andrewheiss/ath-hugo">Code for site</a></p>
+</footer>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+
+    <meta name="author" content="Andrew Heiss">
+    <meta name="description" content="Use ggplot to reproducibly see how much trouble the Polity Project thinks the US is in.">
+    <meta name="keywords" content="r, ggplot, dataviz">
+    <meta name="generator" content="Hugo 0.88.1" />
+
+    <title>
+  Quickly play with Polity IV and OECD data (and see the danger of US democracy) | Andrew Heiss
+</title>
+
+    <link rel="canonical" href="https://www.andrewheiss.com/blog/2017/08/26/quickly-play-with-polity-iv-and-oecd-data-and-see-the-danger-of-us-democracy/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+
+    <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
+    <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://www.andrewheiss.com/blog/2017/08/26/quickly-play-with-polity-iv-and-oecd-data-and-see-the-danger-of-us-democracy/unnamed-chunk-6-1.png"/>
+    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:title" content="Quickly play with Polity IV and OECD data (and see the danger of US democracy)"/>
+    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:description" content="Use ggplot to reproducibly see how much trouble the Polity Project thinks the US is in."/>
+
+
+    <meta property="og:title" content="Quickly play with Polity IV and OECD data (and see the danger of US democracy)" />
+<meta property="og:description" content="Use ggplot to reproducibly see how much trouble the Polity Project thinks the US is in." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.andrewheiss.com/blog/2017/08/26/quickly-play-with-polity-iv-and-oecd-data-and-see-the-danger-of-us-democracy/" />
+<meta property="og:image" content="https://www.andrewheiss.com/blog/2017/08/26/quickly-play-with-polity-iv-and-oecd-data-and-see-the-danger-of-us-democracy/unnamed-chunk-6-1.png" />
+<meta property="article:published_time" content="2017-08-26T00:00:00+00:00" />
+<meta property="article:modified_time" content="2017-08-26T00:00:00+00:00" />
+
+<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:section" content="blog" />
+<meta property="article:tag" content="r" />
+<meta property="article:tag" content="ggplot" />
+<meta property="article:tag" content="dataviz" />
+
+
+    <meta itemprop="name" content="Quickly play with Polity IV and OECD data (and see the danger of US democracy)">
+<meta itemprop="description" content="Use ggplot to reproducibly see how much trouble the Polity Project thinks the US is in."><meta itemprop="datePublished" content="2017-08-26T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2017-08-26T00:00:00+00:00" />
+<meta itemprop="wordCount" content="2437"><meta itemprop="image" content="https://www.andrewheiss.com/blog/2017/08/26/quickly-play-with-polity-iv-and-oecd-data-and-see-the-danger-of-us-democracy/unnamed-chunk-6-1.png">
+<meta itemprop="keywords" content="r,ggplot,dataviz," />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/pure-and-grids-responsive.min.css">
+    <link rel="stylesheet" href="/css/ath-hugo.min.c5619237d890aa972042ca0497d2594d6f3f34b1746c377f560f5096573fb6e3.css" integrity="sha256-xWGSN9iQqpcgQsoEl9JZTW8/NLF0bDd/Vg9Qllc/tuM=" crossorigin="anonymous" media="screen" />
+
+    <script src="https://kit.fontawesome.com/f9d343c40d.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=dLX2MbQJLG">
+    <link rel="manifest" href="/site.webmanifest?v=dLX2MbQJLG">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=dLX2MbQJLG" color="#cf4446">
+    <link rel="shortcut icon" href="/favicon.ico?v=dLX2MbQJLG">
+    <meta name="msapplication-TileColor" content="#170c3a">
+    <meta name="theme-color" content="#170c3a">
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-527449-5', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+
+    <div id="layout" class="pure-g">
+        <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
+            <header>
+                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
+                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+
+                <nav id="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cv/">CV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/research/">Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/teaching/">Teaching</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/talks/">Talks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/now/">Now</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uses/">Uses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+        </div> 
+    
+        <div id="content" class="pure-u-1 pure-u-md-3-4">
+        
+  <section>
+    <article class="content-single">
+        <header class="post-header">
+            <h1 class="post-title">Quickly play with Polity IV and OECD data (and see the danger of US democracy)</h1>
+
+            <div class="post-meta pure-g">
+                <div class="pure-u-1-2">
+                    <span class="posted-on">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime='2017-08-26T00:00:00Z'>
+                            Saturday, August 26, 2017
+                        </time>
+                    </span>
+                </div>
+                <div class="reading-time pure-u-1-2">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    12-minute read
+                </div>
+            </div>
+        </header>
+    
+        <p>The <a href="http://www.systemicpeace.org/polityproject.html">Polity IV Project</a> released new data yesterday, with democratization scores for 169 countries up to 2016. I wanted to check if the ongoing erosion of US democratic institutions since the 2016 elections registered in the US&rsquo;s Polity score, and, lo and behold, it did! We dropped from our solid, historically consistent 10 to an 8.</p>
+<p>But is that bad? How does that compare to other advanced democracies, like countries in the OECD?</p>
+<p>What follows below shows how relatively easy it is to quickly and reproducibly grab the new data, graph it, and compare scores across countries. (This notebook is also in <a href="https://github.com/andrewheiss/polity-oecd">a GitHub repository</a>.)</p>
+<p>Before we start, we&rsquo;ll load all the libraries we&rsquo;ll need:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">library</span>(tidyverse)     <span style="color:#75715e"># dplyr, ggplot, etc.</span>
+<span style="color:#a6e22e">library</span>(readxl)        <span style="color:#75715e"># Read Excel files</span>
+<span style="color:#a6e22e">library</span>(forcats)       <span style="color:#75715e"># Deal with factors</span>
+<span style="color:#a6e22e">library</span>(countrycode)   <span style="color:#75715e"># Deal with country codes and names</span>
+<span style="color:#a6e22e">library</span>(rvest)         <span style="color:#75715e"># Scrape websites</span>
+<span style="color:#a6e22e">library</span>(httr)          <span style="color:#75715e"># Download stuff</span>
+<span style="color:#a6e22e">library</span>(ggrepel)       <span style="color:#75715e"># Place non-overlapping labels on plots</span>
+</code></pre></div><p>First, we have to download the new Polity data. We could navigate to the <a href="http://www.systemicpeace.org/inscrdata.html">Polity IV data page</a> and download the data manually, but that&rsquo;s not scriptable. Instead, we can use <code>GET()</code> from the <code>httr</code> package (or <code>httr::GET()</code> for short) to download the file directly rather than hunting it down with a browser. After saving the Excel file to a temporary file, we use <code>readxl::read_excel()</code> to load and parse the data. The chain of functions following <code>read_excel()</code> (chained together with <code>dplyr</code>’s <code>%&gt;%</code> pipes) selects and renames the <a href="http://www.correlatesofwar.org/data-sets/cow-country-codes">Correlates of War country code</a>, year, and polity score; ensures that those columns are integers (rather than text or decimal-based numbers); and finally filters the data to 2001 and beyond.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">polity.url <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;http://www.systemicpeace.org/inscr/p4v2016.xls&#34;</span>
+
+<span style="color:#75715e"># Download Polity data to temporary file</span>
+<span style="color:#a6e22e">GET</span>(polity.url, <span style="color:#a6e22e">write_disk</span>(polity.temp <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tempfile</span>(fileext <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;.xls&#34;</span>)))
+
+<span style="color:#75715e">## Response [http://www.systemicpeace.org/inscr/p4v2016.xls]</span>
+<span style="color:#75715e">## Date: 2017-08-27 01:23</span>
+<span style="color:#75715e">## Status: 200</span>
+<span style="color:#75715e">## Content-Type: application/vnd.ms-excel</span>
+<span style="color:#75715e">## Size: 4.29 MB</span>
+<span style="color:#75715e">## &lt;ON DISK&gt;  /var/folders/0h/6jl6g9317lv3k5w9h72m18kw0000gn/T//Rtmp0TEhay/file125c8561fd799.xls</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Read and clean Polity data</span>
+polity <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">read_excel</span>(polity.temp) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">select</span>(cowcode <span style="color:#f92672">=</span> ccode, year, polity <span style="color:#f92672">=</span> polity2) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate_at</span>(<span style="color:#a6e22e">vars</span>(year, cowcode, polity),
+            <span style="color:#a6e22e">funs</span>(as.integer)) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(year <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">2000</span>)
+
+polity <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">glimpse</span>()
+
+<span style="color:#75715e">## Observations: 2,814</span>
+<span style="color:#75715e">## Variables: 3</span>
+<span style="color:#75715e">## $ cowcode &lt;int&gt; 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 700, 339, 339, 339,...</span>
+<span style="color:#75715e">## $ year    &lt;int&gt; 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 201...</span>
+<span style="color:#75715e">## $ polity  &lt;int&gt; -7, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, -1, -1, -1, 5, 5, 7, 7, 7, 9, 9, 9, 9, 9, 9...</span>
+</code></pre></div><p>The Polity project does not include information about OECD membership, so we have to download that on our own. It&rsquo;s relatively easy to google &ldquo;OECD member countries&rdquo; and copy/paste the results from any of the resulting webpages into a CSV file, but that&rsquo;s not reproducible or scriptable.</p>
+<p>Instead, we can use the <code>rvest</code> package to scrape data directly from the <a href="https://www.oecd.org/about/membersandpartners/list-oecd-member-countries.htm">OECD&rsquo;s most recent list of members</a>. There are several ways to target HTML elements on a page, including both CSS selectors and XPath queries, each with advantages and disadvantages. Using CSS is fairly simple if you&rsquo;re familiar with the structure of the HTML—if you want to select a table inside an <code>&lt;article&gt;</code> element in the main <code>&lt;section id=&quot;content&quot;&gt;</code> section, you can specify <code>#content &gt; article &gt; table</code>.</p>
+<p>The syntax for XPath is easier to use, but is really hard to write by hand. Fortunately, you don&rsquo;t have to do it manually. In Chrome, go to the <a href="https://www.oecd.org/about/membersandpartners/list-oecd-member-countries.htm">OECD&rsquo;s list</a>, right click on the webpage, and select &ldquo;Inspect&rdquo; to open Chrome&rsquo;s built in web inspector. Activate the inspection tool and find the table with the list of countries:</p>
+<p><img src="select-element.png" alt="Select HTML table"></p>
+<p>Right click on <code>&lt;table align=&quot;center&quot; border=&quot;0&quot; style=&quot;width: 75%;&quot;&gt;</code> in the inspector and choose &ldquo;Copy&rdquo; &gt; &ldquo;Copy XPath&rdquo; to copy an XPath query for that table to the clipboard:</p>
+<p><img src="copy-xpath.png" alt="Copy XPath"></p>
+<p>We can then use that query (which should be something like <code>//*[@id=&quot;webEditContent&quot;]/table[2]</code>) in a <code>dplyr</code> chain that will load the webpage, select the HTML <code>&lt;table&gt;</code> element, and parse it into something R can read.</p>
+<p>The <code>dplyr</code> chain has a few interesting quirks. <code>read_html()</code> will download the given URL as HTML, and <code>html_nodes()</code> will select the HTML element specified by the XPath query. <code>html_table()</code> will parse that element into an R object (here we specify <code>fill = TRUE</code> since not all the rows in the table have the same number of columns; filling the table adds additional empty columns to rows that lack them). <code>bind_rows()</code> and <code>as_data_frame()</code> convert the parsed HTML table into a data frame.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Pro tip: the HTML structure of the OECD page can change over time, and the</span>
+<span style="color:#75715e"># XPath query will inevitably break. To avoid this, use a snapshot of the</span>
+<span style="color:#75715e"># webpage from the Internet Archive instead of the current OECD page, since the</span>
+<span style="color:#75715e"># archived version won&#39;t change.</span>
+
+oecd.url <span style="color:#f92672">&lt;-</span> <span style="color:#e6db74">&#34;https://web.archive.org/web/20170821160714/https://www.oecd.org/about/membersandpartners/list-oecd-member-countries.htm&#34;</span>
+
+oecd.countries.raw <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">read_html</span>(oecd.url) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#75715e"># Use single quotes instead of double quotes since XPath uses &#34; in the query</span>
+  <span style="color:#a6e22e">html_nodes</span>(xpath <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;//*[@id=&#34;webEditContent&#34;]/table[2]&#39;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">html_table</span>(fill <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">bind_rows</span>() <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">as_data_frame</span>()
+</code></pre></div><p>Because this table has extra empty columns, R doesn&rsquo;t recognize header rows automatically and names each column <code>X1</code>, <code>X2</code>, and so on.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">oecd.countries.raw <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">head</span>()
+
+<span style="color:#75715e">## # A tibble: 6 x 4</span>
+<span style="color:#75715e">##      X1        X2                X3    X4</span>
+<span style="color:#75715e">##   &lt;chr&gt;     &lt;chr&gt;             &lt;chr&gt; &lt;lgl&gt;</span>
+<span style="color:#75715e">## 1         Country              Date    NA</span>
+<span style="color:#75715e">## 2       AUSTRALIA       7 June 1971    NA</span>
+<span style="color:#75715e">## 3         AUSTRIA 29 September 1961    NA</span>
+<span style="color:#75715e">## 4         BELGIUM 13 September 1961    NA</span>
+<span style="color:#75715e">## 5          CANADA     10 April 1961    NA</span>
+<span style="color:#75715e">## 6           CHILE        7 May 2010    NA</span>
+</code></pre></div><p>We can select and rename the country and date columns and ignore the empty first and last columns using <code>select()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">oecd.countries.raw1 <span style="color:#f92672">&lt;-</span> oecd.countries.raw <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">select</span>(Country <span style="color:#f92672">=</span> X2, Date <span style="color:#f92672">=</span> X3)
+
+oecd.countries.raw1 <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">head</span>()
+
+<span style="color:#75715e">## # A tibble: 6 x 2</span>
+<span style="color:#75715e">##     Country              Date</span>
+<span style="color:#75715e">##       &lt;chr&gt;             &lt;chr&gt;</span>
+<span style="color:#75715e">## 1   Country              Date</span>
+<span style="color:#75715e">## 2 AUSTRALIA       7 June 1971</span>
+<span style="color:#75715e">## 3   AUSTRIA 29 September 1961</span>
+<span style="color:#75715e">## 4   BELGIUM 13 September 1961</span>
+<span style="color:#75715e">## 5    CANADA     10 April 1961</span>
+<span style="color:#75715e">## 6     CHILE        7 May 2010</span>
+</code></pre></div><p>Because R didn&rsquo;t recognize the header, it included the header as an actual row of data. Additionally, the webpage put a note about membership in the final row:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">oecd.countries.raw1 <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">tail</span>()
+
+<span style="color:#75715e">## # A tibble: 6 x 2</span>
+<span style="color:#75715e">##                              Country                               Date</span>
+<span style="color:#75715e">##                                &lt;chr&gt;                              &lt;chr&gt;</span>
+<span style="color:#75715e">## 1                             SWEDEN                  28 September 1961</span>
+<span style="color:#75715e">## 2                        SWITZERLAND                  28 September 1961</span>
+<span style="color:#75715e">## 3                             TURKEY                      2 August 1961</span>
+<span style="color:#75715e">## 4                     UNITED KINGDOM                         2 May 1961</span>
+<span style="color:#75715e">## 5                      UNITED STATES                      12 April 1961</span>
+<span style="color:#75715e">## 6 More on membership and enlargement More on membership and enlargement</span>
+</code></pre></div><p>We can use <code>slice()</code> to select all rows in between the first and last, starting from row 2 to row <code>n() - 1</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">oecd.countries.raw2 <span style="color:#f92672">&lt;-</span> oecd.countries.raw1 <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">slice</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>(<span style="color:#a6e22e">n</span>() <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>))
+
+oecd.countries.raw2 <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">head</span>()
+
+<span style="color:#75715e">## # A tibble: 6 x 2</span>
+<span style="color:#75715e">##          Country              Date</span>
+<span style="color:#75715e">##            &lt;chr&gt;             &lt;chr&gt;</span>
+<span style="color:#75715e">## 1      AUSTRALIA       7 June 1971</span>
+<span style="color:#75715e">## 2        AUSTRIA 29 September 1961</span>
+<span style="color:#75715e">## 3        BELGIUM 13 September 1961</span>
+<span style="color:#75715e">## 4         CANADA     10 April 1961</span>
+<span style="color:#75715e">## 5          CHILE        7 May 2010</span>
+<span style="color:#75715e">## 6 CZECH REPUBLIC  21 December 1995</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">oecd.countries.raw2 <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">tail</span>()
+
+<span style="color:#75715e">## # A tibble: 6 x 2</span>
+<span style="color:#75715e">##          Country              Date</span>
+<span style="color:#75715e">##            &lt;chr&gt;             &lt;chr&gt;</span>
+<span style="color:#75715e">## 1          SPAIN     3 August 1961</span>
+<span style="color:#75715e">## 2         SWEDEN 28 September 1961</span>
+<span style="color:#75715e">## 3    SWITZERLAND 28 September 1961</span>
+<span style="color:#75715e">## 4         TURKEY     2 August 1961</span>
+<span style="color:#75715e">## 5 UNITED KINGDOM        2 May 1961</span>
+<span style="color:#75715e">## 6  UNITED STATES     12 April 1961</span>
+</code></pre></div><p>Finally, we can use the <code>countrycode</code> package to convert the country names into Correlates of War (COW) codes:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">oecd.countries <span style="color:#f92672">&lt;-</span> oecd.countries.raw2 <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(cowcode <span style="color:#f92672">=</span> <span style="color:#a6e22e">countrycode</span>(Country, <span style="color:#e6db74">&#34;country.name&#34;</span>, <span style="color:#e6db74">&#34;cown&#34;</span>))
+
+oecd.countries <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">glimpse</span>()
+
+<span style="color:#75715e">## Observations: 35</span>
+<span style="color:#75715e">## Variables: 3</span>
+<span style="color:#75715e">## $ Country &lt;chr&gt; &#34;AUSTRALIA&#34;, &#34;AUSTRIA&#34;, &#34;BELGIUM&#34;, &#34;CANADA&#34;, &#34;CHILE&#34;, &#34;CZECH REPUBLIC&#34;, &#34;DENMARK&#34;, &#34;ESTONIA&#34;, &#34;FINL...</span>
+<span style="color:#75715e">## $ Date    &lt;chr&gt; &#34;7 June 1971&#34;, &#34;29 September 1961&#34;, &#34;13 September 1961&#34;, &#34;10 April 1961&#34;, &#34;7 May 2010&#34;, &#34;21 Decembe...</span>
+<span style="color:#75715e">## $ cowcode &lt;int&gt; 900, 305, 211, 20, 155, 316, 390, 366, 375, 220, 255, 350, 310, 395, 205, 666, 325, 740, 732, 367, ...</span>
+</code></pre></div><p>Before we start plotting, we have to manipulate and filter the data a little bit more. First, we&rsquo;ll create a data frame of just US Polity scores, selecting only countries with a COW code of 2 (which is the US)</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">us.polity <span style="color:#f92672">&lt;-</span> polity <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(cowcode <span style="color:#f92672">==</span> <span style="color:#ae81ff">2</span>)
+
+us.polity <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">head</span>()
+
+<span style="color:#75715e">## # A tibble: 6 x 3</span>
+<span style="color:#75715e">##   cowcode  year polity</span>
+<span style="color:#75715e">##     &lt;int&gt; &lt;int&gt;  &lt;int&gt;</span>
+<span style="color:#75715e">## 1       2  2000     10</span>
+<span style="color:#75715e">## 2       2  2001     10</span>
+<span style="color:#75715e">## 3       2  2002     10</span>
+<span style="color:#75715e">## 4       2  2003     10</span>
+<span style="color:#75715e">## 5       2  2004     10</span>
+<span style="color:#75715e">## 6       2  2005     10</span>
+</code></pre></div><p>We then want to calculate the average Polity score for all OECD countries over time, excluding the US. We select all rows with a COW code in <code>oecd.countries$cowcode</code> using <code>%in%</code> in the filter query and then exclude the US with <code>cowcode != 2</code>. We then calculate the yearly mean with <code>group_by()</code> and <code>summarise()</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">oecd.polity <span style="color:#f92672">&lt;-</span> polity <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(cowcode <span style="color:#f92672">%in%</span> oecd.countries<span style="color:#f92672">$</span>cowcode,
+         cowcode <span style="color:#f92672">!=</span> <span style="color:#ae81ff">2</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">group_by</span>(year) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">summarise</span>(polity <span style="color:#f92672">=</span> <span style="color:#a6e22e">mean</span>(polity, na.rm<span style="color:#f92672">=</span><span style="color:#66d9ef">TRUE</span>))
+
+oecd.polity <span style="color:#f92672">%&gt;%</span> <span style="color:#a6e22e">head</span>()
+
+<span style="color:#75715e">## # A tibble: 6 x 2</span>
+<span style="color:#75715e">##    year   polity</span>
+<span style="color:#75715e">##   &lt;int&gt;    &lt;dbl&gt;</span>
+<span style="color:#75715e">## 1  2000 9.454545</span>
+<span style="color:#75715e">## 2  2001 9.454545</span>
+<span style="color:#75715e">## 3  2002 9.484848</span>
+<span style="color:#75715e">## 4  2003 9.484848</span>
+<span style="color:#75715e">## 5  2004 9.484848</span>
+<span style="color:#75715e">## 6  2005 9.484848</span>
+</code></pre></div><p>In the final plot, we want to include shaded regions showing Polity&rsquo;s general classifications of regime type, where autocracies range from −10 to −6, anocracies range from −5 to 5, and democracies range from 6 to 10. We can use <code>dplyr::tribble()</code> to quickly create a small data frame with these ranges. The <code>mutate()</code> command at the end uses <code>forcats::fct_inorder</code> to change the <code>democracy</code> column into an ordered factor so the ranges are plotted in the correct order. Finally, to prevent gaps, I add/subtract 0.5 from the start and end values (i.e. since democracies end at 6 and anocracies start at 5, there would be an empty gap in the plot between 5 and 6).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">polity.breaks <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tribble</span>(
+  <span style="color:#f92672">~</span>start, <span style="color:#f92672">~</span>end, <span style="color:#f92672">~</span>democracy,
+  <span style="color:#ae81ff">10</span>, <span style="color:#ae81ff">5.5</span>, <span style="color:#e6db74">&#34;Democracy&#34;</span>,
+  <span style="color:#ae81ff">5.5</span>, <span style="color:#ae81ff">-5.5</span>, <span style="color:#e6db74">&#34;Anocracy&#34;</span>,
+  <span style="color:#ae81ff">-5.5</span>, <span style="color:#ae81ff">-10</span>, <span style="color:#e6db74">&#34;Autocracy&#34;</span>
+) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(democracy <span style="color:#f92672">=</span> <span style="color:#a6e22e">fct_inorder</span>(democracy, ordered <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>))
+
+polity.breaks
+
+<span style="color:#75715e">## # A tibble: 3 x 3</span>
+<span style="color:#75715e">##   start   end democracy</span>
+<span style="color:#75715e">##   &lt;dbl&gt; &lt;dbl&gt;     &lt;ord&gt;</span>
+<span style="color:#75715e">## 1  10.0   5.5 Democracy</span>
+<span style="color:#75715e">## 2   5.5  -5.5  Anocracy</span>
+<span style="color:#75715e">## 3  -5.5 -10.0 Autocracy</span>
+</code></pre></div><p>Now that we have all the cleaned up data frames, we can finally put it all together in one final plot. Check the heavily commented code below for an explanation of each layer</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># We start with an empty ggplot object since we&#39;re using so many separate data frames</span>
+<span style="color:#a6e22e">ggplot</span>() <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># First we include the shaded ranges for democracies, anocracies, and</span>
+  <span style="color:#75715e"># autocracies. Since we want the regions to go from edge to edge</span>
+  <span style="color:#75715e"># horizontally, we set xmin and xmax to ±Inf. ymin and ymax use the ranges we</span>
+  <span style="color:#75715e"># created in the polity.breaks data frame. We use democracy as the fill</span>
+  <span style="color:#75715e"># variable. The alpha value makes the layer 80% transparent.</span>
+  <span style="color:#a6e22e">geom_rect</span>(data <span style="color:#f92672">=</span> polity.breaks, <span style="color:#a6e22e">aes</span>(xmin <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#66d9ef">Inf</span>, xmax <span style="color:#f92672">=</span> <span style="color:#f92672">+</span><span style="color:#66d9ef">Inf</span>,
+                                      ymin <span style="color:#f92672">=</span> end, ymax <span style="color:#f92672">=</span> start,
+                                      fill <span style="color:#f92672">=</span> democracy),
+            alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.2</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># We then add the line for the US polity score</span>
+  <span style="color:#a6e22e">geom_line</span>(data <span style="color:#f92672">=</span> us.polity, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> year, y <span style="color:#f92672">=</span> polity), size <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#00A1B0&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># And then the line for the average OECD polity score</span>
+  <span style="color:#a6e22e">geom_line</span>(data <span style="color:#f92672">=</span> oecd.polity, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> year, y <span style="color:#f92672">=</span> polity), size <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#EB6642&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># We add a label for the US line above the line at y = 11, using the same color</span>
+  <span style="color:#a6e22e">geom_text</span>(<span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">2000</span>, y <span style="color:#f92672">=</span> <span style="color:#ae81ff">11</span>, label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;United States&#34;</span>),
+            hjust <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Bold&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#00A1B0&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># We add a similar label for the OECD line at y = 8.5, again with the same color</span>
+  <span style="color:#a6e22e">geom_text</span>(<span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">2000</span>, y <span style="color:#f92672">=</span> <span style="color:#ae81ff">8.5</span>, label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;OECD average&#34;</span>),
+            hjust <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Bold&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#EB6642&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># All of the data happens in the democracy region, but we want to show the</span>
+  <span style="color:#75715e"># full range of Polity values, so we force the y axis to go from -10 to 11</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(ylim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">-10</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Remove the &#34;democracy&#34; title from the legend</span>
+  <span style="color:#a6e22e">guides</span>(fill <span style="color:#f92672">=</span> <span style="color:#a6e22e">guide_legend</span>(title <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Add titles and labels and captions</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Polity IV score&#34;</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Democracy in the USA&#34;</span>, subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;I wonder what happened in 2016…&#34;</span>,
+       caption <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Source: Polity IV Project&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Use a light theme with Open Sans Light as the default font</span>
+  <span style="color:#a6e22e">theme_light</span>(base_family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Light&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Move the legend to the bottom and make the title font bigger, bolder, and condenseder</span>
+  <span style="color:#a6e22e">theme</span>(legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>,
+        plot.title <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Bold&#34;</span>,
+                                  size <span style="color:#f92672">=</span> <span style="color:#a6e22e">rel</span>(<span style="color:#ae81ff">1.6</span>)))
+</code></pre></div><p><img src="unnamed-chunk-6-1.png" alt="Polity in the US and OECD"></p>
+<p>Once we have this basic plot, we can extend it with more data. For instance, we can compare the US&rsquo;s Polity score not only to the OECD average, but to specific countries:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">lots.of.countries <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;United States&#34;</span>, <span style="color:#e6db74">&#34;Hungary&#34;</span>, <span style="color:#e6db74">&#34;Turkey&#34;</span>, <span style="color:#e6db74">&#34;Poland&#34;</span>, <span style="color:#e6db74">&#34;Mexico&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">countrycode</span>(<span style="color:#e6db74">&#34;country.name&#34;</span>, <span style="color:#e6db74">&#34;cown&#34;</span>)
+
+lots.of.countries.polity <span style="color:#f92672">&lt;-</span> polity <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">filter</span>(cowcode <span style="color:#f92672">%in%</span> lots.of.countries) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(country <span style="color:#f92672">=</span> <span style="color:#a6e22e">countrycode</span>(cowcode, <span style="color:#e6db74">&#34;cown&#34;</span>, <span style="color:#e6db74">&#34;country.name&#34;</span>))
+  
+<span style="color:#a6e22e">ggplot</span>() <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">geom_rect</span>(data <span style="color:#f92672">=</span> polity.breaks, <span style="color:#a6e22e">aes</span>(xmin <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#66d9ef">Inf</span>, xmax <span style="color:#f92672">=</span> <span style="color:#f92672">+</span><span style="color:#66d9ef">Inf</span>,
+                                      ymin <span style="color:#f92672">=</span> end, ymax <span style="color:#f92672">=</span> start,
+                                      fill <span style="color:#f92672">=</span> democracy),
+            alpha <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.2</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># First we add the line for the average OECD polity score. This time we make it dashed</span>
+  <span style="color:#a6e22e">geom_line</span>(data <span style="color:#f92672">=</span> oecd.polity, <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> year, y <span style="color:#f92672">=</span> polity),
+            size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#EB6642&#34;</span>, linetype <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;dashed&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># We then add the lines for all the other countries</span>
+  <span style="color:#a6e22e">geom_line</span>(data <span style="color:#f92672">=</span> lots.of.countries.polity,
+            <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> year, y <span style="color:#f92672">=</span> polity, color <span style="color:#f92672">=</span> country), size <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># To create the labels we only select the 2005 values. If we didn&#39;t, labels</span>
+  <span style="color:#75715e"># would appear on every year, and we&#39;d essentially have a plot of repeated</span>
+  <span style="color:#75715e"># labels</span>
+  <span style="color:#a6e22e">geom_label_repel</span>(data <span style="color:#f92672">=</span> <span style="color:#a6e22e">filter</span>(lots.of.countries.polity, year <span style="color:#f92672">==</span> <span style="color:#ae81ff">2005</span>),
+                   <span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> year, y <span style="color:#f92672">=</span> polity, color <span style="color:#f92672">=</span> country, label <span style="color:#f92672">=</span> country),
+                   family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Bold&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># We add a label for the OECD line at y = 8.5, again with the same color</span>
+  <span style="color:#a6e22e">geom_label</span>(<span style="color:#a6e22e">aes</span>(x <span style="color:#f92672">=</span> <span style="color:#ae81ff">2000</span>, y <span style="color:#f92672">=</span> <span style="color:#ae81ff">8.5</span>, label <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;OECD average&#34;</span>),
+            hjust <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Bold&#34;</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#EB6642&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">coord_cartesian</span>(ylim <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">11</span>, <span style="color:#ae81ff">-10</span>)) <span style="color:#f92672">+</span>
+  <span style="color:#75715e"># Turn off the legend for the color aesthetic</span>
+  <span style="color:#a6e22e">guides</span>(fill <span style="color:#f92672">=</span> <span style="color:#a6e22e">guide_legend</span>(title <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>),
+         color <span style="color:#f92672">=</span> <span style="color:#66d9ef">FALSE</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>, y <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Polity IV score&#34;</span>,
+       title <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Democracy around the world&#34;</span>,
+       subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Everyone&#39;s doing okay except the US (and Turkey)&#34;</span>,
+       caption <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Source: Polity IV Project&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme_light</span>(base_family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Light&#34;</span>) <span style="color:#f92672">+</span>
+  <span style="color:#a6e22e">theme</span>(legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>,
+        plot.title <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Open Sans Condensed Bold&#34;</span>,
+                                  size <span style="color:#f92672">=</span> <span style="color:#a6e22e">rel</span>(<span style="color:#ae81ff">1.6</span>)))
+</code></pre></div><p><img src="unnamed-chunk-7-1.png" alt="Polity in the US, OECD, and others"></p>
+<p>And thus we can quickly and reproducibly see that democracy in the USA post-2016 is pretty precariously positioned. (But we&rsquo;re not Turkey. Yet.)</p>
+
+    
+        <footer>
+            <div class="tags">
+    <i class="fas fa-tags" aria-hidden="true"></i>&ensp;
+    <a href="/blog/tags/r/">r</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/ggplot/">ggplot</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/dataviz/">dataviz</a></div>
+
+        </footer>
+
+        <div id="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                 
+                var disqus_shortname = 'andrewheisscom';
+                var disqus_title = document.title;
+                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2017\/08\/26\/quickly-play-with-polity-iv-and-oecd-data-and-see-the-danger-of-us-democracy\/';
+
+                 
+                (function () {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+        </div>
+    </article>
+</section>
+
+  
+
+        </div> 
+    </div> 
+    
+    <div id="footer">
+        <footer>
+    <ul class="links">
+        <li>
+            <a href="mailto:aheiss@gsu.edu" aria-label="E-mail"   >
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/andrewheiss" aria-label="Twitter"   >
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/andrewheiss" aria-label="GitHub"   >
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/andrewheiss" aria-label="YouTube"   >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://stackoverflow.com/users/120898/andrew" aria-label="StackOverflow"   >
+                <i class="fab fa-stack-overflow" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.heissatopia.com" aria-label="Heissatopia (family blog)"   >
+                <i class="fab fa-blogger" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/andrewheiss" aria-label="Facebook"   >
+                <i class="fab fa-facebook" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/in/andrewheiss" aria-label="LinkedIn"   >
+                <i class="fab fa-linkedin" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+
+    <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
+
+    <p class="pgp">
+        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
+    </p>
+
+    <p class="copyright">
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+            title="Creative Commons Attribution-ShareAlike 4.0 International license"><i class="fab fa-creative-commons"></i>
+        <i class="fab fa-creative-commons-by" title="Attribution"></i>
+        <i class="fab fa-creative-commons-share" title="Share alike"></i></a>
+        <span class="cc-year">&bull; 2007&ndash;2021</span>
+    </p>
+
+    <p class="colophon"><a href="https://github.com/andrewheiss/ath-hugo">Code for site</a></p>
+</footer>
+
+    </div>
+
+</body>
+
+</html>

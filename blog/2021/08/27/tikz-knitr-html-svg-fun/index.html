@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+
+    <meta name="author" content="Andrew Heiss">
+    <meta name="description" content="Make knitr and R Markdown convert TikZ graphics to font-embedded SVG files when knitting to HTML">
+    <meta name="keywords" content="r, tidyverse, R Markdown, tikz">
+    <meta name="generator" content="Hugo 0.88.1" />
+
+    <title>
+  How to automatically convert TikZ images to SVG (with fonts!) from knitr | Andrew Heiss
+</title>
+
+    <link rel="canonical" href="https://www.andrewheiss.com/blog/2021/08/27/tikz-knitr-html-svg-fun/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+
+    <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
+    <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://www.andrewheiss.com/blog/2021/08/27/tikz-knitr-html-svg-fun/example-final.png"/>
+    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:title" content="How to automatically convert TikZ images to SVG (with fonts!) from knitr"/>
+    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:description" content="Make knitr and R Markdown convert TikZ graphics to font-embedded SVG files when knitting to HTML"/>
+
+
+    <meta property="og:title" content="How to automatically convert TikZ images to SVG (with fonts!) from knitr" />
+<meta property="og:description" content="Make knitr and R Markdown convert TikZ graphics to font-embedded SVG files when knitting to HTML" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.andrewheiss.com/blog/2021/08/27/tikz-knitr-html-svg-fun/" />
+<meta property="og:image" content="https://www.andrewheiss.com/blog/2021/08/27/tikz-knitr-html-svg-fun/example-final.png" />
+<meta property="article:published_time" content="2021-08-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-08-27T00:00:00+00:00" />
+
+<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:section" content="blog" />
+<meta property="article:tag" content="r" />
+<meta property="article:tag" content="tidyverse" />
+<meta property="article:tag" content="R Markdown" />
+<meta property="article:tag" content="tikz" />
+
+
+    <meta itemprop="name" content="How to automatically convert TikZ images to SVG (with fonts!) from knitr">
+<meta itemprop="description" content="Make knitr and R Markdown convert TikZ graphics to font-embedded SVG files when knitting to HTML"><meta itemprop="datePublished" content="2021-08-27T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2021-08-27T00:00:00+00:00" />
+<meta itemprop="wordCount" content="2559"><meta itemprop="image" content="https://www.andrewheiss.com/blog/2021/08/27/tikz-knitr-html-svg-fun/example-final.png">
+<meta itemprop="keywords" content="r,tidyverse,R Markdown,tikz," />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/pure-and-grids-responsive.min.css">
+    <link rel="stylesheet" href="/css/ath-hugo.min.c5619237d890aa972042ca0497d2594d6f3f34b1746c377f560f5096573fb6e3.css" integrity="sha256-xWGSN9iQqpcgQsoEl9JZTW8/NLF0bDd/Vg9Qllc/tuM=" crossorigin="anonymous" media="screen" />
+
+    <script src="https://kit.fontawesome.com/f9d343c40d.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=dLX2MbQJLG">
+    <link rel="manifest" href="/site.webmanifest?v=dLX2MbQJLG">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=dLX2MbQJLG" color="#cf4446">
+    <link rel="shortcut icon" href="/favicon.ico?v=dLX2MbQJLG">
+    <meta name="msapplication-TileColor" content="#170c3a">
+    <meta name="theme-color" content="#170c3a">
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-527449-5', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+
+    <div id="layout" class="pure-g">
+        <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
+            <header>
+                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
+                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+
+                <nav id="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cv/">CV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/research/">Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/teaching/">Teaching</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/talks/">Talks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/now/">Now</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uses/">Uses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+        </div> 
+    
+        <div id="content" class="pure-u-1 pure-u-md-3-4">
+        
+  <section>
+    <article class="content-single">
+        <header class="post-header">
+            <h1 class="post-title">How to automatically convert TikZ images to SVG (with fonts!) from knitr</h1>
+
+            <div class="post-meta pure-g">
+                <div class="pure-u-1-2">
+                    <span class="posted-on">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime='2021-08-27T00:00:00Z'>
+                            Friday, August 27, 2021
+                        </time>
+                    </span>
+                </div>
+                <div class="reading-time pure-u-1-2">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    13-minute read
+                </div>
+            </div>
+        </header>
+    
+        <link rel="stylesheet" href="gist_stuff.css">
+<div class="alert alert-success">An update to knitr has made it a ton easier to embed fonts in SVG files from R. <a href="#update-easier-font-embedding">Jump to the update</a> to see how.</div>
+<div class="alert alert-success">Also, it's possible to change TikZ fonts and not use Computer Modern for everything! <a href="#another-update-changing-fonts">Jump to the second update</a> to see how.</div>
+<hr>
+<p><strong>Contents</strong>:</p>
+<ul>
+<li><a href="#knitting-tikz-chunks-to-pdf">Knitting TikZ chunks to PDF</a></li>
+<li><a href="#knitting-tikz-chunks-to-html-as-pngs">Knitting TikZ chunks to HTML as PNGs</a></li>
+<li><a href="#knitting-tikz-chunks-to-html-as-svgs">Knitting TikZ chunks to HTML as SVGs</a>
+<ul>
+<li><a href="#connecting-dvisvgm-to-ghostscript-on-macos">Connecting <code>dvisvgm</code> to Ghostscript on macOS</a></li>
+<li><a href="#connecting-dvisvgm-to-ghostscript-within-r">Connecting <code>dvisvgm</code> to Ghostscript within R</a></li>
+<li><a href="#choosing-the-tikz-output-format-based-on-the-knitted-output">Choosing the TikZ output format based on the knitted output</a></li>
+<li><a href="#font-issues">Font issues</a></li>
+<li><a href="#font-solutions">Font solutions</a></li>
+</ul>
+</li>
+<li><a href="#tldr-final-working-version">tl;dr: Final working version</a></li>
+<li><a href="#update-easier-font-embedding">UPDATE: Easier font embedding!</a></li>
+<li><a href="#another-update-changing-fonts">ANOTHER UPDATE: Changing fonts!</a>
+<ul>
+<li><a href="#knitting-only-to-pdf">Knitting only to PDF</a></li>
+<li><a href="#knitting-to-pdf-and-html">Knitting to PDF and HTML</a></li>
+</ul>
+</li>
+</ul>
+<hr>
+<p><strong>knitr</strong> and R Markdown are essential parts of my academic writing workflow, and they make it really easy to write in one file format and then convert it to whatever output I need. When knitting to PDF, plots are all vector-based with selectable text, and math equations are all done in beautiful LaTeX. When knitting to HTML, plots are PNG files (since HTML struggles with cross-browser vector image support), and math equations are all done in beautiful MathJax. It&rsquo;s a wonderful system.</p>
+<p>One place where the system struggles, though, is with more complex types of content like TikZ figures. TikZ lets you make all sorts of fancy diagrams and equations, but it&rsquo;s a tricky language and I barely understand it, lol. There are some helpful resources about it, though:</p>
+<ul>
+<li><a href="https://rmwu.github.io/">Rachel Menghua Wu</a>&rsquo;s crash course to TikZ (<a href="https://rmwu.github.io/tutorial/latex/2019/08/27/intro/">part 1</a> and <a href="https://rmwu.github.io/tutorial/latex/2019/11/21/positioning/">part 2</a>)</li>
+<li><a href="https://www.overleaf.com/learn/latex/TikZ_package">Overleaf&rsquo;s guide</a></li>
+<li><a href="https://www.overleaf.com/learn/latex/LaTeX_Graphics_using_TikZ:_A_Tutorial_for_Beginners_(Part_1)%E2%80%94Basic_Drawing">Overleaf&rsquo;s tutorial series</a></li>
+<li><a href="https://www.mathcha.io/">Mathcha</a> can draw and export diagrams as TikZ, as can <a href="http://dagitty.net/">DAGitty</a></li>
+</ul>
+<p>Through the magic of <strong>knitr</strong> and R Markdown, it&rsquo;s actually possible to use TikZ chunks directly in an R Markdown document and have them knit to both PDF <em>and</em> vector-based SVG files in HTML. Magic!</p>
+<h2 id="knitting-tikz-chunks-to-pdf">Knitting TikZ chunks to PDF</h2>
+<p><strong>knitr</strong> has the ability to <a href="https://yihui.org/knitr/demo/engines/">use custom engines for rendering other languages</a>, including TikZ, by including a <code>tikz</code> chunk like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">```{tikz}
+\begin{tikzpicture}
+% TikZ code here
+\end{tikzpicture}
+```
+</code></pre></div><p>To try this out, make a new blank .Rmd file and put this in it:</p>
+<p><em>(Side note: Syntax highlighting R Markdown files is tricky because they involve so many different possible languages (YAML, Markdown, R, Python, tikz, etc.), but GitHub Gists can highlight them just fine. So all these code chunks here are actually embedded Gists. If you have JavaScript enabled, or if GitHub shuts down Gist some day, or if you otherwise can&rsquo;t see them, you can <a href="https://gist.github.com/andrewheiss/55f06b079cb7064f2de5b2c174546fae">see the original gists here</a>), or you can see them in <a href="https://github.com/andrewheiss/ath-hugo/tree/main/content/blog/2021-08-27_tikz-knitr-html-svg-fun">the GitHub repository for this website here</a>)</em></p>
+<script src="https://gist.github.com/andrewheiss/55f06b079cb7064f2de5b2c174546fae.js?file=example-1.Rmd"></script>
+<p>Knit that to PDF and you&rsquo;ll see a neat little diagram of a <a href="https://cran.r-project.org/web/packages/ggdag/vignettes/intro-to-dags.html">directed acyclic graph</a> (or DAG) (<a href="example-1.pdf">see full PDF here</a>):</p>
+<p><img src="example-1.png" width="100%" style="display: block; margin: auto;" /></p>
+<h2 id="knitting-tikz-chunks-to-html-as-pngs">Knitting TikZ chunks to HTML as PNGs</h2>
+<p>If you knit that document to HTML, you&rsquo;ll also see the same diagram, but it will be a low resolution PNG and will look huge and pixelated. Behind the scenes, <strong>knitr</strong> converts the TikZ chunk to PDF and then converts that PDF to PNG and includes it in the HTML file (<a href="example-1.html">see full HTML file here</a>).</p>
+<p><img src="example-1-pixelated.png" width="70%" style="display: block; margin: auto;" /></p>
+<p>There&rsquo;s theoretically a way to change the DPI of this PNG file using the <code>engine.opts</code> chunk option and passing additional arguments to ImageMagick, which handles the conversion, but it only causes errors for me (<code>Error in magick_image_format(image, toupper(format), type, colorspace, : Invalid ImageType value: -density 300</code>) and I can&rsquo;t figure out why (see <a href="https://stackoverflow.com/questions/51735831/is-it-possible-to-increase-resolution-of-image-inserted-to-word-document-from-rm">this StackOverflow post too</a>) :</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">```{tikz, engine.opts = list(convert.opts = &#39;-density 300&#39;), fig.ext=&#34;png&#34;}
+% Stuff here
+```
+</code></pre></div><h2 id="knitting-tikz-chunks-to-html-as-svgs">Knitting TikZ chunks to HTML as SVGs</h2>
+<p>But even if I could get it to work, PNG files aren&rsquo;t great for vector-like things like TikZ diagrams. It would be great if instead I could convert these diagrams to vector-based SVG files.</p>
+<p>Fortunately <strong>knitr</strong> handles that too! Try this! (Note the <code>self_contained: no</code> in the YAML metadata—this will create a standalone DVI and SVG file in a folder named <code>&lt;NAME_OF_RMD&gt;_files/html-figures/</code>. You don&rsquo;t technically need this—without it, R will embed the images as base64-encoded text—but to make it easier to see the files R makes, we&rsquo;ll disable it)</p>
+<script src="https://gist.github.com/andrewheiss/55f06b079cb7064f2de5b2c174546fae.js?file=example-2.Rmd"></script>
+<p>You&rsquo;ll most likely get an error about Ghostscript:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-Text" data-lang="Text">processing of PostScript specials is disabled (Ghostscript not found)
+</code></pre></div><h3 id="connecting-dvisvgm-to-ghostscript-on-macos">Connecting <code>dvisvgm</code> to Ghostscript on macOS</h3>
+<p>Unfortunately it takes a little bit of initial setup to get all the moving pieces working for it to happen. To go from TikZ to SVG, <strong>knitr</strong> first converts the <code>tikz</code> chunk to DVI and then uses the terminal program <code>dvisvgm</code> to convert the DVI to SVG. Getting <code>dvisvgm</code> working on macOS is tricky though (and presumably it&rsquo;s tricky on Windows too, but I don&rsquo;t have a Windows machine to test it on).</p>
+<p>The most typical way of installing the LaTeX ecosystem on macOS is to install <a href="https://www.tug.org/mactex/">MacTeX</a>, which comes with all the dozens of special utilities TeX uses for typesetting. MacTeX comes with both <code>dvisvgm</code> and a special program called Ghostscript that handles text in DVI files. HOWEVER, by default it does not provide a way to have <code>dvisvgm</code> and Ghostscript talk to each other (there&rsquo;s <a href="https://tex.stackexchange.com/questions/559640/making-dvisvgm-and-ghostscript-from-mactex-talk-to-each-other">a whole post about it here</a>). Ghostscript really is installed, though—<code>dvisvgm</code> just can&rsquo;t see it.</p>
+<p>To fix it, you actually need to reinstall MacTex and choose a custom installation option. When you get to the &ldquo;Installation Type&rdquo; section in the package installation dialog box, click on &ldquo;Customize&rdquo; and then make sure the box is checked for &ldquo;Ghostscript Dynamic Library&rdquo;. By default this is not checked, and I have no clue why, since this is the bridge that you need to get <code>dvisvgm</code> and Ghostscript to talk to each other.</p>
+<p><img src="install-mactex.png" width="70%" style="display: block; margin: auto;" /></p>
+<p>Install MacTeX with that option enabled and you&rsquo;ll have a special new file nested deep within your filesystem at <code>/usr/local/share/ghostscript/9.53.3/lib/libgs.dylib.9.53</code>. This <code>libgs.dylib.**</code> file is the dynamic library that <code>dvisvgm</code> needs to know about to work. MacTex 2021 installs Ghostscript 9.53.3, so later versions of MacTex will place <code>libgs.dylib</code> somewhere else.</p>
+<p>To tell <code>dvisvgm</code> where this dynamic library is, you then need to set an environment variable. Open <code>~/.bash_profile</code> or <code>~/.zshrc</code> or whatever you use for setting your PATH and other terminal settings and add this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">export LIBGS<span style="color:#f92672">=</span>/usr/local/share/ghostscript/9.53.3/lib/libgs.dylib.9.53
+</code></pre></div><p>Open a new terminal window and type <code>print $LIBGS</code> to verify that the environment variable was actually set. Now you should be able to run <code>dvisvgm -l</code> and see an entry for <code>ps</code> in it (see <a href="https://dvisvgm.de/FAQ/">this FAQ page</a> for lots of other details and help for troubleshooting this):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">$ dvisvgm -l
+...
+ps         dvips PostScript specials
+...
+</code></pre></div><p>That means everything&rsquo;s working and you should now be able to convert from DVI to SVG!</p>
+<h3 id="connecting-dvisvgm-to-ghostscript-within-r">Connecting <code>dvisvgm</code> to Ghostscript within R</h3>
+<p>However, RStudio doesn&rsquo;t pick up your shell&rsquo;s environment variables when knitting files, so if you knit the document with <code>fix.ext='svg'</code> enabled, you&rsquo;ll still get an error about Ghostscript not being found.</p>
+<p>To get around this, you can actually set environment variables from within the R Markdown document itself. Add <code>Sys.setenv()</code> to an invisible chunk like this:</p>
+<script src="https://gist.github.com/andrewheiss/55f06b079cb7064f2de5b2c174546fae.js?file=example-3.Rmd"></script>
+<p>And now everything should work! You&rsquo;ll get an HTML file with a vector-based SVG version of the TikZ figure (<a href="example-2.html">see full HTML file here</a>):</p>
+<p><img src="example-2.png" width="70%" style="display: block; margin: auto;" /></p>
+<h3 id="choosing-the-tikz-output-format-based-on-the-knitted-output">Choosing the TikZ output format based on the knitted output</h3>
+<p>We can now knit this TikZ chunk to PDF if we use <code>fig.ext=&quot;pdf&quot;</code> and to SVG if we use <code>fig.ext=&quot;svg&quot;</code> in the chunk options. Remembering to switch these extensions manually, though, is tedious. To make life a little easier, we can create some conditional output types using <strong>knitr</strong>&rsquo;s (newer?) <code>opts-template</code> ability, which lets you create chunk option templates that you can reuse throughout the document. Here, we&rsquo;ll use <code>fig.ext=&quot;pdf&quot;</code> when knitting to PDF, and <code>fig.ext=&quot;svg&quot;</code> otherwise. If I could get the TikZ → PNG conversion working nicely, I&rsquo;d make it use <code>fig.ext=&quot;png&quot;</code> when knitting to Word, too.</p>
+<script src="https://gist.github.com/andrewheiss/55f06b079cb7064f2de5b2c174546fae.js?file=example-4.Rmd"></script>
+<p>Now if you knit that file ↑ to PDF, it will create a PDF TikZ image; if you knit to HTML, it will create an SVG image through <code>dvisvgm</code>. Magic!</p>
+<h3 id="font-issues">Font issues</h3>
+<p>You&rsquo;ll notice that we&rsquo;ve only been using text-less TikZ figures as an example so far. TikZ handles text just fine—it processes it through LaTeX and lets you do everything regular LaTeX typesetting does, so you can add fancy equations and Greek letters, etc. to diagrams. Let&rsquo;s add some letters with subscripts:</p>
+<script src="https://gist.github.com/andrewheiss/55f06b079cb7064f2de5b2c174546fae.js?file=example-5.Rmd"></script>
+<p>When knitting to PDF, this diagram looks great, typeset in Computer Modern like any standard LaTeX document(<a href="example-5.pdf">see full PDF here</a>):</p>
+<p><img src="example-5-pdf.png" width="100%" style="display: block; margin: auto;" /></p>
+<p>When knitting to HTML, the SVG version of the diagram also works, except for the fonts, since <code>dvisvgm</code> doesn&rsquo;t embed the fonts by default (<a href="example-5.html">see full HTML file here</a>):</p>
+<p><img src="example-5.png" width="70%" style="display: block; margin: auto;" /></p>
+<p>If you open the SVG file that R generates (find it at <code>&lt;RMD_filename&gt;_files/figure-html/unnamed-chunk-1-1.svg</code>) in something like Illustrator, it will complain about font references that are missing, like <code>cmmi10</code> and <code>cmmi7</code>:</p>
+<p><img src="illustrator.png" width="50%" style="display: block; margin: auto;" /></p>
+<p>And if you open the SVG file in a text editor you&rsquo;ll notice references to font names, but those assume that you have fonts named &ldquo;cmmi7&rdquo; and &ldquo;cmmi10&rdquo; on your computer, which is doubtful:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-xml" data-lang="xml">...
+<span style="color:#f92672">&lt;font</span> <span style="color:#a6e22e">id=</span><span style="color:#e6db74">&#39;cmmi7&#39;</span> <span style="color:#a6e22e">horiz-adv-x=</span><span style="color:#e6db74">&#39;0&#39;</span><span style="color:#f92672">&gt;</span>
+<span style="color:#f92672">&lt;font-face</span> <span style="color:#a6e22e">font-family=</span><span style="color:#e6db74">&#39;cmmi7&#39;</span> <span style="color:#a6e22e">units-per-em=</span><span style="color:#e6db74">&#39;1000&#39;</span> <span style="color:#a6e22e">ascent=</span><span style="color:#e6db74">&#39;750&#39;</span> <span style="color:#a6e22e">descent=</span><span style="color:#e6db74">&#39;250&#39;</span><span style="color:#f92672">/&gt;</span>
+...
+</code></pre></div><h3 id="font-solutions">Font solutions</h3>
+<p>Fortunately there&rsquo;s a solution! <code>dvisvgm</code> has an optional flag (<code>--font-format=woff</code>) that will embed the special LaTeX fonts using a base64-encoded web-optimized WOFF file, which means the SVG file should show the correct fonts in any modern browser or editor.</p>
+<p>However, there&rsquo;s currently not a direct way to use that flag with <strong>knitr</strong>. The command for <code>dvisvgm</code> is hardcoded into <strong>knitr</strong>&rsquo;s code and you can&rsquo;t add any extra arguments (though <a href="https://github.com/yihui/knitr/issues/2038">I&rsquo;ve opened an issue at GitHub</a> about this).</p>
+<p>But never fear! There&rsquo;s a neat roundabout way around this!</p>
+<p>You can use <a href="https://bookdown.org/yihui/rmarkdown-cookbook/chunk-hooks.html">special chunk hooks</a> in <strong>knitr</strong> to run functions before or after chunks are rendered. We can create a function that runs after a TikZ chunk is rendered that takes the temporary DVI file that <strong>knitr</strong> creates and then runs <code>dvisvgm --font-format=woff</code> on it, thus overwriting the non-embedded SVG file that <strong>knitr</strong> makes with its hardcoded <code>dvisvgm</code> command. Here&rsquo;s one way to do it (which I adapted from <a href="https://github.com/yihui/knitr/blob/3237add034368a3018ff26fa9f4d0ca89a4afd78/R/hooks-extra.R#L74">the built-in <code>hook_png()</code> function</a>):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">embed_svg_fonts <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(before, options, envir) {
+  <span style="color:#75715e"># !before means after the chunk is run</span>
+  <span style="color:#a6e22e">if </span>(<span style="color:#f92672">!</span>before) {
+    <span style="color:#75715e"># Get a list of all the plot files this chunk makes</span>
+    paths <span style="color:#f92672">&lt;-</span> knitr<span style="color:#f92672">:::</span><span style="color:#a6e22e">get_plot_files</span>()
+
+    <span style="color:#75715e"># Loop through all the plot files. When dealing with SVG, knitr actually</span>
+    <span style="color:#75715e"># creates two different files: an initial DVI and the converted SVG. We&#39;ll</span>
+    <span style="color:#75715e"># use the original DVI and pass it through dvisvgm again, this time with</span>
+    <span style="color:#75715e"># --font-format=woff enabled. This will overwrite the SVG that knitr makes</span>
+    knitr<span style="color:#f92672">:::</span><span style="color:#a6e22e">in_base_dir</span>(
+      <span style="color:#a6e22e">lapply</span>(paths, <span style="color:#a6e22e">function</span>(x) {
+        <span style="color:#a6e22e">message</span>(<span style="color:#e6db74">&#34;Embedding fonts in &#34;</span>, x)
+        path_svg <span style="color:#f92672">&lt;-</span> xfun<span style="color:#f92672">::</span><span style="color:#a6e22e">with_ext</span>(x, <span style="color:#e6db74">&#34;svg&#34;</span>)
+        path_dvi <span style="color:#f92672">&lt;-</span> xfun<span style="color:#f92672">::</span><span style="color:#a6e22e">with_ext</span>(x, <span style="color:#e6db74">&#34;dvi&#34;</span>)
+        
+        <span style="color:#a6e22e">if </span>(<span style="color:#a6e22e">system2</span>(<span style="color:#e6db74">&#39;dvisvgm&#39;</span>, <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#39;--font-format=woff&#39;</span>, <span style="color:#e6db74">&#39;-o&#39;</span>, <span style="color:#a6e22e">shQuote</span>(path_svg), <span style="color:#a6e22e">shQuote</span>(path_dvi))) <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>)
+          <span style="color:#a6e22e">stop</span>(<span style="color:#e6db74">&#39;Failed to convert &#39;</span>, path_dvi, <span style="color:#e6db74">&#39; to &#39;</span>, path_svg)
+      })
+    )
+  }
+}
+
+<span style="color:#75715e"># Register the function as a possible hook</span>
+<span style="color:#75715e"># Use this in a chunk by setting embed_svg_fonts=TRUE in the chunk options</span>
+knitr<span style="color:#f92672">::</span>knit_hooks<span style="color:#f92672">$</span><span style="color:#a6e22e">set</span>(embed_svg_fonts <span style="color:#f92672">=</span> embed_svg_fonts)
+</code></pre></div><p>Stick that ↑ in an invisible chunk (probably in the same one with <code>Sys.setenv(LIBGS = &quot;blah&quot;)</code>), and then add <code>embed_svg_fonts=TRUE</code> to the chunk options of the TikZ chunk, and it should work. When you knit, you&rsquo;ll see two messages about converting DVI to SVG. We don&rsquo;t care about the first—that&rsquo;s <strong>knitr</strong>&rsquo;s basic version without embedded fonts. The second message corresponds to the command we created with the hook, which includes <code>--font-format=woff</code>.</p>
+<p>Here&rsquo;s what the SVG file looks like now with the fonts embedded in it (<a href="dag-text-1.svg">see full SVG file here</a>):</p>
+<p><img src="dag-text-1.svg" width="40%" style="display: block; margin: auto;" /></p>
+<h2 id="tldr-final-working-version">tl;dr: Final working version</h2>
+<p>Here&rsquo;s what your final R Markdown file should look like:</p>
+<script src="https://gist.github.com/andrewheiss/55f06b079cb7064f2de5b2c174546fae.js?file=example-final.Rmd"></script>
+<p>When knitting to PDF, the TikZ figure will show up as a regular PDF image, as excepted. When knitting to HTML, though, <strong>knitr</strong> will create a DVI version of the image and then convert that to SVG (but without font embedding enabled in <code>dvisvgm</code>). Then finally, because of the post-rendering hook, <strong>knitr</strong> will run the <code>embed_svg_fonts()</code> function on the DVI and create a new SVG with fonts embedded that will overwrite the original SVG file.</p>
+<p>Look at that! So great! (<a href="example-final.html">see full HTML file here</a>):</p>
+<p><img src="example-final.png" width="70%" style="display: block; margin: auto;" /></p>
+<h2 id="update-easier-font-embedding">UPDATE: Easier font embedding!</h2>
+<p>I submitted <a href="https://github.com/yihui/knitr/pull/2039">a pull request to <strong>knitr</strong></a> that would allow users to specify additional arguments to <code>dvisvgm</code> from a chunk, and it was just merged in, so with the development version of <strong>knitr</strong> (and someday with the CRAN version, once a new version is eventually submitted), you can use the <code>dvisvgm.opts</code> option in the <code>engine.opts</code> chunk options like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">```{tikz, fig.ext=&#34;svg&#34;, engine.opts=list(dvisvgm.opts = &#34;--font-format=woff&#34;)}
+% Stuff here
+```
+</code></pre></div><p>So now there&rsquo;s no need for the <code>embed_svg_fonts()</code> hook function! This should work now for the complete DAG example:</p>
+<script src="https://gist.github.com/andrewheiss/55f06b079cb7064f2de5b2c174546fae.js?file=example-final-new.Rmd"></script>
+<h2 id="another-update-changing-fonts">ANOTHER UPDATE: Changing fonts!</h2>
+<p>You&rsquo;re not limited to the default (and kinda ugly) Computer Modern font with TikZ chunks, but changing the font is a little tricky becuase each TikZ chunk in <strong>knitr</strong> is treated as a standalone LaTeX document, so you need to adjust the fonts in each chunk.</p>
+<h3 id="knitting-only-to-pdf">Knitting only to PDF</h3>
+<p>If you&rsquo;re <em>only</em> interested in knitting to PDF, you can use XeTeX to embed any font you want in the diagram. When using XeTeX, you&rsquo;d typically add something like this to the preamble of your document to change the document font:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex"><span style="color:#66d9ef">\usepackage</span>{fontspec}
+<span style="color:#66d9ef">\setmainfont</span>{Comic Sans MS}  <span style="color:#75715e">% ew
+</span></code></pre></div><p>Each standalone TikZ knitr chunk gets passed to <a href="https://github.com/yihui/knitr/blob/master/inst/misc/tikz2pdf.tex">a special <code>tikz2pdf.tex</code> template</a>. The content of the chunk is inserted in the <code>%% TIKZ_CODE %%</code> area, and there&rsquo;s a space in the template for preamble things at <code>%% EXTRA_TIKZ_PREAMBLE_CODE %%</code>. To get content inserted there, you can use the <code>extra.preamble</code> option in <code>engine.opts</code> like so:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">```{tikz, engine.opts=list(extra.preamble=c(&#34;\\usepackage{fontspec}&#34;, &#34;\\setmainfont{Comic Sans MS}&#34;))}
+% Stuff here
+```
+</code></pre></div><p>That won&rsquo;t work right away though. When you knit, <strong>knitr</strong> uses the default <code>pdflatex</code> LaTeX engine to render each TikZ chunk, and you&rsquo;ll get an error because <code>fontspec</code> only works with XeTeX. You can tell <strong>knitr</strong> to use <code>xelatex</code> to render those chunks if you set the <code>tinytex.engine</code> option:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">options</span>(tinytex.engine <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;xelatex&#34;</span>)
+</code></pre></div><p>Once you set <code>xelatex</code> as the default LaTeX engine for the document, all TikZ chunks will render correctly. Here&rsquo;s a complete example (note that I moved the <code>extra.preamble</code> stuff to a separate variable so that it&rsquo;s easier to reuse) (<a href="example-xelatex.pdf">see full PDF here</a>):</p>
+<script src="https://gist.github.com/andrewheiss/55f06b079cb7064f2de5b2c174546fae.js?file=example-xelatex.Rmd"></script>
+<p><img src="example-xelatex.png" width="70%" style="display: block; margin: auto;" /></p>
+<h3 id="knitting-to-pdf-and-html">Knitting to PDF and HTML</h3>
+<p>This is a little trickier if you want to convert these TikZ chunks to SVG when knitting to HTML. <strong>knitr</strong> ignores the <code>tinytex.engine</code> option when you knit to HTML, so there&rsquo;s no way to tell TikZ chunks to get processed through <code>xelatex</code>. Additionally, <code>xelatex</code> does not produce .dvi files, which <code>dvisvgm</code> uses to convert to SVG. <code>xelatex</code> instead creates its own special .xdv files. In theory, newer versions of <code>dvisvgm</code> should work with XDV files, but <strong>knitr</strong> is hard-coded to pass DVI files to <code>dvisvgm</code>, not XDV files. So even if we could force TikZ chunks to go through <code>xelatex</code>, they wouldn&rsquo;t be converted to SVG. Alas.</p>
+<p>But all is not lost! It&rsquo;s possible to change fonts in non-XeTeX documents. Because you&rsquo;re limited to whatever <code>pdflatex</code> can support, you can only use specific font packages instead of whatever font you want. For instance, to use <a href="https://ctan.org/pkg/tex-gyre-pagella">TEX Gyre Pagella</a>, include <code>\usepackage{tgpagella}</code> in your preamble. <a href="https://www.overleaf.com/learn/latex/Font_typefaces">See this</a> for a basic list of possible font packages, or <a href="https://tug.org/FontCatalogue/">this for a pretty complete catalogue</a>.</p>
+<p>For instance, here&rsquo;s how to use <a href="https://tug.org/FontCatalogue/linuxlibertine/">Linux Libertine</a> for text and <a href="https://github.com/alerque/libertinus">Libertinus Math</a> for math <em>with</em> embedded SVG fonts when knitting to HTML (<a href="example-svg-libertine.html">see full HTML file here</a>):</p>
+<script src="https://gist.github.com/andrewheiss/55f06b079cb7064f2de5b2c174546fae.js?file=example-svg-libertine.Rmd"></script>
+<p><img src="example-svg-libertine.png" width="70%" style="display: block; margin: auto;" /></p>
+<p>Or with <a href="https://tug.org/FontCatalogue/gfsartemisiaeulermath/">GFS Artemisia with Euler for math</a> (<a href="example-svg-artemisia.html">see full HTML file here</a>):</p>
+<script src="https://gist.github.com/andrewheiss/55f06b079cb7064f2de5b2c174546fae.js?file=example-svg-artemisia.Rmd"></script>
+<p><img src="example-svg-artemisia.png" width="70%" style="display: block; margin: auto;" /></p>
+
+    
+        <footer>
+            <div class="tags">
+    <i class="fas fa-tags" aria-hidden="true"></i>&ensp;
+    <a href="/blog/tags/r/">r</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/tidyverse/">tidyverse</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/r-markdown/">R Markdown</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/tikz/">tikz</a></div>
+
+        </footer>
+
+        <div id="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                 
+                var disqus_shortname = 'andrewheisscom';
+                var disqus_title = document.title;
+                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2021\/08\/27\/tikz-knitr-html-svg-fun\/';
+
+                 
+                (function () {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+        </div>
+    </article>
+</section>
+
+  
+
+        </div> 
+    </div> 
+    
+    <div id="footer">
+        <footer>
+    <ul class="links">
+        <li>
+            <a href="mailto:aheiss@gsu.edu" aria-label="E-mail"   >
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/andrewheiss" aria-label="Twitter"   >
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/andrewheiss" aria-label="GitHub"   >
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/andrewheiss" aria-label="YouTube"   >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://stackoverflow.com/users/120898/andrew" aria-label="StackOverflow"   >
+                <i class="fab fa-stack-overflow" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.heissatopia.com" aria-label="Heissatopia (family blog)"   >
+                <i class="fab fa-blogger" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/andrewheiss" aria-label="Facebook"   >
+                <i class="fab fa-facebook" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/in/andrewheiss" aria-label="LinkedIn"   >
+                <i class="fab fa-linkedin" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+
+    <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
+
+    <p class="pgp">
+        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
+    </p>
+
+    <p class="copyright">
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+            title="Creative Commons Attribution-ShareAlike 4.0 International license"><i class="fab fa-creative-commons"></i>
+        <i class="fab fa-creative-commons-by" title="Attribution"></i>
+        <i class="fab fa-creative-commons-share" title="Share alike"></i></a>
+        <span class="cc-year">&bull; 2007&ndash;2021</span>
+    </p>
+
+    <p class="colophon"><a href="https://github.com/andrewheiss/ath-hugo">Code for site</a></p>
+</footer>
+
+    </div>
+
+</body>
+
+</html>

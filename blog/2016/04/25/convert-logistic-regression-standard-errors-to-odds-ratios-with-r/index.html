@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en">
+
+    <meta name="author" content="Andrew Heiss">
+    <meta name="description" content="Correctly transform logistic regression standard errors to odds ratios using R">
+    <meta name="keywords" content="r, regression">
+    <meta name="generator" content="Hugo 0.88.1" />
+
+    <title>
+  Convert logistic regression standard errors to odds ratios with R | Andrew Heiss
+</title>
+
+    <link rel="canonical" href="https://www.andrewheiss.com/blog/2016/04/25/convert-logistic-regression-standard-errors-to-odds-ratios-with-r/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+
+    <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
+    <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png?v=1"/>
+    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:title" content="Convert logistic regression standard errors to odds ratios with R"/>
+    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:description" content="Correctly transform logistic regression standard errors to odds ratios using R"/>
+
+
+    <meta property="og:title" content="Convert logistic regression standard errors to odds ratios with R" />
+<meta property="og:description" content="Correctly transform logistic regression standard errors to odds ratios using R" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.andrewheiss.com/blog/2016/04/25/convert-logistic-regression-standard-errors-to-odds-ratios-with-r/" />
+<meta property="og:image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta property="article:published_time" content="2016-04-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2016-04-25T00:00:00+00:00" />
+
+<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:section" content="blog" />
+<meta property="article:tag" content="r" />
+<meta property="article:tag" content="regression" />
+
+
+    <meta itemprop="name" content="Convert logistic regression standard errors to odds ratios with R">
+<meta itemprop="description" content="Correctly transform logistic regression standard errors to odds ratios using R"><meta itemprop="datePublished" content="2016-04-25T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2016-04-25T00:00:00+00:00" />
+<meta itemprop="wordCount" content="667"><meta itemprop="image" content="https://www.andrewheiss.com/profiles/twitter-card-large.png"/>
+<meta itemprop="keywords" content="r,regression," />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/pure-and-grids-responsive.min.css">
+    <link rel="stylesheet" href="/css/ath-hugo.min.c5619237d890aa972042ca0497d2594d6f3f34b1746c377f560f5096573fb6e3.css" integrity="sha256-xWGSN9iQqpcgQsoEl9JZTW8/NLF0bDd/Vg9Qllc/tuM=" crossorigin="anonymous" media="screen" />
+
+    <script src="https://kit.fontawesome.com/f9d343c40d.js" crossorigin="anonymous"></script>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=dLX2MbQJLG">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=dLX2MbQJLG">
+    <link rel="manifest" href="/site.webmanifest?v=dLX2MbQJLG">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg?v=dLX2MbQJLG" color="#cf4446">
+    <link rel="shortcut icon" href="/favicon.ico?v=dLX2MbQJLG">
+    <meta name="msapplication-TileColor" content="#170c3a">
+    <meta name="theme-color" content="#170c3a">
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-527449-5', 'auto');
+      ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+
+    <div id="layout" class="pure-g">
+        <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
+            <header>
+                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
+                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+
+                <nav id="main-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/cv/">CV</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/blog/">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/research/">Research</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/teaching/">Teaching</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/talks/">Talks</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/now/">Now</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/uses/">Uses</a>
+                        </li>
+                    </ul>
+                </nav>
+            </header>
+
+        </div> 
+    
+        <div id="content" class="pure-u-1 pure-u-md-3-4">
+        
+  <section>
+    <article class="content-single">
+        <header class="post-header">
+            <h1 class="post-title">Convert logistic regression standard errors to odds ratios with R</h1>
+
+            <div class="post-meta pure-g">
+                <div class="pure-u-1-2">
+                    <span class="posted-on">
+                        <i class="far fa-calendar-alt" aria-hidden="true"></i>
+                        <time datetime='2016-04-25T00:00:00Z'>
+                            Monday, April 25, 2016
+                        </time>
+                    </span>
+                </div>
+                <div class="reading-time pure-u-1-2">
+                    <i class="far fa-clock" aria-hidden="true"></i>
+                    4-minute read
+                </div>
+            </div>
+        </header>
+    
+        <p>Converting logistic regression coefficients and standard errors into odds ratios is trivial in Stata: just add <code>, or</code> to the end of a <code>logit</code> command:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">. use &#34;http://www.ats.ucla.edu/stat/data/hsbdemo&#34;, clear
+
+. logit honors i.female math read, or
+
+Logistic regression                             Number of obs     =        200
+                                                LR chi2(3)        =      80.87
+                                                Prob &gt; chi2       =     0.0000
+Log likelihood = -75.209827                     Pseudo R2         =     0.3496
+
+------------------------------------------------------------------------------
+      honors | Odds Ratio   Std. Err.      z    P&gt;|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      female |
+     female  |   3.173393   1.377573     2.66   0.008      1.35524    7.430728
+        math |   1.140779   .0370323     4.06   0.000     1.070458     1.21572
+        read |   1.078145    .029733     2.73   0.006     1.021417    1.138025
+       _cons |   1.99e-06   3.68e-06    -7.09   0.000     5.29e-08    .0000749
+------------------------------------------------------------------------------
+</code></pre></div><p>Doing the same thing in R is a little trickier. Calculating odds ratios for <em>coefficients</em> is trivial, and <code>exp(coef(model))</code> gives the same results as Stata:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#75715e"># Load libraries</span>
+<span style="color:#a6e22e">library</span>(dplyr)  <span style="color:#75715e"># Data frame manipulation</span>
+<span style="color:#a6e22e">library</span>(readr)  <span style="color:#75715e"># Read CSVs nicely</span>
+<span style="color:#a6e22e">library</span>(broom)  <span style="color:#75715e"># Convert models to data frames</span>
+
+<span style="color:#75715e"># Use treatment contrasts instead of polynomial contrasts for ordered factors</span>
+<span style="color:#a6e22e">options</span>(contrasts<span style="color:#f92672">=</span><span style="color:#a6e22e">rep</span>(<span style="color:#e6db74">&#34;contr.treatment&#34;</span>, <span style="color:#ae81ff">2</span>))
+
+<span style="color:#75715e"># Load and clean data</span>
+df <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">read_csv</span>(<span style="color:#e6db74">&#34;http://www.ats.ucla.edu/stat/data/hsbdemo.csv&#34;</span>) <span style="color:#f92672">%&gt;%</span>
+  <span style="color:#a6e22e">mutate</span>(honors <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(honors, levels<span style="color:#f92672">=</span><span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;not enrolled&#34;</span>, <span style="color:#e6db74">&#34;enrolled&#34;</span>)),
+         female <span style="color:#f92672">=</span> <span style="color:#a6e22e">factor</span>(female, levels<span style="color:#f92672">=</span><span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;male&#34;</span>, <span style="color:#e6db74">&#34;female&#34;</span>), ordered<span style="color:#f92672">=</span><span style="color:#66d9ef">TRUE</span>))
+
+<span style="color:#75715e"># Run model</span>
+model <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">glm</span>(honors <span style="color:#f92672">~</span> female <span style="color:#f92672">+</span> math <span style="color:#f92672">+</span> read, data<span style="color:#f92672">=</span>df, family<span style="color:#f92672">=</span><span style="color:#a6e22e">binomial</span>(link<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;logit&#34;</span>))
+<span style="color:#a6e22e">summary</span>(model)
+<span style="color:#75715e">#&gt;</span>
+<span style="color:#75715e">#&gt; Call:</span>
+<span style="color:#75715e">#&gt; glm(formula = honors ~ female + math + read, family = binomial(link = &#34;logit&#34;), </span>
+<span style="color:#75715e">#&gt;     data = df)</span>
+<span style="color:#75715e">#&gt;</span>
+<span style="color:#75715e">#&gt; Deviance Residuals:</span>
+<span style="color:#75715e">#&gt;     Min       1Q   Median       3Q      Max  </span>
+<span style="color:#75715e">#&gt; -2.0055  -0.6061  -0.2730   0.4844   2.3953  </span>
+<span style="color:#75715e">#&gt;</span>
+<span style="color:#75715e">#&gt; Coefficients:</span>
+<span style="color:#75715e">#&gt;               Estimate Std. Error z value Pr(&gt;|z|)    </span>
+<span style="color:#75715e">#&gt; (Intercept)  -13.12749    1.85080  -7.093 1.31e-12 ***</span>
+<span style="color:#75715e">#&gt; femalefemale   1.15480    0.43409   2.660  0.00781 ** </span>
+<span style="color:#75715e">#&gt; math           0.13171    0.03246   4.058 4.96e-05 ***</span>
+<span style="color:#75715e">#&gt; read           0.07524    0.02758   2.728  0.00636 ** </span>
+<span style="color:#75715e">#&gt; ---</span>
+<span style="color:#75715e">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span>
+<span style="color:#75715e">#&gt;</span>
+<span style="color:#75715e">#&gt; (Dispersion parameter for binomial family taken to be 1)</span>
+<span style="color:#75715e">#&gt;</span>
+<span style="color:#75715e">#&gt;     Null deviance: 231.29  on 199  degrees of freedom</span>
+<span style="color:#75715e">#&gt; Residual deviance: 150.42  on 196  degrees of freedom</span>
+<span style="color:#75715e">#&gt; AIC: 158.42</span>
+<span style="color:#75715e">#&gt;</span>
+<span style="color:#75715e">#&gt; Number of Fisher Scoring iterations: 5</span>
+
+<span style="color:#75715e"># Exponentiate coefficients</span>
+<span style="color:#a6e22e">exp</span>(<span style="color:#a6e22e">coef</span>(model))
+<span style="color:#75715e">#&gt;  (Intercept) femalefemale         math         read </span>
+<span style="color:#75715e">#&gt; 1.989771e-06 3.173393e+00 1.140779e+00 1.078145e+00</span>
+
+<span style="color:#75715e"># Exponentiate standard errors</span>
+<span style="color:#75715e"># WRONG</span>
+ses <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">sqrt</span>(<span style="color:#a6e22e">diag</span>(<span style="color:#a6e22e">vcov</span>(model)))
+<span style="color:#a6e22e">exp</span>(ses)
+<span style="color:#75715e">#&gt;  (Intercept) femalefemale         math         read </span>
+<span style="color:#75715e">#&gt;     6.364894     1.543557     1.032994     1.027961</span>
+</code></pre></div><p>Calculating the odds-ratio adjusted <em>standard errors</em> is less trivial—<code>exp(ses)</code> does not work. This is because of the underlying math behind logistic regression (and all other models that use odds ratios, hazard ratios, etc.). Instead of exponentiating, the standard errors have to be calculated with calculus (Taylor series) or simulation (bootstrapping). Stata uses the <a href="https://www.stata.com/support/faqs/statistics/delta-rule/">Taylor series-based delta method</a>, which is <a href="http://www.ats.ucla.edu/stat/r/faq/deltamethod.htm">fairly easy to implement in R</a> (see Example 2).</p>
+<p>Essentially, you can calculate the odds ratio-adjusted standard error with $\sqrt{\text{gradient} \times \text{coefficient variance} \times \text{gradient}}$, and since the first derivative/gradient of $e^x$ is just $e^x$, in this case the adjusted standard error is simply $\sqrt{e^{\text{coefficient}} \times \text{coefficient variance} \times e^{\text{coefficient}}}$ or $\sqrt{(e^{\text{coefficient}})^2 \times \text{coefficient variance}}$</p>
+<p>Doing this in R is easy, especially with <a href="https://github.com/dgrtwo/broom"><code>broom::tidy()</code></a>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">model.df <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">tidy</span>(model)  <span style="color:#75715e"># Convert model to dataframe for easy manipulation</span>
+model.df
+<span style="color:#75715e">#&gt;           term     estimate  std.error statistic      p.value</span>
+<span style="color:#75715e">#&gt; 1  (Intercept) -13.12749111 1.85079765 -7.092883 1.313465e-12</span>
+<span style="color:#75715e">#&gt; 2 femalefemale   1.15480121 0.43408932  2.660285 7.807461e-03</span>
+<span style="color:#75715e">#&gt; 3         math   0.13171175 0.03246105  4.057532 4.959406e-05</span>
+<span style="color:#75715e">#&gt; 4         read   0.07524236 0.02757725  2.728422 6.363817e-03</span>
+
+model.df <span style="color:#f92672">%&gt;%</span> 
+  <span style="color:#a6e22e">mutate</span>(or <span style="color:#f92672">=</span> <span style="color:#a6e22e">exp</span>(estimate),  <span style="color:#75715e"># Odds ratio/gradient</span>
+         var.diag <span style="color:#f92672">=</span> <span style="color:#a6e22e">diag</span>(<span style="color:#a6e22e">vcov</span>(model)),  <span style="color:#75715e"># Variance of each coefficient</span>
+         or.se <span style="color:#f92672">=</span> <span style="color:#a6e22e">sqrt</span>(or^2 <span style="color:#f92672">*</span> var.diag))  <span style="color:#75715e"># Odds-ratio adjusted </span>
+<span style="color:#75715e">#&gt;           term     estimate  std.error statistic      p.value           or</span>
+<span style="color:#75715e">#&gt; 1  (Intercept) -13.12749111 1.85079765 -7.092883 1.313465e-12 1.989771e-06</span>
+<span style="color:#75715e">#&gt; 2 femalefemale   1.15480121 0.43408932  2.660285 7.807461e-03 3.173393e+00</span>
+<span style="color:#75715e">#&gt; 3         math   0.13171175 0.03246105  4.057532 4.959406e-05 1.140779e+00</span>
+<span style="color:#75715e">#&gt; 4         read   0.07524236 0.02757725  2.728422 6.363817e-03 1.078145e+00</span>
+<span style="color:#75715e">#&gt;       var.diag        or.se</span>
+<span style="color:#75715e">#&gt; 1 3.4254519469 3.682663e-06</span>
+<span style="color:#75715e">#&gt; 2 0.1884335381 1.377536e+00</span>
+<span style="color:#75715e">#&gt; 3 0.0010537198 3.703090e-02</span>
+<span style="color:#75715e">#&gt; 4 0.0007605045 2.973228e-02</span>
+</code></pre></div><p>This can all be wrapped up into a simple function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">get.or.se <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">function</span>(model) {
+  broom<span style="color:#f92672">::</span><span style="color:#a6e22e">tidy</span>(model) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">mutate</span>(or <span style="color:#f92672">=</span> <span style="color:#a6e22e">exp</span>(estimate),
+           var.diag <span style="color:#f92672">=</span> <span style="color:#a6e22e">diag</span>(<span style="color:#a6e22e">vcov</span>(model)),
+           or.se <span style="color:#f92672">=</span> <span style="color:#a6e22e">sqrt</span>(or^2 <span style="color:#f92672">*</span> var.diag)) <span style="color:#f92672">%&gt;%</span>
+    <span style="color:#a6e22e">select</span>(or.se) <span style="color:#f92672">%&gt;%</span> unlist <span style="color:#f92672">%&gt;%</span> unname
+}
+
+<span style="color:#a6e22e">get.or.se</span>(model)
+<span style="color:#75715e">#&gt; [1] 3.682663e-06 1.377536e+00 3.703090e-02 2.973228e-02</span>
+</code></pre></div><p>Same results in both programs!</p>
+<p><img src="same.gif" alt="Same!" title="Same!"></p>
+
+    
+        <footer>
+            <div class="tags">
+    <i class="fas fa-tags" aria-hidden="true"></i>&ensp;
+    <a href="/blog/tags/r/">r</a>
+    <span class="separator">•</span>
+    <a href="/blog/tags/regression/">regression</a></div>
+
+        </footer>
+
+        <div id="comments">
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                 
+                var disqus_shortname = 'andrewheisscom';
+                var disqus_title = document.title;
+                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2016\/04\/25\/convert-logistic-regression-standard-errors-to-odds-ratios-with-r\/';
+
+                 
+                (function () {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+                    Disqus.</a></noscript>
+        </div>
+    </article>
+</section>
+
+  
+
+<script src="/js/math-code.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"></script>
+<script>
+    MathJax = {
+        tex: {
+            inlineMath: [
+                ['$', '$'], ['\\(', '\\)']
+            ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        options: {
+            skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        }
+    };
+</script>
+
+        </div> 
+    </div> 
+    
+    <div id="footer">
+        <footer>
+    <ul class="links">
+        <li>
+            <a href="mailto:aheiss@gsu.edu" aria-label="E-mail"   >
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://twitter.com/andrewheiss" aria-label="Twitter"   >
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://github.com/andrewheiss" aria-label="GitHub"   >
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.youtube.com/andrewheiss" aria-label="YouTube"   >
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://stackoverflow.com/users/120898/andrew" aria-label="StackOverflow"   >
+                <i class="fab fa-stack-overflow" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.heissatopia.com" aria-label="Heissatopia (family blog)"   >
+                <i class="fab fa-blogger" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.facebook.com/andrewheiss" aria-label="Facebook"   >
+                <i class="fab fa-facebook" aria-hidden="true"></i>
+            </a>
+        </li>
+        <li>
+            <a href="https://www.linkedin.com/in/andrewheiss" aria-label="LinkedIn"   >
+                <i class="fab fa-linkedin" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+
+    <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
+
+    <p class="pgp">
+        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
+    </p>
+
+    <p class="copyright">
+        <a href="http://creativecommons.org/licenses/by-sa/4.0/"
+            title="Creative Commons Attribution-ShareAlike 4.0 International license"><i class="fab fa-creative-commons"></i>
+        <i class="fab fa-creative-commons-by" title="Attribution"></i>
+        <i class="fab fa-creative-commons-share" title="Share alike"></i></a>
+        <span class="cc-year">&bull; 2007&ndash;2021</span>
+    </p>
+
+    <p class="colophon"><a href="https://github.com/andrewheiss/ath-hugo">Code for site</a></p>
+</footer>
+
+    </div>
+
+</body>
+
+</html>
