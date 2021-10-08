@@ -9,40 +9,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Language" content="en">
 
-    <meta name="author" content="Andrew Heiss">
+    <meta name="author" content="Shagun Jhaver">
     <meta name="description" content="Use R to explore possible biases that come from differential treatment timing in two-way fixed effects (TWFE) regression models">
     <meta name="keywords" content="r, tidyverse, regression, statistics, data visualization, econometrics, panel data">
     <meta name="generator" content="Hugo 0.88.1" />
 
     <title>
-  Exploring Pamela Jakiela&#39;s simple TWFE diagnostics with R | Andrew Heiss
+  Exploring Pamela Jakiela&#39;s simple TWFE diagnostics with R | Shagun Jhaver
 </title>
 
-    <link rel="canonical" href="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/">
-    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
-    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+    <link rel="canonical" href="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.shagunjhaver.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.shagunjhaver.com/feed.json">
 
     <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
     <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
 
     <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:image" content="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png"/>
-    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:image" content="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png"/>
+    <meta name="twitter:site" content="@shagunjhaver"/>
     <meta name="twitter:title" content="Exploring Pamela Jakiela&#39;s simple TWFE diagnostics with R"/>
-    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:creator" content="@shagunjhaver"/>
     <meta name="twitter:description" content="Use R to explore possible biases that come from differential treatment timing in two-way fixed effects (TWFE) regression models"/>
 
 
     <meta property="og:title" content="Exploring Pamela Jakiela&#39;s simple TWFE diagnostics with R" />
 <meta property="og:description" content="Use R to explore possible biases that come from differential treatment timing in two-way fixed effects (TWFE) regression models" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/" />
-<meta property="og:image" content="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png" />
+<meta property="og:url" content="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/" />
+<meta property="og:image" content="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png" />
 <meta property="article:published_time" content="2021-08-25T00:00:00+00:00" />
 <meta property="article:modified_time" content="2021-08-25T00:00:00+00:00" />
 
-<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
-<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:author" content="https://www.facebook.com/shagun.jhaver" />
+<meta property="article:publisher" content="https://www.facebook.com/shagun.jhaver" />
 <meta property="article:section" content="blog" />
 <meta property="article:tag" content="r" />
 <meta property="article:tag" content="tidyverse" />
@@ -55,7 +55,7 @@
     <meta itemprop="name" content="Exploring Pamela Jakiela&#39;s simple TWFE diagnostics with R">
 <meta itemprop="description" content="Use R to explore possible biases that come from differential treatment timing in two-way fixed effects (TWFE) regression models"><meta itemprop="datePublished" content="2021-08-25T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2021-08-25T00:00:00+00:00" />
-<meta itemprop="wordCount" content="7919"><meta itemprop="image" content="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png">
+<meta itemprop="wordCount" content="7919"><meta itemprop="image" content="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png">
 <meta itemprop="keywords" content="r,tidyverse,regression,statistics,data visualization,econometrics,panel data," />
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -93,8 +93,8 @@
     <div id="layout" class="pure-g">
         <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
             <header>
-                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
-                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+                <h1 class="title"><a href="/">Shagun Jhaver</a></h1>
+                <h2 class="minibio">Social computing, CSCW, HCI, content moderation, and online harassment</h2>
 
                 <nav id="main-nav">
                     <ul class="nav-list">
@@ -151,10 +151,10 @@
             </div>
         </header>
     
-        <script src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/kePrint/kePrint.js"></script>
-<link href="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/lightable/lightable.css" rel="stylesheet" />
-<script src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/kePrint/kePrint.js"></script>
-<link href="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/lightable/lightable.css" rel="stylesheet" />
+        <script src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/kePrint/kePrint.js"></script>
+<link href="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/lightable/lightable.css" rel="stylesheet" />
+<script src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/kePrint/kePrint.js"></script>
+<link href="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/lightable/lightable.css" rel="stylesheet" />
 <h2 id="contents----omit-in-toc---">Contents <!-- omit in toc --></h2>
 <ul>
 <li><a href="#a-different-way-of-thinking-about-ols-coefficients">A different way of thinking about OLS coefficients</a></li>
@@ -264,7 +264,7 @@ plot_trt_out <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e
 
 (hist_out <span style="color:#f92672">+</span> hist_trt) <span style="color:#f92672">/</span> <span style="color:#a6e22e">plot_spacer</span>() <span style="color:#f92672">/</span> plot_trt_out <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.28</span>, <span style="color:#ae81ff">0.02</span>, <span style="color:#ae81ff">0.7</span>))
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-fake-data-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-fake-data-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>We can find the average treatment effect (ATE) of this imaginary program on the outcome using a simple univariate regression model:</p>
 <p><code>$$\color{gray}{\overbrace{\color{#FFA615}{Y}}^{\text{Outcome}}_{\underbrace{\color{#FFA615}{i}}_{\text{An individual}}}} \color{black}{=} \color{gray}{\overbrace{\color{black}{\alpha}}^{\text{Intercept}}} \color{black}{+} \color{gray}{\underbrace{\color{#0599B0}{\beta}}_{\text{ATE}}} \color{gray}{\overbrace{\color{#A4BD0A}{D_i}}^{\text{Treatment}}} \color{black}{+} \color{gray}{\overbrace{\color{black}{\epsilon_i}}^{\text{Error}}}$$</code></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">model_effect <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(outcome <span style="color:#f92672">~</span> treatment, data <span style="color:#f92672">=</span> fake_data)
@@ -332,7 +332,7 @@ fake_data_resid <span style="color:#f92672">&lt;-</span> fake_data <span style="
   <span style="color:#a6e22e">scale_x_continuous</span>(labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">comma_format</span>()) <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">theme</span>(panel.grid.major.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-fake-data-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-fake-data-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>There’s a pattern to which observations get positive or negative weights. According to <a href="#ref-Jakiela:2021">Jakiela</a> (<a href="#ref-Jakiela:2021">2021, 4</a>),</p>
 <blockquote>
 <p>As in any univariate OLS regression of an outcome on a continuous measure of treatment intensity, observations with below mean treatment intensity receive negative weight, and may be thought of as part of the comparison group.</p>
@@ -708,7 +708,7 @@ Year fixed effects
             size <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#A4BD0A&#34;</span>) <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Year free primary education implemented&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">theme_clean</span>()
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-fpe-start-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-fpe-start-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>This timing could cause problems. To see these issues, let’s calculate the ATE ($\beta$) with that fancy schmancy Frisch-Waugh-Lovell theorem with residualized treatment weights. There’s one key difference here when calculating the residuals though. With the simple model earlier, the treatment residuals were just <code>\(D_i - \bar{D}\)</code>, or the residuals from <code>lm(treatment ~ 1)</code>. In TWFE situations, though, treatment residuals need to account for both country and year fixed effects, or <code>lm(treatment ~ country + year)</code>:</p>
 <p><code>$$\color{#0599B0}{\beta^{\text{TWFE}}} \color{black}{= \sum_{it}} \color{#FFA615}{Y_{it}} \color{black} \left( \frac{\color{#353D03}{\tilde{D}_{it}}}{\sum_{it} \color{#353D03}{\tilde{D}_{it}}^2} \right)$$</code></p>
 <p>Or, with code:</p>
@@ -813,7 +813,7 @@ hist_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e2
   <span style="color:#a6e22e">theme_clean</span>()
 
 hist_primary <span style="color:#f92672">+</span> hist_secondary
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>These histograms confirm the proportions we found earlier—about 25% of the treated observations have negative weights.</p>
 <p>Which treated country-years are getting these negative weights, though? According to Jakiela, early adopters and later years are more likely to have this switch happen. Let’s make another plot:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot_waffle_primary <span style="color:#f92672">&lt;-</span> fpe_primary_weights <span style="color:#f92672">%&gt;%</span>
@@ -867,7 +867,7 @@ waffle_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6
         legend.key.size <span style="color:#f92672">=</span> <span style="color:#a6e22e">unit</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#e6db74">&#34;lines&#34;</span>))
 
 waffle_primary <span style="color:#f92672">/</span> waffle_secondary
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weight-waffle-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weight-waffle-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>And that is indeed the case! Malawi, Ethiopia, Ghana, Uganda, and Cameroon all eliminated fees before 2000, and they start getting negative weights after 2005.</p>
 <h3 id="32-testing-the-homogeneity-assumption-directly">3.2: Testing the homogeneity assumption directly</h3>
 <p>We thus have issues with negative weighting here for early adopting countries and later country-years. However, as long as the treatment effects are homogenous—or that the elimination of school fees has the same effect across time and country—this negative weighting isn’t an issue. If treatment effects are heterogenous—especially if the effects change over time within treated countries—the TWFE estimate will be severely biased.</p>
@@ -922,7 +922,7 @@ plot_out_trt_secondary <span style="color:#f92672">&lt;-</span> <span style="col
   <span style="color:#a6e22e">theme</span>(legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>)
 
 plot_out_trt_primary <span style="color:#f92672">|</span> plot_out_trt_secondary
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-outcome-trt-resid-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-outcome-trt-resid-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>For primary enrollment, the lines for treated and untreated observations look like they have similar slopes. When using Loess lines, the two groups don’t align perfectly, and the relationship between residualized treatment and residualized outcome doesn’t look perfectly linear. When secondary enrollment is the outcome, the lines for the treated and untreated groups seem to switch directions—the slope is negative for untreated observations but positive for treated. This is a bad sign for the homogeneity assumption.</p>
 <p>We can statistically test if the slopes in two groups are the same or not by using an interaction term in a regression model:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">check_slopes_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(out_resid <span style="color:#f92672">~</span> treatment_resid <span style="color:#f92672">*</span> <span style="color:#a6e22e">factor</span>(treatment),
@@ -1225,7 +1225,7 @@ prop_neg_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#
 
 ((ate_primary <span style="color:#f92672">/</span> prop_neg_primary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>))) <span style="color:#f92672">|</span>
   ((ate_secondary <span style="color:#f92672">/</span> prop_neg_secondary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>)))
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-exclude-later-years-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-exclude-later-years-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <h3 id="change-how-many-post-treatment-years-are-kept">Change how many post-treatment years are kept</h3>
 <p>Dropping rows based on end years like this is neat, but it doesn’t take into account the differential treatment timing. Countries like Mozambique, which eliminated its fees in 2005, don’t even show up in the first few models of exclude-later-years robustness check, since those models end in 2000–2004. As an alternative, we can keep specific numbers of years post-treatment for each country. For instance, we can look at Mozambique 2, 3, 4, or 5 (and so on) years after treatment. Doing this centers all countries at <code>\(t = 0\)</code>, rather than <code>\(t = \text{start year}\)</code>.</p>
 <p>For primary schools in this situation, the effect is smaller and not significant when only a few post-treatment years are kept, but it stabilizes at around 20 after only 5 post-treatment years, which suggests that <code>\(\delta\)</code> is indeed homogenous—we don’t need a ton of post-treatment data to find it. For secondary schools, though, the effect remains negative and insigificant throughout every specification.</p>
@@ -1337,7 +1337,7 @@ prop_neg_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#
 
 ((ate_primary <span style="color:#f92672">/</span> prop_neg_primary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>))) <span style="color:#f92672">|</span>
   ((ate_secondary <span style="color:#f92672">/</span> prop_neg_secondary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>)))
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-post-treatment-years-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-post-treatment-years-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <h3 id="exclude-individual-countries">Exclude individual countries</h3>
 <p>Finally, since early adopter countries are more likely to have negative treatment weights, we can remove individual countries from the panel to see what their omission does to the overall TWFE estimate. For primary school enrollment, the ATE remains positive and significant across most specifications, except when Malawi, Uganda, or Namibia are excluded. But Malawi and Uganda were early adopters and thus have negatively weighted treatment observations in later years, as we saw earlier, which give them strange leverage in the the overall TWFE ATE calculation. For secondary schools, the effect remains basically zero and insignificant across all specifications except when Malawi is omitted, but that’s again because Malawi was an early adopter.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">fpe_omit_countries_primary <span style="color:#f92672">&lt;-</span> fpe_primary <span style="color:#f92672">%&gt;%</span>
@@ -1393,7 +1393,7 @@ ate_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22
   <span style="color:#a6e22e">theme</span>(panel.grid.major.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
 
 ate_primary <span style="color:#f92672">|</span> ate_secondary
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-drop-countries-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-drop-countries-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <h2 id="tldr-conclusion">tl;dr: Conclusion</h2>
 <p><em><strong>Phew.</strong></em> That was a ton of code, but coding my way through this paper and translating Jakiela’s diagnostics and robustness checks from math into R was incredibly helpful for me to start understanding all this new TWFE stuff.</p>
 <p>Here are the main tl;dr takeaways from her paper:</p>
@@ -1455,7 +1455,7 @@ explain the residualized outcome. If the slopes for treated and comparison obser
                  
                 var disqus_shortname = 'andrewheisscom';
                 var disqus_title = document.title;
-                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2021\/08\/25\/twfe-diagnostics\/';
+                var disqus_url = 'https:\/\/www.shagunjhaver.com\/blog\/2021\/08\/25\/twfe-diagnostics\/';
 
                  
                 (function () {
@@ -1541,7 +1541,7 @@ explain the residualized outcome. If the slopes for treated and comparison obser
     <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
 
     <p class="pgp">
-        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        <a href="https://www.shagunjhaver.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
         fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
     </p>
 

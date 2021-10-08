@@ -9,40 +9,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Language" content="en">
 
-    <meta name="author" content="Andrew Heiss">
+    <meta name="author" content="Shagun Jhaver">
     <meta name="description" content="Use R to explore the three rules of *do*-calculus in plain language and derive the backdoor adjustment formula by hand">
     <meta name="keywords" content="r, tidyverse, DAGs, causal inference, do calculus">
     <meta name="generator" content="Hugo 0.88.1" />
 
     <title>
-  Do-calculus adventures! Exploring the three rules of do-calculus in plain language and deriving the backdoor adjustment formula by hand | Andrew Heiss
+  Do-calculus adventures! Exploring the three rules of do-calculus in plain language and deriving the backdoor adjustment formula by hand | Shagun Jhaver
 </title>
 
-    <link rel="canonical" href="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/">
-    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.andrewheiss.com/atom.xml">
-    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.andrewheiss.com/feed.json">
+    <link rel="canonical" href="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/">
+    <link rel="alternate" type="application/atom+xml" title="Blog Posts" href="https://www.shagunjhaver.com/atom.xml">
+    <link rel="alternate" type="application/json" title="JSON Feed" href="https://www.shagunjhaver.com/feed.json">
 
     <link rel="openid2.provider" href="https://www.google.com/accounts/o8/ud?source=profiles">
     <link rel="openid2.local_id" href="https://www.google.com/profiles/andrewheiss">
 
     <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:image" content="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/do-calculus-math.png"/>
-    <meta name="twitter:site" content="@andrewheiss"/>
+    <meta name="twitter:image" content="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/do-calculus-math.png"/>
+    <meta name="twitter:site" content="@shagunjhaver"/>
     <meta name="twitter:title" content="Do-calculus adventures! Exploring the three rules of do-calculus in plain language and deriving the backdoor adjustment formula by hand"/>
-    <meta name="twitter:creator" content="@andrewheiss"/>
+    <meta name="twitter:creator" content="@shagunjhaver"/>
     <meta name="twitter:description" content="Use R to explore the three rules of *do*-calculus in plain language and derive the backdoor adjustment formula by hand"/>
 
 
     <meta property="og:title" content="Do-calculus adventures! Exploring the three rules of do-calculus in plain language and deriving the backdoor adjustment formula by hand" />
 <meta property="og:description" content="Use R to explore the three rules of *do*-calculus in plain language and derive the backdoor adjustment formula by hand" />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/" />
-<meta property="og:image" content="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/do-calculus-math.png" />
+<meta property="og:url" content="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/" />
+<meta property="og:image" content="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/do-calculus-math.png" />
 <meta property="article:published_time" content="2021-09-07T00:00:00+00:00" />
 <meta property="article:modified_time" content="2021-09-07T00:00:00+00:00" />
 
-<meta property="article:author" content="https://www.facebook.com/andrewheiss" />
-<meta property="article:publisher" content="https://www.facebook.com/andrewheiss" />
+<meta property="article:author" content="https://www.facebook.com/shagun.jhaver" />
+<meta property="article:publisher" content="https://www.facebook.com/shagun.jhaver" />
 <meta property="article:section" content="blog" />
 <meta property="article:tag" content="r" />
 <meta property="article:tag" content="tidyverse" />
@@ -54,7 +54,7 @@
     <meta itemprop="name" content="Do-calculus adventures! Exploring the three rules of do-calculus in plain language and deriving the backdoor adjustment formula by hand">
 <meta itemprop="description" content="Use R to explore the three rules of *do*-calculus in plain language and derive the backdoor adjustment formula by hand"><meta itemprop="datePublished" content="2021-09-07T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2021-09-07T00:00:00+00:00" />
-<meta itemprop="wordCount" content="5568"><meta itemprop="image" content="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/do-calculus-math.png">
+<meta itemprop="wordCount" content="5568"><meta itemprop="image" content="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/do-calculus-math.png">
 <meta itemprop="keywords" content="r,tidyverse,DAGs,causal inference,do calculus," />
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -92,8 +92,8 @@
     <div id="layout" class="pure-g">
         <div id="sidebar" class="pure-u-1 pure-u-md-1-4">
             <header>
-                <h1 class="title"><a href="/">Andrew Heiss</a></h1>
-                <h2 class="minibio">International NGOs, nonprofit management, authoritarianism, data science, and R</h2>
+                <h1 class="title"><a href="/">Shagun Jhaver</a></h1>
+                <h2 class="minibio">Social computing, CSCW, HCI, content moderation, and online harassment</h2>
 
                 <nav id="main-nav">
                     <ul class="nav-list">
@@ -263,7 +263,7 @@ plot_rule1_g_x_over <span style="color:#f92672">&lt;-</span> <span style="color:
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_rule1_g <span style="color:#f92672">|</span> plot_rule1_g_x_over
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule1-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule1-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>If we want to calculate the causal effect of X on Y, do we need to worry about Z here, or can we ignore it? Let’s apply Rule 1. If we look at the modified <code>\(G_{\overline{X}}\)</code>, Y and Z are completely d-separated if we account for both W and X—there’s no direct arrow between them, and there’s no active path connecting them through W or X, since we’re accounting for (or condition on) those nodes. Y and Z are thus d-separated and <code>\(Y \perp Z \mid W, X\)</code>. We can confirm this with the <code>impliedConditionalIndependencies()</code> function from the <strong>dagitty</strong> package:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(rule1_g_x_over)
 <span style="color:#75715e">## W _||_ X</span>
@@ -287,7 +287,7 @@ plot_rule1_g_simple <span style="color:#f92672">&lt;-</span> <span style="color:
        subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Simplified DAG without X&#34;</span>) <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">theme_do_calc</span>()
 plot_rule1_g_simple
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule1-simple-1.png" width="50%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule1-simple-1.png" width="50%" style="display: block; margin: auto;" /></p>
 <p>The simplified X-free version of Rule 1 looks like this:</p>
 <p><code>$$P(y \mid z, w) = P(y \mid w) \qquad \text{ if } (Y \perp Z \mid W)_{G}$$</code></p>
 <p>In other words, we can ignore Z and remove it from the <code>\(P(y \mid z, w)\)</code> equation if Y and Z are d-separated (or independent of each other) after accounting for W. Once we account for W, there’s no possible connection between Y and Z, so they really are d-separated. We can again confirm this with code:</p>
@@ -338,7 +338,7 @@ plot_rule2_g_simple_z_under <span style="color:#f92672">&lt;-</span> <span style
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_rule2_g_simple <span style="color:#f92672">|</span> plot_rule2_g_simple_z_under
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule2-simple-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule2-simple-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>So, can we treat Z here like an observational node instead of a interventional <code>\(\operatorname{do}(\cdot)\)</code> node? Let’s apply Rule 2. If we look at the modified <code>\(G_{\underline{Z}}\)</code> graph, Z and Y are completely d-separated if we account for W—there’s no direct arrow between them, and there’s no active path connecting them through W since we’re conditioning on W. We can thus say that <code>\(Y \perp Z \mid W\)</code>. We can confirm this with code too:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(rule2_g_simple_z_under)
 <span style="color:#75715e">## Y _||_ Z | W</span>
@@ -381,7 +381,7 @@ plot_rule2_modified <span style="color:#f92672">&lt;-</span> <span style="color:
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_rule2_g <span style="color:#f92672">|</span> plot_rule2_modified
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule2-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule2-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Okay. Our goal here is to check if we can treat <code>\(\operatorname{do}(z)\)</code> like a regular observational <code>\(z\)</code>. We can legally do this if Y and Z are d-separated in that modified graph, after accounting for both W and X, or <code>\(Y \perp Z \mid W, X\)</code>. And that is indeed the case! There’s no direct arrow connecting Y and Z in the modified graph, and once we condition on (or account for) W and X, no pathways between Y and Z are active—Y and Z are independent and d-separated. We can confirm this with code:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(rule2_g_modified)
 <span style="color:#75715e">## W _||_ X</span>
@@ -423,7 +423,7 @@ plot_rule3_g_modified <span style="color:#f92672">&lt;-</span> <span style="colo
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_rule3_g <span style="color:#f92672">|</span> plot_rule3_g_modified
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule3-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Notice how these two graphs are identical. Because we only delete arrows going into Z if Z is not an ancestor of W, in this case <code>\(G = G_{\overline{X}, \overline{Z(W)}}\)</code>.</p>
 <p>Remember that our original goal is to get rid of <code>\(\operatorname{do}(z)\)</code>, which we can legally do if Y and Z are d-separated and independent in our modified graph, or if <code>\(Y \perp Z \mid W, X\)</code>. That is once again indeed the case here: there’s no direct arrow between Y and Z, and if we condition on W and X, there’s no way to pass association between Y and Z, meaning that Y and Z are d-separated. Let’s confirm it with code:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(rule3_g)
@@ -470,7 +470,7 @@ plot_rule3_g_alt_modified <span style="color:#f92672">&lt;-</span> <span style="
 plot_rule3_g_alt <span style="color:#f92672">|</span> plot_rule3_g_alt_modified
 <span style="color:#75715e">## Warning: Removed 1 rows containing missing values (geom_dag_point).</span>
 <span style="color:#75715e">## Warning: Removed 1 rows containing missing values (geom_dag_text).</span>
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule3-alt-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule3-alt-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Phew. In this case, our DAG surgery for making the modified graph <code>\(G_{\overline{X}, \overline{Z(W)}}\)</code> actually ended up completely d-separating Z from all nodes. Because Z isn’t an ancestor of W (but is instead a descendant), we get to delete arrows going into it, and we get to delete arrows going into X as well. We can remove <code>\(\operatorname{do}(z)\)</code> from the equation as long as <code>\(Y \perp Z \mid W, X\)</code> in this modified graph. That is most definitely the case here. And once again, code confirms it (ignore the 0s here—they’re only there so that the DAG plots correctly):</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(rule3_g_alt_modified)
 <span style="color:#75715e">## 0 _||_ W</span>
@@ -518,7 +518,7 @@ plot_backdoor_g <span style="color:#f92672">&lt;-</span> <span style="color:#a6e
        subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Basic backdoor confounding&#34;</span>) <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">theme_do_calc</span>()
 plot_backdoor_g
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/basic-backdoor-dag-1.png" width="50%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/basic-backdoor-dag-1.png" width="50%" style="display: block; margin: auto;" /></p>
 <h3 id="marginalizing-across-z">Marginalizing across <code>\(z\)</code></h3>
 <p>We’re interested in the causal effect of X on Y, or <code>\(P(y \mid \operatorname{do}(x))\)</code>. If this were an experiment like a randomized controlled trial, we’d be able to delete all arrows going into X, which would remove all confounding from Z and allow us to measure the exact causal effect of X on Y. However, with observational data, we can’t delete arrows like that. But, we can condition the X → Y relationship on Z, given that it influences both X and Y.</p>
 <p>We thus need to calculate the joint probability of <code>\(P(y \mid \operatorname{do}(x))\)</code> across all values of Z. Using the rules of <a href="https://en.wikipedia.org/wiki/Marginal_distribution">probability marginalization</a> and <a href="https://en.wikipedia.org/wiki/Chain_rule_(probability)">the chain rule for joint probabilities</a>, we can write this joint probability like so:</p>
@@ -549,7 +549,7 @@ plot_backdoor_g_underline_x <span style="color:#f92672">&lt;-</span> <span style
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_backdoor_g <span style="color:#f92672">|</span> plot_backdoor_g_underline_x
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/backdoor-rule2-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/backdoor-rule2-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Following Rule 2, we can treat <code>\(\color{#FF4136} \operatorname{do}(x)\)</code> like a regular observational <code>\(\color{#FF4136} x\)</code> as long as X and Y are d-separated in this modified <code>\(G_{\underline{X}}\)</code> graph when conditioning on Z. And that is indeed the case: there’s no direct arrow between X and Y, and by conditioning on Z, there’s no active pathway between X and Y through Z. Let’s see if code backs us up:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(backdoor_g_underline_x)
 <span style="color:#75715e">## X _||_ Y | Z</span>
@@ -578,7 +578,7 @@ plot_backdoor_g_overline_x <span style="color:#f92672">&lt;-</span> <span style=
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_backdoor_g <span style="color:#f92672">|</span> plot_backdoor_g_overline_x
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/backdoor-rule3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/backdoor-rule3-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As long as X and Z are d-separated and independent, we can remove that <code>\(\color{#B10DC9} \operatorname{do}(x)\)</code> completely. According to this graph, there’s no direct arrow connecting them, and there’s no active pathway through Y, since Y is a collider in this case and doesn’t pass on causal association. As always, let’s verify with code:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(backdoor_g_overline_x)
 <span style="color:#75715e">## X _||_ Z</span>
@@ -630,7 +630,7 @@ $$</p>
                  
                 var disqus_shortname = 'andrewheisscom';
                 var disqus_title = document.title;
-                var disqus_url = 'https:\/\/www.andrewheiss.com\/blog\/2021\/09\/07\/do-calculus-backdoors\/';
+                var disqus_url = 'https:\/\/www.shagunjhaver.com\/blog\/2021\/09\/07\/do-calculus-backdoors\/';
 
                  
                 (function () {
@@ -716,7 +716,7 @@ $$</p>
     <p class="colophon">ORCID iD: <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></p>
 
     <p class="pgp">
-        <a href="https://www.andrewheiss.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
+        <a href="https://www.shagunjhaver.com/pgp_ath.asc.txt">PGP public <i class="fas fa-key" aria-hidden="true"></i></a> &bull; PGP
         fingerprint:<br />4AA2 FA83 A8B2 05A4 E30F<br /> 610D 1382 6216 9178 36AB
     </p>
 

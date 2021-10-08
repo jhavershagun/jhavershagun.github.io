@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
-    <title>Andrew Heiss</title>
-    <link href="https://www.andrewheiss.com/" rel="alternate" />
-    <link href="https://www.andrewheiss.com/atom.xml" rel="self" />
-    <id>https://www.andrewheiss.com/</id>
-    <updated>2021-10-08T14:22:37-04:00</updated>
+    <title>Shagun Jhaver</title>
+    <link href="https://www.shagunjhaver.com/" rel="alternate" />
+    <link href="https://www.shagunjhaver.com/atom.xml" rel="self" />
+    <id>https://www.shagunjhaver.com/</id>
+    <updated>2021-10-08T16:54:53-04:00</updated>
     <entry>
         <title type="html"><![CDATA[Do-calculus adventures! Exploring the three rules of do-calculus in plain language and deriving the backdoor adjustment formula by hand]]></title>
-        <link href="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/" rel="alternate" />
         <published>2021-09-07T00:00:00+00:00</published>
         <updated>2021-09-07T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/</id>
+        <id>https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/</id>
         <summary type="html"><![CDATA[Use R to explore the three rules of *do*-calculus in plain language and derive the backdoor adjustment formula by hand]]></summary>
         <content type="html"><![CDATA[<h2 id="contents----omit-in-toc---">Contents <!-- omit in toc --></h2>
 <ul>
@@ -128,7 +128,7 @@ plot_rule1_g_x_over <span style="color:#f92672">&lt;-</span> <span style="color:
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_rule1_g <span style="color:#f92672">|</span> plot_rule1_g_x_over
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule1-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule1-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>If we want to calculate the causal effect of X on Y, do we need to worry about Z here, or can we ignore it? Let’s apply Rule 1. If we look at the modified <code>\(G_{\overline{X}}\)</code>, Y and Z are completely d-separated if we account for both W and X—there’s no direct arrow between them, and there’s no active path connecting them through W or X, since we’re accounting for (or condition on) those nodes. Y and Z are thus d-separated and <code>\(Y \perp Z \mid W, X\)</code>. We can confirm this with the <code>impliedConditionalIndependencies()</code> function from the <strong>dagitty</strong> package:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(rule1_g_x_over)
 <span style="color:#75715e">## W _||_ X</span>
@@ -152,7 +152,7 @@ plot_rule1_g_simple <span style="color:#f92672">&lt;-</span> <span style="color:
        subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Simplified DAG without X&#34;</span>) <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">theme_do_calc</span>()
 plot_rule1_g_simple
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule1-simple-1.png" width="50%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule1-simple-1.png" width="50%" style="display: block; margin: auto;" /></p>
 <p>The simplified X-free version of Rule 1 looks like this:</p>
 <p><code>$$P(y \mid z, w) = P(y \mid w) \qquad \text{ if } (Y \perp Z \mid W)_{G}$$</code></p>
 <p>In other words, we can ignore Z and remove it from the <code>\(P(y \mid z, w)\)</code> equation if Y and Z are d-separated (or independent of each other) after accounting for W. Once we account for W, there’s no possible connection between Y and Z, so they really are d-separated. We can again confirm this with code:</p>
@@ -203,7 +203,7 @@ plot_rule2_g_simple_z_under <span style="color:#f92672">&lt;-</span> <span style
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_rule2_g_simple <span style="color:#f92672">|</span> plot_rule2_g_simple_z_under
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule2-simple-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule2-simple-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>So, can we treat Z here like an observational node instead of a interventional <code>\(\operatorname{do}(\cdot)\)</code> node? Let’s apply Rule 2. If we look at the modified <code>\(G_{\underline{Z}}\)</code> graph, Z and Y are completely d-separated if we account for W—there’s no direct arrow between them, and there’s no active path connecting them through W since we’re conditioning on W. We can thus say that <code>\(Y \perp Z \mid W\)</code>. We can confirm this with code too:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(rule2_g_simple_z_under)
 <span style="color:#75715e">## Y _||_ Z | W</span>
@@ -246,7 +246,7 @@ plot_rule2_modified <span style="color:#f92672">&lt;-</span> <span style="color:
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_rule2_g <span style="color:#f92672">|</span> plot_rule2_modified
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule2-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule2-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Okay. Our goal here is to check if we can treat <code>\(\operatorname{do}(z)\)</code> like a regular observational <code>\(z\)</code>. We can legally do this if Y and Z are d-separated in that modified graph, after accounting for both W and X, or <code>\(Y \perp Z \mid W, X\)</code>. And that is indeed the case! There’s no direct arrow connecting Y and Z in the modified graph, and once we condition on (or account for) W and X, no pathways between Y and Z are active—Y and Z are independent and d-separated. We can confirm this with code:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(rule2_g_modified)
 <span style="color:#75715e">## W _||_ X</span>
@@ -288,7 +288,7 @@ plot_rule3_g_modified <span style="color:#f92672">&lt;-</span> <span style="colo
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_rule3_g <span style="color:#f92672">|</span> plot_rule3_g_modified
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule3-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Notice how these two graphs are identical. Because we only delete arrows going into Z if Z is not an ancestor of W, in this case <code>\(G = G_{\overline{X}, \overline{Z(W)}}\)</code>.</p>
 <p>Remember that our original goal is to get rid of <code>\(\operatorname{do}(z)\)</code>, which we can legally do if Y and Z are d-separated and independent in our modified graph, or if <code>\(Y \perp Z \mid W, X\)</code>. That is once again indeed the case here: there’s no direct arrow between Y and Z, and if we condition on W and X, there’s no way to pass association between Y and Z, meaning that Y and Z are d-separated. Let’s confirm it with code:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(rule3_g)
@@ -335,7 +335,7 @@ plot_rule3_g_alt_modified <span style="color:#f92672">&lt;-</span> <span style="
 plot_rule3_g_alt <span style="color:#f92672">|</span> plot_rule3_g_alt_modified
 <span style="color:#75715e">## Warning: Removed 1 rows containing missing values (geom_dag_point).</span>
 <span style="color:#75715e">## Warning: Removed 1 rows containing missing values (geom_dag_text).</span>
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule3-alt-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/plot-rule3-alt-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Phew. In this case, our DAG surgery for making the modified graph <code>\(G_{\overline{X}, \overline{Z(W)}}\)</code> actually ended up completely d-separating Z from all nodes. Because Z isn’t an ancestor of W (but is instead a descendant), we get to delete arrows going into it, and we get to delete arrows going into X as well. We can remove <code>\(\operatorname{do}(z)\)</code> from the equation as long as <code>\(Y \perp Z \mid W, X\)</code> in this modified graph. That is most definitely the case here. And once again, code confirms it (ignore the 0s here—they’re only there so that the DAG plots correctly):</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(rule3_g_alt_modified)
 <span style="color:#75715e">## 0 _||_ W</span>
@@ -383,7 +383,7 @@ plot_backdoor_g <span style="color:#f92672">&lt;-</span> <span style="color:#a6e
        subtitle <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Basic backdoor confounding&#34;</span>) <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">theme_do_calc</span>()
 plot_backdoor_g
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/basic-backdoor-dag-1.png" width="50%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/basic-backdoor-dag-1.png" width="50%" style="display: block; margin: auto;" /></p>
 <h3 id="marginalizing-across-z">Marginalizing across <code>\(z\)</code></h3>
 <p>We’re interested in the causal effect of X on Y, or <code>\(P(y \mid \operatorname{do}(x))\)</code>. If this were an experiment like a randomized controlled trial, we’d be able to delete all arrows going into X, which would remove all confounding from Z and allow us to measure the exact causal effect of X on Y. However, with observational data, we can’t delete arrows like that. But, we can condition the X → Y relationship on Z, given that it influences both X and Y.</p>
 <p>We thus need to calculate the joint probability of <code>\(P(y \mid \operatorname{do}(x))\)</code> across all values of Z. Using the rules of <a href="https://en.wikipedia.org/wiki/Marginal_distribution">probability marginalization</a> and <a href="https://en.wikipedia.org/wiki/Chain_rule_(probability)">the chain rule for joint probabilities</a>, we can write this joint probability like so:</p>
@@ -414,7 +414,7 @@ plot_backdoor_g_underline_x <span style="color:#f92672">&lt;-</span> <span style
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_backdoor_g <span style="color:#f92672">|</span> plot_backdoor_g_underline_x
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/backdoor-rule2-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/backdoor-rule2-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>Following Rule 2, we can treat <code>\(\color{#FF4136} \operatorname{do}(x)\)</code> like a regular observational <code>\(\color{#FF4136} x\)</code> as long as X and Y are d-separated in this modified <code>\(G_{\underline{X}}\)</code> graph when conditioning on Z. And that is indeed the case: there’s no direct arrow between X and Y, and by conditioning on Z, there’s no active pathway between X and Y through Z. Let’s see if code backs us up:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(backdoor_g_underline_x)
 <span style="color:#75715e">## X _||_ Y | Z</span>
@@ -443,7 +443,7 @@ plot_backdoor_g_overline_x <span style="color:#f92672">&lt;-</span> <span style=
   <span style="color:#a6e22e">theme_do_calc</span>()
 
 plot_backdoor_g <span style="color:#f92672">|</span> plot_backdoor_g_overline_x
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/backdoor-rule3-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/09/07/do-calculus-backdoors/index_files/figure-html/backdoor-rule3-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>As long as X and Z are d-separated and independent, we can remove that <code>\(\color{#B10DC9} \operatorname{do}(x)\)</code> completely. According to this graph, there’s no direct arrow connecting them, and there’s no active pathway through Y, since Y is a collider in this case and doesn’t pass on causal association. As always, let’s verify with code:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">impliedConditionalIndependencies</span>(backdoor_g_overline_x)
 <span style="color:#75715e">## X _||_ Z</span>
@@ -481,13 +481,13 @@ $$</p>
     </entry>
     <entry>
         <title type="html"><![CDATA[How to automatically convert TikZ images to SVG (with fonts!) from knitr]]></title>
-        <link href="https://www.andrewheiss.com/blog/2021/08/27/tikz-knitr-html-svg-fun/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2021/08/27/tikz-knitr-html-svg-fun/" rel="alternate" />
         <published>2021-08-27T00:00:00+00:00</published>
         <updated>2021-08-27T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2021/08/27/tikz-knitr-html-svg-fun/</id>
+        <id>https://www.shagunjhaver.com/blog/2021/08/27/tikz-knitr-html-svg-fun/</id>
         <summary type="html"><![CDATA[Make knitr and R Markdown convert TikZ graphics to font-embedded SVG files when knitting to HTML]]></summary>
         <content type="html"><![CDATA[<link rel="stylesheet" href="gist_stuff.css">
 <div class="alert alert-success">An update to knitr has made it a ton easier to embed fonts in SVG files from R. <a href="#update-easier-font-embedding">Jump to the update</a> to see how.</div>
@@ -667,18 +667,18 @@ knitr<span style="color:#f92672">::</span>knit_hooks<span style="color:#f92672">
     </entry>
     <entry>
         <title type="html"><![CDATA[Exploring Pamela Jakiela's simple TWFE diagnostics with R]]></title>
-        <link href="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/" rel="alternate" />
         <published>2021-08-25T00:00:00+00:00</published>
         <updated>2021-08-25T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/</id>
+        <id>https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/</id>
         <summary type="html"><![CDATA[Use R to explore possible biases that come from differential treatment timing in two-way fixed effects (TWFE) regression models]]></summary>
-        <content type="html"><![CDATA[<script src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/kePrint/kePrint.js"></script>
-<link href="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/lightable/lightable.css" rel="stylesheet" />
-<script src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/kePrint/kePrint.js"></script>
-<link href="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/lightable/lightable.css" rel="stylesheet" />
+        <content type="html"><![CDATA[<script src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/kePrint/kePrint.js"></script>
+<link href="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/lightable/lightable.css" rel="stylesheet" />
+<script src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/kePrint/kePrint.js"></script>
+<link href="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/lightable/lightable.css" rel="stylesheet" />
 <h2 id="contents----omit-in-toc---">Contents <!-- omit in toc --></h2>
 <ul>
 <li><a href="#a-different-way-of-thinking-about-ols-coefficients">A different way of thinking about OLS coefficients</a></li>
@@ -788,7 +788,7 @@ plot_trt_out <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e
 
 (hist_out <span style="color:#f92672">+</span> hist_trt) <span style="color:#f92672">/</span> <span style="color:#a6e22e">plot_spacer</span>() <span style="color:#f92672">/</span> plot_trt_out <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.28</span>, <span style="color:#ae81ff">0.02</span>, <span style="color:#ae81ff">0.7</span>))
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-fake-data-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-fake-data-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>We can find the average treatment effect (ATE) of this imaginary program on the outcome using a simple univariate regression model:</p>
 <p><code>$$\color{gray}{\overbrace{\color{#FFA615}{Y}}^{\text{Outcome}}_{\underbrace{\color{#FFA615}{i}}_{\text{An individual}}}} \color{black}{=} \color{gray}{\overbrace{\color{black}{\alpha}}^{\text{Intercept}}} \color{black}{+} \color{gray}{\underbrace{\color{#0599B0}{\beta}}_{\text{ATE}}} \color{gray}{\overbrace{\color{#A4BD0A}{D_i}}^{\text{Treatment}}} \color{black}{+} \color{gray}{\overbrace{\color{black}{\epsilon_i}}^{\text{Error}}}$$</code></p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">model_effect <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(outcome <span style="color:#f92672">~</span> treatment, data <span style="color:#f92672">=</span> fake_data)
@@ -856,7 +856,7 @@ fake_data_resid <span style="color:#f92672">&lt;-</span> fake_data <span style="
   <span style="color:#a6e22e">scale_x_continuous</span>(labels <span style="color:#f92672">=</span> <span style="color:#a6e22e">comma_format</span>()) <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">theme_clean</span>() <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">theme</span>(panel.grid.major.x <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-fake-data-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-fake-data-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>There’s a pattern to which observations get positive or negative weights. According to <a href="#ref-Jakiela:2021">Jakiela</a> (<a href="#ref-Jakiela:2021">2021, 4</a>),</p>
 <blockquote>
 <p>As in any univariate OLS regression of an outcome on a continuous measure of treatment intensity, observations with below mean treatment intensity receive negative weight, and may be thought of as part of the comparison group.</p>
@@ -1232,7 +1232,7 @@ Year fixed effects
             size <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>, color <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;#A4BD0A&#34;</span>) <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">labs</span>(x <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Year free primary education implemented&#34;</span>, y <span style="color:#f92672">=</span> <span style="color:#66d9ef">NULL</span>) <span style="color:#f92672">+</span>
   <span style="color:#a6e22e">theme_clean</span>()
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-fpe-start-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-fpe-start-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>This timing could cause problems. To see these issues, let’s calculate the ATE ($\beta$) with that fancy schmancy Frisch-Waugh-Lovell theorem with residualized treatment weights. There’s one key difference here when calculating the residuals though. With the simple model earlier, the treatment residuals were just <code>\(D_i - \bar{D}\)</code>, or the residuals from <code>lm(treatment ~ 1)</code>. In TWFE situations, though, treatment residuals need to account for both country and year fixed effects, or <code>lm(treatment ~ country + year)</code>:</p>
 <p><code>$$\color{#0599B0}{\beta^{\text{TWFE}}} \color{black}{= \sum_{it}} \color{#FFA615}{Y_{it}} \color{black} \left( \frac{\color{#353D03}{\tilde{D}_{it}}}{\sum_{it} \color{#353D03}{\tilde{D}_{it}}^2} \right)$$</code></p>
 <p>Or, with code:</p>
@@ -1337,7 +1337,7 @@ hist_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e2
   <span style="color:#a6e22e">theme_clean</span>()
 
 hist_primary <span style="color:#f92672">+</span> hist_secondary
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>These histograms confirm the proportions we found earlier—about 25% of the treated observations have negative weights.</p>
 <p>Which treated country-years are getting these negative weights, though? According to Jakiela, early adopters and later years are more likely to have this switch happen. Let’s make another plot:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">plot_waffle_primary <span style="color:#f92672">&lt;-</span> fpe_primary_weights <span style="color:#f92672">%&gt;%</span>
@@ -1391,7 +1391,7 @@ waffle_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6
         legend.key.size <span style="color:#f92672">=</span> <span style="color:#a6e22e">unit</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#e6db74">&#34;lines&#34;</span>))
 
 waffle_primary <span style="color:#f92672">/</span> waffle_secondary
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weight-waffle-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weight-waffle-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>And that is indeed the case! Malawi, Ethiopia, Ghana, Uganda, and Cameroon all eliminated fees before 2000, and they start getting negative weights after 2005.</p>
 <h3 id="32-testing-the-homogeneity-assumption-directly">3.2: Testing the homogeneity assumption directly</h3>
 <p>We thus have issues with negative weighting here for early adopting countries and later country-years. However, as long as the treatment effects are homogenous—or that the elimination of school fees has the same effect across time and country—this negative weighting isn’t an issue. If treatment effects are heterogenous—especially if the effects change over time within treated countries—the TWFE estimate will be severely biased.</p>
@@ -1446,7 +1446,7 @@ plot_out_trt_secondary <span style="color:#f92672">&lt;-</span> <span style="col
   <span style="color:#a6e22e">theme</span>(legend.position <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;bottom&#34;</span>)
 
 plot_out_trt_primary <span style="color:#f92672">|</span> plot_out_trt_secondary
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-outcome-trt-resid-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-outcome-trt-resid-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <p>For primary enrollment, the lines for treated and untreated observations look like they have similar slopes. When using Loess lines, the two groups don’t align perfectly, and the relationship between residualized treatment and residualized outcome doesn’t look perfectly linear. When secondary enrollment is the outcome, the lines for the treated and untreated groups seem to switch directions—the slope is negative for untreated observations but positive for treated. This is a bad sign for the homogeneity assumption.</p>
 <p>We can statistically test if the slopes in two groups are the same or not by using an interaction term in a regression model:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">check_slopes_primary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">lm</span>(out_resid <span style="color:#f92672">~</span> treatment_resid <span style="color:#f92672">*</span> <span style="color:#a6e22e">factor</span>(treatment),
@@ -1749,7 +1749,7 @@ prop_neg_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#
 
 ((ate_primary <span style="color:#f92672">/</span> prop_neg_primary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>))) <span style="color:#f92672">|</span>
   ((ate_secondary <span style="color:#f92672">/</span> prop_neg_secondary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>)))
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-exclude-later-years-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-exclude-later-years-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <h3 id="change-how-many-post-treatment-years-are-kept">Change how many post-treatment years are kept</h3>
 <p>Dropping rows based on end years like this is neat, but it doesn’t take into account the differential treatment timing. Countries like Mozambique, which eliminated its fees in 2005, don’t even show up in the first few models of exclude-later-years robustness check, since those models end in 2000–2004. As an alternative, we can keep specific numbers of years post-treatment for each country. For instance, we can look at Mozambique 2, 3, 4, or 5 (and so on) years after treatment. Doing this centers all countries at <code>\(t = 0\)</code>, rather than <code>\(t = \text{start year}\)</code>.</p>
 <p>For primary schools in this situation, the effect is smaller and not significant when only a few post-treatment years are kept, but it stabilizes at around 20 after only 5 post-treatment years, which suggests that <code>\(\delta\)</code> is indeed homogenous—we don’t need a ton of post-treatment data to find it. For secondary schools, though, the effect remains negative and insigificant throughout every specification.</p>
@@ -1861,7 +1861,7 @@ prop_neg_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#
 
 ((ate_primary <span style="color:#f92672">/</span> prop_neg_primary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>))) <span style="color:#f92672">|</span>
   ((ate_secondary <span style="color:#f92672">/</span> prop_neg_secondary) <span style="color:#f92672">+</span> <span style="color:#a6e22e">plot_layout</span>(heights <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.2</span>)))
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-post-treatment-years-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-post-treatment-years-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <h3 id="exclude-individual-countries">Exclude individual countries</h3>
 <p>Finally, since early adopter countries are more likely to have negative treatment weights, we can remove individual countries from the panel to see what their omission does to the overall TWFE estimate. For primary school enrollment, the ATE remains positive and significant across most specifications, except when Malawi, Uganda, or Namibia are excluded. But Malawi and Uganda were early adopters and thus have negatively weighted treatment observations in later years, as we saw earlier, which give them strange leverage in the the overall TWFE ATE calculation. For secondary schools, the effect remains basically zero and insignificant across all specifications except when Malawi is omitted, but that’s again because Malawi was an early adopter.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r">fpe_omit_countries_primary <span style="color:#f92672">&lt;-</span> fpe_primary <span style="color:#f92672">%&gt;%</span>
@@ -1917,7 +1917,7 @@ ate_secondary <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22
   <span style="color:#a6e22e">theme</span>(panel.grid.major.y <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_blank</span>())
 
 ate_primary <span style="color:#f92672">|</span> ate_secondary
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-drop-countries-1.png" width="100%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/robust-drop-countries-1.png" width="100%" style="display: block; margin: auto;" /></p>
 <h2 id="tldr-conclusion">tl;dr: Conclusion</h2>
 <p><em><strong>Phew.</strong></em> That was a ton of code, but coding my way through this paper and translating Jakiela’s diagnostics and robustness checks from math into R was incredibly helpful for me to start understanding all this new TWFE stuff.</p>
 <p>Here are the main tl;dr takeaways from her paper:</p>
@@ -1963,13 +1963,13 @@ explain the residualized outcome. If the slopes for treated and comparison obser
     </entry>
     <entry>
         <title type="html"><![CDATA[Exploring R² and regression variance with Euler/Venn diagrams]]></title>
-        <link href="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/" rel="alternate" />
         <published>2021-08-21T00:00:00+00:00</published>
         <updated>2021-08-21T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2021/08/21/r2-euler/</id>
+        <id>https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/</id>
         <summary type="html"><![CDATA[Use R to correctly close backdoor confounding in panel data with marginal structural models and inverse probability weights with both GEE and multilevel models]]></summary>
         <content type="html"><![CDATA[<h2 id="contents----omit-in-toc---">Contents <!-- omit in toc --></h2>
 <ul>
@@ -2072,7 +2072,7 @@ ss_x1 <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">ss</s
 <span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y&#34;</span> <span style="color:#f92672">=</span> ss_y,
              <span style="color:#e6db74">&#34;X1&#34;</span> <span style="color:#f92672">=</span> ss_x1)),
      quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/unrelated-vars-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/index_files/figure-html/unrelated-vars-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>Just looking at this plot, we can see that <code>Y</code> has more variation than <code>X1</code>. Neat.</p>
 <p>These two variables are related to each other though and have some covariance. We can calculate the shared covariance using <a href="https://en.wikipedia.org/wiki/Analysis_of_variance">ANOVA</a>. Ordinarily you need to feed R’s <code>anova()</code> function an <code>lm()</code> object to calculate different variance statistics (e.g. <code>anova(lm(Y ~ X1, data = df))</code>), but to save some typing, you can also use the <code>aov()</code> function to skip the intermediate <code>lm()</code> step. The nice thing about using the sum of squares values for these diagrams rather than variance values is that <code>aov()</code> reports its results as sums of squares, so we can use those results directly.</p>
 <p>Let’s see how much of the variation between <code>Y</code> and <code>X1</code> is shared:</p>
@@ -2099,13 +2099,13 @@ ss_both_y_x1
              <span style="color:#e6db74">&#34;X1&#34;</span> <span style="color:#f92672">=</span> ss_x1 <span style="color:#f92672">-</span> ss_both_y_x1,
              <span style="color:#e6db74">&#34;Y&amp;X1&#34;</span> <span style="color:#f92672">=</span> ss_both_y_x1)),
      quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-basic-overlap-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-basic-overlap-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>Now we can visualize the covariance between these two variables! Let’s get rid of the raw numbers and add some letters for the different segments:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(<span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;Y&#34;</span> <span style="color:#f92672">=</span> ss_y <span style="color:#f92672">-</span> ss_both_y_x1,
              <span style="color:#e6db74">&#34;X1&#34;</span> <span style="color:#f92672">=</span> ss_x1 <span style="color:#f92672">-</span> ss_both_y_x1,
              <span style="color:#e6db74">&#34;Y&amp;X1&#34;</span> <span style="color:#f92672">=</span> ss_both_y_x1)),
      quantities <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;A&#34;</span>, <span style="color:#e6db74">&#34;B&#34;</span>, <span style="color:#e6db74">&#34;C&#34;</span>))
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-basic-overlap-labels-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-basic-overlap-labels-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>Area C here represents the amount of variation in <code>Y</code> explained by <code>X1</code>, while Area A represents the unexplained portion of <code>Y</code>. In regression language, A is basically the error term:</p>
 <p>$$
 \hat{Y} = \beta_0 + \beta_1 X_1 + \color{gray}{\overbrace{\epsilon}^{\color{black}{\text{A}}}}
@@ -2145,7 +2145,7 @@ part_c <span style="color:#f92672">/</span> (part_a <span style="color:#f92672">
              <span style="color:#e6db74">&#34;X1&amp;X2&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
              <span style="color:#e6db74">&#34;Y&amp;X1&amp;X2&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>)),
      quantities <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#66d9ef">LETTERS</span>[1<span style="color:#f92672">:</span><span style="color:#ae81ff">7</span>]))
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-generic-3-rings-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-generic-3-rings-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>This looks complicated, but the same principles apply. The entire circles for <code>Y</code>, <code>X1</code>, and <code>X2</code> represent each variable’s total variance. Overlapping areas represent shared variance. For instance, the combination of D and G here (or <code>\(A \cap B\)</code>) is the covariance that we calculated previously. The <code>\(R^2\)</code> is still here too—the total explained variance in <code>Y</code> is the combination of D, E, and G, while A is the residual unexplained variance. That means we can calculate <code>\(R^2\)</code> like this:</p>
 <p>$$
 \frac{D + E + G}{A + D + E + G}
@@ -2295,7 +2295,7 @@ all_pieces
 
 <span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(all_pieces),
      quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">LETTERS</span>[1<span style="color:#f92672">:</span><span style="color:#ae81ff">7</span>])
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-complex-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-complex-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>These circles are now all proportional to the actual values in the data. Both <code>X1</code> and <code>X2</code> explain some of the variation in <code>Y</code>, but not a ton (and <code>X1</code> explains more than <code>X2</code>). The explained variance is represented by the area D + E + G, which means we can now calculate the actual <code>\(R^2\)</code>:</p>
 <p>$$
 R^2 = \frac{D + E + G}{A + D + E + G} = \frac{39.69 + 13.27 + 42.29}{304.6 + 39.69 + 13.27 + 42.29} = 0.238
@@ -2345,14 +2345,14 @@ math_part <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">t
                   plot.subtitle <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(size <span style="color:#f92672">=</span> <span style="color:#ae81ff">15</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Roboto Condensed&#34;</span>),
                   plot.caption <span style="color:#f92672">=</span> <span style="color:#a6e22e">element_text</span>(size <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>, family <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Roboto Condensed Light&#34;</span>, hjust <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>))
   )
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/nice-plot-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/index_files/figure-html/nice-plot-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <h3 id="multicollinearity">Multicollinearity</h3>
 <p>Another neat feature of this kind of diagram is that it helps visualize <a href="https://en.wikipedia.org/wiki/Multicollinearity">multicollinearity</a>, or the issues that arise when you control for explanatory variables that explain the same kind of variation in the outcome. Multicollinearity leads to strange coefficient estimates and variance inflation because mathematically the regression model has no way of telling which of the highly correlated explanatory variables explain which parts of the outcome.</p>
 <p>In the diagram, areas D and E are uniquely accounted for by <code>X1</code> and <code>X2</code> respectively, but G is is overlapped, making it impossible to know if <code>X1</code> or <code>X2</code> explains that portion of the variation in <code>Y</code>. Similarly, area F shows the variation shared by both <code>X1</code> and <code>X2</code>, and again it’s impossible to know which parts are unique. As a result, the area (F + G) represents the total multicollinearity in the model:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(all_pieces),
      quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">LETTERS</span>[1<span style="color:#f92672">:</span><span style="color:#ae81ff">7</span>],
      fills <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#a6e22e">rep</span>(<span style="color:#e6db74">&#34;white&#34;</span>, <span style="color:#ae81ff">5</span>), <span style="color:#a6e22e">rep</span>(<span style="color:#e6db74">&#34;#FF4136&#34;</span>, <span style="color:#ae81ff">2</span>)))
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-multicollinearity-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-multicollinearity-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <h2 id="why-this-matters">Why this matters</h2>
 <p>One really neat thing about thinking about <code>\(R^2\)</code> this way is that it highlights a key difference in the purposes of regression: prediction and estimation.</p>
 <p>With prediction, the goal of the regression model is to predict the outcome as accurately as possible. This is what Netflix does when guessing what show you might want to watch next, or what the <a href="https://earlywarningproject.ushmm.org/">US Holocaust Museum does to predict genocide and human rights abuses</a>. You throw in as many control variables as you can in order to create a model that explains variation in Y as accurately as possible. As a result, these kinds of models will typically have a high <code>\(R^2\)</code>.</p>
@@ -2369,7 +2369,7 @@ math_part <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">t
              <span style="color:#e6db74">&#34;X5&amp;Next show\non Netflix&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">4</span>,
              <span style="color:#e6db74">&#34;X1&amp;X2&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
              <span style="color:#e6db74">&#34;Next show\non Netflix&amp;X1&amp;X2&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.5</span>)))
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-diagram-prediction-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-diagram-prediction-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>Look at that squishy little area of Y that’s not explained by any of the other variables. Neato.</p>
 <p>In the realm of causal inference in social science, or with estimation in general, the focus of the analysis is on <em>a single X variable</em> , like whether or not people in the sample participated in a social program. You might include a bunch of control variables if you identification strategy tells you do: an interaction term for time and group if you’re using <a href="https://evalf21.classes.andrewheiss.com/example/diff-in-diff/">difference-in-differences</a>, an indicator showing if people are above/below a threshold if you’re using <a href="https://evalf21.classes.andrewheiss.com/example/rdd/">regression discontinuity</a>, an instrument if you’re using <a href="https://evalf21.classes.andrewheiss.com/example/iv/">instrumental variables</a>, confounding control variables if you’re using <a href="https://evalf21.classes.andrewheiss.com/example/matching-ipw/">inverse probability weighting and a DAG</a>, or nothing(!) if you’re using a <a href="https://evalf21.classes.andrewheiss.com/example/rcts/">randomized controlled trial</a> (like you can really just run <code>lm(Y ~ treatment)</code>!). Each of these types of models will inevitably return an <code>\(R^2\)</code> value, since that what regression does, but we care less about that when estimating causal effects. All we care about is the accuracy of one little sliver of the diagram—that single policy lever that we might have control over to influence the larger outcome.</p>
 <p>For instance, let’s say you’re a new little nonprofit who created a cool new program to help reduce childhood poverty within your city. You want to know if that program does anything to poverty more generally. You have lots of donor money so you decide to run a carefully designed randomized trial. You run a regression model and get a tiny <code>\(R^2\)</code> value, like 0.015. You panic because that means your experiment only explains 1.5% of the variation in poverty, and that seems really bad and low!</p>
@@ -2379,7 +2379,7 @@ math_part <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">t
              <span style="color:#e6db74">&#34;Program&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>,
              <span style="color:#e6db74">&#34;Poverty&amp;Program&#34;</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.25</span>)),
      fills <span style="color:#f92672">=</span> <span style="color:#a6e22e">c</span>(<span style="color:#e6db74">&#34;white&#34;</span>, <span style="color:#e6db74">&#34;grey75&#34;</span>, <span style="color:#e6db74">&#34;#FF851B&#34;</span>))
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-diagram-estimation-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-diagram-estimation-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>So don’t dismiss models immediately just because of a low <code>\(R^2\)</code>! The purpose of the models matters!</p>
 <h2 id="caveats">Caveats</h2>
 <p>There are a few important caveats to keep in mind with these diagrams:</p>
@@ -2392,7 +2392,7 @@ math_part <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">t
 <p>The geometry behind creating these Euler diagrams is complex and doesn’t always work perfectly. Let’s plot the actual values of the sum of squares for each segment:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">plot</span>(<span style="color:#a6e22e">euler</span>(all_pieces),
      quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-complex-values-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-complex-values-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>That central piece where <code>Y</code>, <code>X1</code>, and <code>X2</code> is 42, but it’s smaller any of the other intersections, which all have smaller sum-of-squares values. Yikes!</p>
 <p>The <strong>eulerr</strong> package provides a way of diagnosing how bad things are by either inspecting the results of <code>euler()</code> directly, or looking at the residuals and errors with <code>error_plot()</code>:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-r" data-lang="r"><span style="color:#a6e22e">euler</span>(all_pieces)
@@ -2410,7 +2410,7 @@ math_part <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">t
 
 <span style="color:#a6e22e">error_plot</span>(<span style="color:#a6e22e">euler</span>(all_pieces),
            quantities <span style="color:#f92672">=</span> <span style="color:#66d9ef">TRUE</span>)
-</code></pre></div><p><img src="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-errors-1.png" width="75%" style="display: block; margin: auto;" /></p>
+</code></pre></div><p><img src="https://www.shagunjhaver.com/blog/2021/08/21/r2-euler/index_files/figure-html/plot-errors-1.png" width="75%" style="display: block; margin: auto;" /></p>
 <p>That central piece is underrepresented, while the other intersections are overrepresented. Alas.</p>
 <h2 id="references">References</h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
@@ -2433,13 +2433,13 @@ math_part <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">t
     </entry>
     <entry>
         <title type="html"><![CDATA[AFC Richmond / Ted Lasso cross stitch pattern]]></title>
-        <link href="https://www.andrewheiss.com/blog/2021/07/20/afc-richmond-ted-lasso-cross-stitch/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2021/07/20/afc-richmond-ted-lasso-cross-stitch/" rel="alternate" />
         <published>2021-07-20T00:00:00+00:00</published>
         <updated>2021-07-20T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2021/07/20/afc-richmond-ted-lasso-cross-stitch/</id>
+        <id>https://www.shagunjhaver.com/blog/2021/07/20/afc-richmond-ted-lasso-cross-stitch/</id>
         <summary type="html"><![CDATA[Make your own Ted Lasso AFC Richmond crest cross stitch with a free pattern and an Illustrator template]]></summary>
         <content type="html"><![CDATA[<div class="alert alert-info"><a href="#downloads">Jump to the downloads</a> and get your own free pattern and template files!</div>
 <p>Apparently I now only produce <a href="/blog/tags/cross-stitch/">cross stitch content</a>. Thanks, pandemic.</p>
@@ -2461,13 +2461,13 @@ math_part <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">t
     </entry>
     <entry>
         <title type="html"><![CDATA[Hex sticker/logo cross stitch pattern]]></title>
-        <link href="https://www.andrewheiss.com/blog/2021/07/10/hex-cross-stitch/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2021/07/10/hex-cross-stitch/" rel="alternate" />
         <published>2021-07-10T00:00:00+00:00</published>
         <updated>2021-07-10T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2021/07/10/hex-cross-stitch/</id>
+        <id>https://www.shagunjhaver.com/blog/2021/07/10/hex-cross-stitch/</id>
         <summary type="html"><![CDATA[Make your own data science hex logo cross stitch with a free pattern and an Illustrator template]]></summary>
         <content type="html"><![CDATA[<div class="alert alert-info"><a href="#downloads">Jump to the downloads</a> and get your own free pattern and template files!</div>
 <p>In the data science world, hex stickers with logos of developers' favorite packages are all the rage. People collect them at conferences and events and display them on their laptops (or, like me, keep them in a pile on their desk because they&rsquo;re too afraid to commit to affixing them anywhere permanently). There are even <a href="http://hexb.in/sticker.html">official standard dimensions</a> and <a href="https://github.com/terinjokes/StickersStandard">templates</a> people can follow.</p>
@@ -2491,13 +2491,13 @@ math_part <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">t
     </entry>
     <entry>
         <title type="html"><![CDATA[Bayesian (cross stitch) sampler]]></title>
-        <link href="https://www.andrewheiss.com/blog/2021/01/26/bayesian-cross-stitch-sampler/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2021/01/26/bayesian-cross-stitch-sampler/" rel="alternate" />
         <published>2021-01-26T00:00:00+00:00</published>
         <updated>2021-01-26T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2021/01/26/bayesian-cross-stitch-sampler/</id>
+        <id>https://www.shagunjhaver.com/blog/2021/01/26/bayesian-cross-stitch-sampler/</id>
         <summary type="html"><![CDATA[Make your own Bayesian cross stitch sampler with a free pattern of Bayes Theorem and the accompanying Illustrator template]]></summary>
         <content type="html"><![CDATA[<div class="alert alert-info"><a href="#downloads">Jump to the downloads</a> and get your own free pattern!</div>
 <p>For my latest pandemic art medium (on this, the three hundred and nineteenth day of sheltering in place), I decided to teach myself how to cross stitch. I did a ton of needlepoint as a kid and teen, but was always afraid of cross stitch because it was so much smaller and more delicate.</p>
@@ -2523,13 +2523,13 @@ math_part <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">t
     </entry>
     <entry>
         <title type="html"><![CDATA[Marginal structural models for panel data with GEE and multilevel models]]></title>
-        <link href="https://www.andrewheiss.com/blog/2021/01/15/msm-gee-multilevel/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2021/01/15/msm-gee-multilevel/" rel="alternate" />
         <published>2021-01-15T00:00:00+00:00</published>
         <updated>2021-01-15T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2021/01/15/msm-gee-multilevel/</id>
+        <id>https://www.shagunjhaver.com/blog/2021/01/15/msm-gee-multilevel/</id>
         <summary type="html"><![CDATA[Use R to correctly close backdoor confounding in panel data with marginal structural models and inverse probability weights with both GEE and multilevel models]]></summary>
         <content type="html"><![CDATA[<script src="/blog/2021/01/15/msm-gee-multilevel/index_files/kePrint-0.0.1/kePrint.js"></script>
 <link href="/blog/2021/01/15/msm-gee-multilevel/index_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
@@ -3372,13 +3372,13 @@ Manual multilevel weights
     </entry>
     <entry>
         <title type="html"><![CDATA[Generating inverse probability weights for marginal structural models with time-series cross-sectional panel data]]></title>
-        <link href="https://www.andrewheiss.com/blog/2020/12/03/ipw-tscs-msm/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2020/12/03/ipw-tscs-msm/" rel="alternate" />
         <published>2020-12-03T00:00:00+00:00</published>
         <updated>2020-12-03T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2020/12/03/ipw-tscs-msm/</id>
+        <id>https://www.shagunjhaver.com/blog/2020/12/03/ipw-tscs-msm/</id>
         <summary type="html"><![CDATA[Use R to close backdoor confounding in panel data with marginal structural models and inverse probability weights for both binary and continuous treatments]]></summary>
         <content type="html"><![CDATA[<p>In <a href="/blog/2020/12/01/ipw-binary-continuous/">my post on generating inverse probability weights for both binary and continuous treatments</a>, I mentioned that I’d eventually need to figure out how to deal with more complex data structures and causal models where treatments, outcomes, and confounders vary over time. Instead of adjusting for DAG confounding with inverse probability weights, we need to use something called marginal structural models (MSMs) to make adjustments that account for treatment and outcome history and other time structures. This is complex stuff and social science hasn’t done much with it (but it’s been a common approach in epidemiology).</p>
 <p>This post is my first attempt at teaching myself how to do this stuff. As I note at the end in the <a href="#important-caveats">caveats section</a>, there might be (surely are!) mistakes. Please correct them!</p>
@@ -3833,13 +3833,13 @@ model_ate_ipw <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22
     </entry>
     <entry>
         <title type="html"><![CDATA[Generating inverse probability weights for both binary and continuous treatments]]></title>
-        <link href="https://www.andrewheiss.com/blog/2020/12/01/ipw-binary-continuous/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2020/12/01/ipw-binary-continuous/" rel="alternate" />
         <published>2020-12-01T00:00:00+00:00</published>
         <updated>2020-12-01T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2020/12/01/ipw-binary-continuous/</id>
+        <id>https://www.shagunjhaver.com/blog/2020/12/01/ipw-binary-continuous/</id>
         <summary type="html"><![CDATA[Use R to close backdoor confounding by generating and using inverse probability weights for both binary and continuous treatments]]></summary>
         <content type="html"><![CDATA[<p>My <a href="https://evalf20.classes.andrewheiss.com/">program evaluation class</a> is basically a fun wrapper around topics in causal inference and econometrics. I’m a big fan of Judea Pearl-style <a href="https://bigthink.com/errors-we-live-by/judea-pearls-the-book-of-why-brings-news-of-a-new-science-of-causes">“causal revolution”</a> causal graphs (or <a href="https://cran.r-project.org/web/packages/ggdag/vignettes/intro-to-dags.html">DAGs</a>), and they’ve made it easier for both me and my students to understand econometric approaches like diff-in-diff, regression discontinuity, and instrumental variables.</p>
 <p>DAGs are also incredibly helpful for doing causal inference with observational data <em>without</em> needing a specific quasi-experimental situation. As I show <a href="/blog/2020/02/25/closing-backdoors-dags/">in this blog post</a> (and in <a href="/research/chapters/heiss-causal-inference-2021/">this new textbook chapter!</a>), you can use DAGs to identify confounders that distort the relationship (i.e. open up backdoors) between treatment and outcome. You can then use statistical methods to close those backdoors and adjust for the confounding. In both that blog post and the chapter, I show how to do this with matching and with inverse probability weighting (IPW).</p>
@@ -4292,13 +4292,13 @@ model_grant_weightit <span style="color:#f92672">&lt;-</span> <span style="color
     </entry>
     <entry>
         <title type="html"><![CDATA[Emergency online teaching resources]]></title>
-        <link href="https://www.andrewheiss.com/blog/2020/03/12/emergency-online-teaching-resources/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2020/03/12/emergency-online-teaching-resources/" rel="alternate" />
         <published>2020-03-12T00:00:00+00:00</published>
         <updated>2020-03-12T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2020/03/12/emergency-online-teaching-resources/</id>
+        <id>https://www.shagunjhaver.com/blog/2020/03/12/emergency-online-teaching-resources/</id>
         <summary type="html"><![CDATA[List of resources to help teach online as universities rapidly shut down during the COVID-19 pandemic]]></summary>
         <content type="html"><![CDATA[<p><em>This is written for instructors in the Department of Public Management and Policy at the Andrew Young School of Policy Studies at Georgia State University, but it&rsquo;s hopefully widely applicable too.</em></p>
 <hr>
@@ -4459,13 +4459,13 @@ model_grant_weightit <span style="color:#f92672">&lt;-</span> <span style="color
     </entry>
     <entry>
         <title type="html"><![CDATA[Ways to close backdoors in DAGs]]></title>
-        <link href="https://www.andrewheiss.com/blog/2020/02/25/closing-backdoors-dags/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2020/02/25/closing-backdoors-dags/" rel="alternate" />
         <published>2020-02-25T00:00:00+00:00</published>
         <updated>2020-02-25T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2020/02/25/closing-backdoors-dags/</id>
+        <id>https://www.shagunjhaver.com/blog/2020/02/25/closing-backdoors-dags/</id>
         <summary type="html"><![CDATA[Use regression, inverse probability weighting, and matching to close confounding backdoors and find causation in observational data]]></summary>
         <content type="html"><![CDATA[<p><span class="small">(<a href="https://github.com/andrewheiss/closing-backdoors-dags">See this notebook on GitHub</a>)</span></p>
 <hr>
@@ -4981,13 +4981,13 @@ all_models <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">
     </entry>
     <entry>
         <title type="html"><![CDATA[Automatically zip up subdirectories with Make]]></title>
-        <link href="https://www.andrewheiss.com/blog/2020/01/10/makefile-subdirectory-zips/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2020/01/10/makefile-subdirectory-zips/" rel="alternate" />
         <published>2020-01-10T00:00:00+00:00</published>
         <updated>2020-01-10T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2020/01/10/makefile-subdirectory-zips/</id>
+        <id>https://www.shagunjhaver.com/blog/2020/01/10/makefile-subdirectory-zips/</id>
         <summary type="html"><![CDATA[Use a Makefile to automatically zip up all subdirectories in a given folder *while also* accounting for dependencies]]></summary>
         <content type="html"><![CDATA[<p><a href="https://github.com/andrewheiss/makefile-subdirectory-zips">See this notebook on GitHub</a>. You can (and should) download the project from there if you want to follow along and try this out.</p>
 <hr>
@@ -5253,13 +5253,13 @@ ZIP_TARGETS <span style="color:#f92672">=</span> <span style="color:#66d9ef">$(<
     </entry>
     <entry>
         <title type="html"><![CDATA[Create a dynamic dashboard with R, flexdashboard, and Shiny]]></title>
-        <link href="https://www.andrewheiss.com/blog/2020/01/01/flexdashboard-dynamic-data/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2020/01/01/flexdashboard-dynamic-data/" rel="alternate" />
         <published>2020-01-01T00:00:00+00:00</published>
         <updated>2020-01-01T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2020/01/01/flexdashboard-dynamic-data/</id>
+        <id>https://www.shagunjhaver.com/blog/2020/01/01/flexdashboard-dynamic-data/</id>
         <summary type="html"><![CDATA[Use R Markdown, flexdashboard, and Shiny to create a dashboard that automatically loads data from a Google Sheet]]></summary>
         <content type="html"><![CDATA[<p>Now that I&rsquo;m on the tenure track, I&rsquo;ve been looking for a way to keep track of my different research projects so I can get them all finished and published. <a href="https://doi.org/10.1017/S1049096516000160">Matt Lebo&rsquo;s &ldquo;Managing Your Research Pipeline&rdquo;</a> presents a neat way of quantifying and tracking the progress of your research, and I recently adopted it for my own stuff. I even made a fancy <a href="https://rmarkdown.rstudio.com/">R Markdown</a> + <a href="https://rmarkdown.rstudio.com/flexdashboard/"><strong>flexdashboard</strong></a> <a href="https://twitter.com/andrewheiss/status/1201892963451842562">dashboard to show the status of the pipeline</a> interactively. I manage the data for the dashboard in a Google Sheet, knit the dashboard, and create an HTML file with the latest statistics.</p>
 <p>The combination of <a href="https://rmarkdown.rstudio.com/">R Markdown</a> + <a href="https://rmarkdown.rstudio.com/flexdashboard/"><strong>flexdashboard</strong></a> + <a href="https://plot.ly/ggplot2/"><strong>ggplotly</strong></a> makes it incredibly easy to create interactive dashboards, but you have to reknit and recompile the dashboard any time any data changes, which I&rsquo;m not a fan of doing. Wouldn&rsquo;t it be amazing if there was a way to get the latest data into a dashboard document without any reknitting?</p>
@@ -5465,13 +5465,13 @@ renderPlotly({
     </entry>
     <entry>
         <title type="html"><![CDATA[Convert Markdown to rich text (with syntax highlighting!) in any macOS app]]></title>
-        <link href="https://www.andrewheiss.com/blog/2019/10/09/convert-md-rtf-macos-services/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2019/10/09/convert-md-rtf-macos-services/" rel="alternate" />
         <published>2019-10-09T00:00:00+00:00</published>
         <updated>2019-10-09T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2019/10/09/convert-md-rtf-macos-services/</id>
+        <id>https://www.shagunjhaver.com/blog/2019/10/09/convert-md-rtf-macos-services/</id>
         <summary type="html"><![CDATA[Create a macOS Automator service to convert Markdown to rich text from any app in macOS]]></summary>
         <content type="html"><![CDATA[<p>GSU uses Microsoft&rsquo;s Office365 for e-mail, which is fine. My previous institutions—Duke and BYU—both use it too, and it&rsquo;s pretty standard. GSU also enforces 2-factor authentication (2FA) with Duo, which is also fine. Everybody should use some sort of 2FA for all their important accounts!</p>
 <p>However, for whatever reason, GSU&rsquo;s version of Duo&rsquo;s 2FA doesn&rsquo;t allow you to generate app-specific passwords for things like e-mail. Instead, any e-mail client I use has to have support for Microsoft&rsquo;s special <a href="https://docs.microsoft.com/en-us/office365/enterprise/office-365-client-support-modern-authentication">Modern Authentication</a> system, which opens up a popup window to handle the 2FA and logging in and everything. The issue with this is that very few e-mail clients support Modern Authentication. In the macOS world, the only program that supports it is Apple Mail. That&rsquo;s all.</p>
@@ -5544,13 +5544,13 @@ osascript -e <span style="color:#e6db74">&#34;set the clipboard to «data HTML</
     </entry>
     <entry>
         <title type="html"><![CDATA[Chidi's budget and utility: doing algebra and calculus with R and yacas]]></title>
-        <link href="https://www.andrewheiss.com/blog/2019/02/16/algebra-calculus-r-yacas/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2019/02/16/algebra-calculus-r-yacas/" rel="alternate" />
         <published>2019-02-16T00:00:00+00:00</published>
         <updated>2019-02-16T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2019/02/16/algebra-calculus-r-yacas/</id>
+        <id>https://www.shagunjhaver.com/blog/2019/02/16/algebra-calculus-r-yacas/</id>
         <summary type="html"><![CDATA[Use algebra and calculus with R and yacas to find Chidi's optimal level of pizza and frozen yogurt consumption given his budget and utility function.]]></summary>
         <content type="html"><![CDATA[<p><span class="small">(<a href="https://github.com/andrewheiss/algebra-calculus-r-yacas">See this notebook on GitHub</a>)</span></p>
 <hr>
@@ -5952,13 +5952,13 @@ max_utility <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e"
     </entry>
     <entry>
         <title type="html"><![CDATA[Half a dozen frequentist and Bayesian ways to measure the difference in means in two groups]]></title>
-        <link href="https://www.andrewheiss.com/blog/2019/01/29/diff-means-half-dozen-ways/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2019/01/29/diff-means-half-dozen-ways/" rel="alternate" />
         <published>2019-01-29T00:00:00+00:00</published>
         <updated>2019-01-29T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2019/01/29/diff-means-half-dozen-ways/</id>
+        <id>https://www.shagunjhaver.com/blog/2019/01/29/diff-means-half-dozen-ways/</id>
         <summary type="html"><![CDATA[Learn how to run standard t-tests, simulations, and Bayesian difference in means tests with R and Stan]]></summary>
         <content type="html"><![CDATA[<p><span class="small">(<a href="https://github.com/andrewheiss/diff-means-half-dozen-ways">See this notebook on GitHub</a>)</span></p>
 <hr>
@@ -6585,13 +6585,13 @@ meta_diffs <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e">
     </entry>
     <entry>
         <title type="html"><![CDATA[Tidy text, parts of speech, and unique words in the Qur'an]]></title>
-        <link href="https://www.andrewheiss.com/blog/2018/12/28/tidytext-pos-arabic/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2018/12/28/tidytext-pos-arabic/" rel="alternate" />
         <published>2018-12-28T00:00:00+00:00</published>
         <updated>2018-12-28T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2018/12/28/tidytext-pos-arabic/</id>
+        <id>https://www.shagunjhaver.com/blog/2018/12/28/tidytext-pos-arabic/</id>
         <summary type="html"><![CDATA[Use R and parts-of-speech tagging to explore the Qur'an in Arabic]]></summary>
         <content type="html"><![CDATA[<p><span class="small">(<a href="https://github.com/andrewheiss/tidytext-pos-arabic">See this notebook on GitHub</a>)</span></p>
 <hr>
@@ -6806,13 +6806,13 @@ plot_unique_nouns
     </entry>
     <entry>
         <title type="html"><![CDATA[Tidy text, parts of speech, and unique words in the Bible]]></title>
-        <link href="https://www.andrewheiss.com/blog/2018/12/26/tidytext-pos-john/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2018/12/26/tidytext-pos-john/" rel="alternate" />
         <published>2018-12-26T00:00:00+00:00</published>
         <updated>2018-12-26T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2018/12/26/tidytext-pos-john/</id>
+        <id>https://www.shagunjhaver.com/blog/2018/12/26/tidytext-pos-john/</id>
         <summary type="html"><![CDATA[Use R and parts-of-speech tagging to explore the distinctive features of John]]></summary>
         <content type="html"><![CDATA[<p><span class="small">(<a href="https://github.com/andrewheiss/tidytext-pos-john">See this notebook on GitHub</a>)</span></p>
 <hr>
@@ -7053,13 +7053,13 @@ top_coefs <span style="color:#f92672">%&gt;%</span>
     </entry>
     <entry>
         <title type="html"><![CDATA[The academic job search finally comes to an end]]></title>
-        <link href="https://www.andrewheiss.com/blog/2018/12/17/academic-job-market-visualized/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2018/12/17/academic-job-market-visualized/" rel="alternate" />
         <published>2018-12-17T00:00:00+00:00</published>
         <updated>2018-12-17T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2018/12/17/academic-job-market-visualized/</id>
+        <id>https://www.shagunjhaver.com/blog/2018/12/17/academic-job-market-visualized/</id>
         <summary type="html"><![CDATA[Explore 2.5 years of applying for academic jobs with fancy data visualization]]></summary>
         <content type="html"><![CDATA[<p>I am <em>so beyond thrilled</em> to announce that I&rsquo;ll be joining the <a href="https://aysps.gsu.edu/">Andrew Young School of Policy Studies</a> at <a href="https://www.gsu.edu/">Georgia State University</a> in Fall 2019 as an assistant professor in the <a href="https://aysps.gsu.edu/public-management-policy/">Department of Public Management and Policy</a>. I&rsquo;ll be teaching classes in statistics/data science, economics, and nonprofit management in beautiful downtown Atlanta, and we&rsquo;ll be moving back to the South. I am so so excited about this! The Andrew Young School does amazing work in public policy, administration, and nonprofit management, and I&rsquo;ll be working with phenomenal colleagues and students. I still can&rsquo;t believe this is real.</p>
 <p>Part of the reason I&rsquo;m in shock is that for the past 2.5 years, I&rsquo;ve been ripped apart and destroyed by the academic job market. This job market is a horrendous beast of a thing. It is soul-crushing and dream-shattering and a constant stream of rejection. While facing rejection <a href="https://www.nytimes.com/2018/12/14/opinion/sunday/writers-rejections-resolutions.html">is good and builds grit etc., etc.</a>, in reality it&rsquo;s awful.</p>
@@ -7115,13 +7115,13 @@ top_coefs <span style="color:#f92672">%&gt;%</span>
     </entry>
     <entry>
         <title type="html"><![CDATA[How to test any hypothesis with the infer package]]></title>
-        <link href="https://www.andrewheiss.com/blog/2018/12/05/test-any-hypothesis/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2018/12/05/test-any-hypothesis/" rel="alternate" />
         <published>2018-12-05T00:00:00+00:00</published>
         <updated>2018-12-05T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2018/12/05/test-any-hypothesis/</id>
+        <id>https://www.shagunjhaver.com/blog/2018/12/05/test-any-hypothesis/</id>
         <summary type="html"><![CDATA[Use the infer package in R to test any statistical hypothesis through simulation.]]></summary>
         <content type="html"><![CDATA[<p>This semester, I used the new <a href="https://moderndive.com/">ModernDive textbook</a> to teach <a href="https://statsf18.classes.andrewheiss.com/">introductory statistics for executive MPA students at BYU</a>, and it&rsquo;s been absolutely delightful. The book&rsquo;s approach to teaching statistics follows a growing trend (led by <a href="http://www2.stat.duke.edu/~mc301/">Mine Çetinkaya-Rundel</a>, <a href="https://alison.rbind.io/">Alison Hill</a>, and others) of emphasizing data and simulations instead of classical probability theory and complex statistical tests.</p>
 <p>Where this approach <em>really</em> shines is with hypothesis testing. This is the core of inferential statistics, but it&rsquo;s really hard for students to wrap their head around how to reject null hypotheses and interpret p-values. <a href="https://fivethirtyeight.com/features/not-even-scientists-can-easily-explain-p-values/">Even seasoned scientists struggle with explaining what p-values mean</a>. This stuff is hard.</p>
@@ -7249,13 +7249,13 @@ pub_private_null <span style="color:#f92672">%&gt;%</span>
     </entry>
     <entry>
         <title type="html"><![CDATA[Create a cheap, disposable supercomputer with R, DigitalOcean, and future]]></title>
-        <link href="https://www.andrewheiss.com/blog/2018/07/30/disposable-supercomputer-future/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2018/07/30/disposable-supercomputer-future/" rel="alternate" />
         <published>2018-07-30T00:00:00+00:00</published>
         <updated>2018-07-30T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2018/07/30/disposable-supercomputer-future/</id>
+        <id>https://www.shagunjhaver.com/blog/2018/07/30/disposable-supercomputer-future/</id>
         <summary type="html"><![CDATA[Use the future R package to run computationally intensive R commands on a cluster of remote computers]]></summary>
         <content type="html"><![CDATA[<p><em>tl;dr</em>: <a href="#full-example">Skip to complete example</a></p>
 <hr>
@@ -7687,13 +7687,13 @@ gapminder_models_to_plot <span style="color:#f92672">&lt;-</span> gapminder_mode
     </entry>
     <entry>
         <title type="html"><![CDATA[Show multiply imputed results in a side-by-side regression table with broom and huxtable]]></title>
-        <link href="https://www.andrewheiss.com/blog/2018/03/08/amelia-broom-huxtable/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2018/03/08/amelia-broom-huxtable/" rel="alternate" />
         <published>2018-03-08T00:00:00+00:00</published>
         <updated>2018-03-08T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2018/03/08/amelia-broom-huxtable/</id>
+        <id>https://www.shagunjhaver.com/blog/2018/03/08/amelia-broom-huxtable/</id>
         <summary type="html"><![CDATA[Extend broom's tidy() and glance() to work with lists of multiply imputed regression models]]></summary>
         <content type="html"><![CDATA[<p><span class="small">(<a href="https://github.com/andrewheiss/amelia-broom-huxtable">See this notebook on GitHub</a>)</span></p>
 <hr>
@@ -7906,13 +7906,13 @@ models_imputed <span style="color:#f92672">&lt;-</span> models_imputed_df<span s
     </entry>
     <entry>
         <title type="html"><![CDATA[Meld regression output from multiple imputations with tidyverse]]></title>
-        <link href="https://www.andrewheiss.com/blog/2018/03/07/amelia-tidy-melding/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2018/03/07/amelia-tidy-melding/" rel="alternate" />
         <published>2018-03-07T00:00:00+00:00</published>
         <updated>2018-03-07T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2018/03/07/amelia-tidy-melding/</id>
+        <id>https://www.shagunjhaver.com/blog/2018/03/07/amelia-tidy-melding/</id>
         <summary type="html"><![CDATA[Use tidyverse functions to correctly meld and pool multiply imputed model output.]]></summary>
         <content type="html"><![CDATA[<p><span class="small">(<a href="https://github.com/andrewheiss/amelia-tidy-melding">See this notebook on GitHub</a>)</span></p>
 <hr>
@@ -8115,13 +8115,13 @@ r2s_avg
     </entry>
     <entry>
         <title type="html"><![CDATA[Fun with empirical and function-based derivatives in R]]></title>
-        <link href="https://www.andrewheiss.com/blog/2018/02/15/derivatives-r-fun/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2018/02/15/derivatives-r-fun/" rel="alternate" />
         <published>2018-02-15T00:00:00+00:00</published>
         <updated>2018-02-15T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2018/02/15/derivatives-r-fun/</id>
+        <id>https://www.shagunjhaver.com/blog/2018/02/15/derivatives-r-fun/</id>
         <summary type="html"><![CDATA[Use R to do things with derivatives, both with actual functions and with existing empirical data.]]></summary>
         <content type="html"><![CDATA[<script src="/blog/2018/02/15/derivatives-r-fun/index_files/kePrint-0.0.1/kePrint.js"></script>
 <link href="/blog/2018/02/15/derivatives-r-fun/index_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
@@ -8385,13 +8385,13 @@ demand_empricial_approx <span style="color:#f92672">&lt;-</span> <span style="co
     </entry>
     <entry>
         <title type="html"><![CDATA[Working with R, Cairo graphics, custom fonts, and ggplot]]></title>
-        <link href="https://www.andrewheiss.com/blog/2017/09/27/working-with-r-cairo-graphics-custom-fonts-and-ggplot/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2017/09/27/working-with-r-cairo-graphics-custom-fonts-and-ggplot/" rel="alternate" />
         <published>2017-09-27T00:00:00+00:00</published>
         <updated>2017-09-27T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2017/09/27/working-with-r-cairo-graphics-custom-fonts-and-ggplot/</id>
+        <id>https://www.shagunjhaver.com/blog/2017/09/27/working-with-r-cairo-graphics-custom-fonts-and-ggplot/</id>
         <summary type="html"><![CDATA[The Cairo graphics library makes it easy to embed custom fonts in PDFs and create high resolution PNGs.]]></summary>
         <content type="html"><![CDATA[<p>Skip to instructions for <a href="#mac">macOS</a> or <a href="#windows">Windows</a></p>
 <hr>
@@ -8577,13 +8577,13 @@ p
     </entry>
     <entry>
         <title type="html"><![CDATA[Create supply and demand economics curves with ggplot2]]></title>
-        <link href="https://www.andrewheiss.com/blog/2017/09/15/create-supply-and-demand-economics-curves-with-ggplot2/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2017/09/15/create-supply-and-demand-economics-curves-with-ggplot2/" rel="alternate" />
         <published>2017-09-15T00:00:00+00:00</published>
         <updated>2017-09-15T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2017/09/15/create-supply-and-demand-economics-curves-with-ggplot2/</id>
+        <id>https://www.shagunjhaver.com/blog/2017/09/15/create-supply-and-demand-economics-curves-with-ggplot2/</id>
         <summary type="html"><![CDATA[Use ggplot to create economics-style, non-data-based conceptual graphs.]]></summary>
         <content type="html"><![CDATA[<div class="alert alert-primary">This is now an R package named <a href="https://github.com/andrewheiss/reconPlots"><code>reconPlots</code></a>.</div>
 <p><span class="small">(<a href="#tldr">Skip to the tl;dr complete example</a>; <a href="https://github.com/andrewheiss/supply-demand-ggplot">see this mini project on GitHub</a>)</span></p>
@@ -8881,13 +8881,13 @@ plot_labels <span style="color:#f92672">&lt;-</span> <span style="color:#a6e22e"
     </entry>
     <entry>
         <title type="html"><![CDATA[Quickly play with Polity IV and OECD data (and see the danger of US democracy)]]></title>
-        <link href="https://www.andrewheiss.com/blog/2017/08/26/quickly-play-with-polity-iv-and-oecd-data-and-see-the-danger-of-us-democracy/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2017/08/26/quickly-play-with-polity-iv-and-oecd-data-and-see-the-danger-of-us-democracy/" rel="alternate" />
         <published>2017-08-26T00:00:00+00:00</published>
         <updated>2017-08-26T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2017/08/26/quickly-play-with-polity-iv-and-oecd-data-and-see-the-danger-of-us-democracy/</id>
+        <id>https://www.shagunjhaver.com/blog/2017/08/26/quickly-play-with-polity-iv-and-oecd-data-and-see-the-danger-of-us-democracy/</id>
         <summary type="html"><![CDATA[Use ggplot to reproducibly see how much trouble the Polity Project thinks the US is in.]]></summary>
         <content type="html"><![CDATA[<p>The <a href="http://www.systemicpeace.org/polityproject.html">Polity IV Project</a> released new data yesterday, with democratization scores for 169 countries up to 2016. I wanted to check if the ongoing erosion of US democratic institutions since the 2016 elections registered in the US&rsquo;s Polity score, and, lo and behold, it did! We dropped from our solid, historically consistent 10 to an 8.</p>
 <p>But is that bad? How does that compare to other advanced democracies, like countries in the OECD?</p>
@@ -9159,13 +9159,13 @@ lots.of.countries.polity <span style="color:#f92672">&lt;-</span> polity <span s
     </entry>
     <entry>
         <title type="html"><![CDATA[Exploring Minard's 1812 plot with ggplot2]]></title>
-        <link href="https://www.andrewheiss.com/blog/2017/08/10/exploring-minards-1812-plot-with-ggplot2/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2017/08/10/exploring-minards-1812-plot-with-ggplot2/" rel="alternate" />
         <published>2017-08-10T00:00:00+00:00</published>
         <updated>2017-08-10T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2017/08/10/exploring-minards-1812-plot-with-ggplot2/</id>
+        <id>https://www.shagunjhaver.com/blog/2017/08/10/exploring-minards-1812-plot-with-ggplot2/</id>
         <summary type="html"><![CDATA[Use ggplot to do fun and fancy things with Minard's famous plot of Napoleon's 1812 retreat from Russia.]]></summary>
         <content type="html"><![CDATA[<p>For whatever reason, I decided to start reading Tolstoy&rsquo;s <em>War and Peace</em> (via Audible) the week I had to turn in my dissertation. I still have a dozen or so hours to go, but the book has been incredible. I had no idea what it was about going into it, and was delighted to find that the &ldquo;war&rdquo; parts of the book deal with the Napolonic wars—both his 1804–1805 campaign in the <a href="https://en.wikipedia.org/wiki/War_of_the_Third_Coalition">War of the Third Coalition</a> (like the <a href="https://en.wikipedia.org/wiki/Battle_of_Austerlitz">Battle of Austerlitz</a>), and his <a href="https://en.wikipedia.org/wiki/French_invasion_of_Russia">1812 campaign to invade Russia</a>, from whence we get <a href="https://en.wikipedia.org/wiki/1812_Overture">Tchaikovsky&rsquo;s <em>1812 Overture</em></a>. I knew <em>nothing</em> about these wars and Tolstoy&rsquo;s descriptions are incredible and gripping.</p>
 <p>It&rsquo;s been especially exciting because I&rsquo;m preparing a course on data visualization this fall and had been looking forward to using <a href="https://en.wikipedia.org/wiki/Charles_Joseph_Minard#Work">Charles Minard&rsquo;s famous plot</a> about Napoleon&rsquo;s 1812 winter retreat from Moscow, where the Grande Armée dropped from 422,000 to 10,000 troops.</p>
@@ -9548,13 +9548,13 @@ grid<span style="color:#f92672">::</span><span style="color:#a6e22e">grid.draw</
     </entry>
     <entry>
         <title type="html"><![CDATA[Super basic practical guide to Docker and RStudio]]></title>
-        <link href="https://www.andrewheiss.com/blog/2017/04/27/super-basic-practical-guide-to-docker-and-rstudio/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2017/04/27/super-basic-practical-guide-to-docker-and-rstudio/" rel="alternate" />
         <published>2017-04-27T00:00:00+00:00</published>
         <updated>2017-04-27T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2017/04/27/super-basic-practical-guide-to-docker-and-rstudio/</id>
+        <id>https://www.shagunjhaver.com/blog/2017/04/27/super-basic-practical-guide-to-docker-and-rstudio/</id>
         <summary type="html"><![CDATA[Use RStudio inside Docker containers for portable and reproducible development environments.]]></summary>
         <content type="html"><![CDATA[<p>All the cool data science kids seem to be using <a href="https://www.docker.com/">Docker</a> these days, and being able to instantly spin up a pre-built computer with a complete development or production environment is magic. The R community has also jumped on the Docker whale, and <a href="https://ropensci.org/">rOpenSci</a> maintains <a href="https://hub.docker.com/u/rocker/">dozens of pre-built Docker images</a>. <a href="https://ropensci.org/blog/blog/2014/10/23/introducing-rocker">These images are well documented</a> and there are <a href="https://github.com/rocker-org/rocker/wiki/Using-the-RStudio-image">helpful guides explaining how to get started</a>.</p>
 <p>Read all that first. This post doesn&rsquo;t explain how Docker works. Instead, it&rsquo;s a quick super basic beginner&rsquo;s guide about how I use these Docker images in real-world R development and research.</p>
@@ -9682,13 +9682,13 @@ runcmd:
     </entry>
     <entry>
         <title type="html"><![CDATA[Save base graphics as pseudo-objects in R]]></title>
-        <link href="https://www.andrewheiss.com/blog/2016/12/08/save-base-graphics-as-pseudo-objects-in-r/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2016/12/08/save-base-graphics-as-pseudo-objects-in-r/" rel="alternate" />
         <published>2016-12-08T00:00:00+00:00</published>
         <updated>2016-12-08T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2016/12/08/save-base-graphics-as-pseudo-objects-in-r/</id>
+        <id>https://www.shagunjhaver.com/blog/2016/12/08/save-base-graphics-as-pseudo-objects-in-r/</id>
         <summary type="html"><![CDATA[Use pryr to save a series of R commands as a kind of macro you can call repeatedly.]]></summary>
         <content type="html"><![CDATA[<p><strong>tl;dr:</strong> Use <code>pryr::%&lt;a-%</code> to save a series of R commands as a kind of macro you can call repeatedly.</p>
 <hr>
@@ -9875,13 +9875,13 @@ p.both.river
     </entry>
     <entry>
         <title type="html"><![CDATA[Convert logistic regression standard errors to odds ratios with R]]></title>
-        <link href="https://www.andrewheiss.com/blog/2016/04/25/convert-logistic-regression-standard-errors-to-odds-ratios-with-r/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2016/04/25/convert-logistic-regression-standard-errors-to-odds-ratios-with-r/" rel="alternate" />
         <published>2016-04-25T00:00:00+00:00</published>
         <updated>2016-04-25T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2016/04/25/convert-logistic-regression-standard-errors-to-odds-ratios-with-r/</id>
+        <id>https://www.shagunjhaver.com/blog/2016/04/25/convert-logistic-regression-standard-errors-to-odds-ratios-with-r/</id>
         <summary type="html"><![CDATA[Correctly transform logistic regression standard errors to odds ratios using R]]></summary>
         <content type="html"><![CDATA[<p>Converting logistic regression coefficients and standard errors into odds ratios is trivial in Stata: just add <code>, or</code> to the end of a <code>logit</code> command:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">. use &#34;http://www.ats.ucla.edu/stat/data/hsbdemo&#34;, clear
@@ -10000,13 +10000,13 @@ model.df <span style="color:#f92672">%&gt;%</span>
     </entry>
     <entry>
         <title type="html"><![CDATA[Drone sightings in the US, visualized]]></title>
-        <link href="https://www.andrewheiss.com/blog/2016/04/03/drone-sightings-in-the-us-visualized/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2016/04/03/drone-sightings-in-the-us-visualized/" rel="alternate" />
         <published>2016-04-03T00:00:00+00:00</published>
         <updated>2016-04-03T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2016/04/03/drone-sightings-in-the-us-visualized/</id>
+        <id>https://www.shagunjhaver.com/blog/2016/04/03/drone-sightings-in-the-us-visualized/</id>
         <summary type="html"><![CDATA[See where the FAA has reported hobbyist drone sightings from 2014–2016]]></summary>
         <content type="html"><![CDATA[<p>For my first entry into <a href="https://rud.is/b/2016/03/30/introducing-a-weekly-r-python-js-etc-vis-challenge/">@hrbrmstr&rsquo;s new weekly data visualization challenge</a>, I made two plots related to the <a href="https://www.faa.gov/uas/resources/public_records/uas_sightings_report/">dataset of unmanned aircraft (UAS) sightings</a>. The <a href="https://github.com/andrewheiss/2016-13/tree/master/andrewheiss">R code for these plots is on GitHub</a>.</p>
 <p>First, I was interested in the type of drones being spotted. When I think of drones, I typically think of the ones the CIA and Air Force have flying over Yemen, Somalia, Afghanistan, and Pakistan shooting at suspected ISIS and Al-Qaeda members. To see if that&rsquo;s the case with these UAS sightings, I mapped out all US-based Air Force bases and all drone sightings, assuming that any military drone sightings would happen near bases.</p>
@@ -10023,13 +10023,13 @@ model.df <span style="color:#f92672">%&gt;%</span>
     </entry>
     <entry>
         <title type="html"><![CDATA[Fauxcasts: Use a podcast app to listen to audiobooks]]></title>
-        <link href="https://www.andrewheiss.com/blog/2016/02/11/fauxcasts/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2016/02/11/fauxcasts/" rel="alternate" />
         <published>2016-02-11T00:00:00+00:00</published>
         <updated>2016-02-11T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2016/02/11/fauxcasts/</id>
+        <id>https://www.shagunjhaver.com/blog/2016/02/11/fauxcasts/</id>
         <summary type="html"><![CDATA[Create a temporary podcast feed of a CD-based audiobook and use a modern podcast app to listen to the book faster and better.]]></summary>
         <content type="html"><![CDATA[<p>Our public library has a huge collection of books on CD, including a bunch of <a href="https://en.wikipedia.org/wiki/Arkangel_Shakespeare">well dramatized versions of Shakespeare plays</a> that I&rsquo;ve always meant to read. However, out of all the music-listening devices I own, only two have optical drives: the ancient Mac Mini we use for our media center and our minivan. It&rsquo;s trivial to rip the audiobooks to MP3 on the Mac Mini, but I&rsquo;ve never been completely happy with the options for listening to them.</p>
 <p>I listen to to pretty much all spoken word media on my iPhone or iPad through either <a href="https://overcast.fm/">Overcast</a> (for podcasts) or the <a href="https://www.audible.com/sw">Audible app</a> (for audiobooks). Both of these apps allow for faster playback (up to 2.5 or 3x), and Overcast uses the fantastic Smart Speed feature to cut out the silence in between sentences.<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup> Apple&rsquo;s native Music app has none of these extra features, which means I have to listen to CD-based audiobooks at 1x speed like a caveman.</p>
@@ -10052,13 +10052,13 @@ model.df <span style="color:#f92672">%&gt;%</span>
     </entry>
     <entry>
         <title type="html"><![CDATA[Use LibreOffice Base as a GUI for an SQLite database in OS X]]></title>
-        <link href="https://www.andrewheiss.com/blog/2016/02/10/libreoffice-base-sqlite-odbc-osx/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2016/02/10/libreoffice-base-sqlite-odbc-osx/" rel="alternate" />
         <published>2016-02-10T00:00:00+00:00</published>
         <updated>2016-02-10T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2016/02/10/libreoffice-base-sqlite-odbc-osx/</id>
+        <id>https://www.shagunjhaver.com/blog/2016/02/10/libreoffice-base-sqlite-odbc-osx/</id>
         <summary type="html"><![CDATA[Connect LibreOffice to an SQLite database to take advantage of SQLite’s ubiquitousness and LibreOffice’s form-based GUI.]]></summary>
         <content type="html"><![CDATA[<h2 id="the-problem">The problem</h2>
 <p>As I conduct interviews for my dissertation research, I&rsquo;ve been trying to figure out an open source database for storing interview notes and keeping track of the people and organizations I&rsquo;m talking to. My ideal requirements are simple:</p>
@@ -10111,13 +10111,13 @@ model.df <span style="color:#f92672">%&gt;%</span>
     </entry>
     <entry>
         <title type="html"><![CDATA[Toggle the Bluetooth menu item with AppleScript]]></title>
-        <link href="https://www.andrewheiss.com/blog/2013/05/28/toggle-bluetooth-menu-applescript/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2013/05/28/toggle-bluetooth-menu-applescript/" rel="alternate" />
         <published>2013-05-28T00:00:00+00:00</published>
         <updated>2013-05-28T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2013/05/28/toggle-bluetooth-menu-applescript/</id>
+        <id>https://www.shagunjhaver.com/blog/2013/05/28/toggle-bluetooth-menu-applescript/</id>
         <summary type="html"><![CDATA[The OS X Bluetooth menu item re-enables itself every time a device battery gets low. This simple application turns it back off.]]></summary>
         <content type="html"><![CDATA[<p>I like to keep my menubar as uncluttered as possible, so I keep as many items hidden as possible—especially system programs like Time Machine, the displays menu, or the volume menu.</p>
 <p><img src="menubar.png" alt="Clean menu bar"></p>
@@ -10157,13 +10157,13 @@ model.df <span style="color:#f92672">%&gt;%</span>
     </entry>
     <entry>
         <title type="html"><![CDATA[True side-by-side page numbers in InDesign]]></title>
-        <link href="https://www.andrewheiss.com/blog/2013/03/15/side-by-side-page-numbers-indesign/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2013/03/15/side-by-side-page-numbers-indesign/" rel="alternate" />
         <published>2013-03-15T00:00:00+00:00</published>
         <updated>2013-03-15T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2013/03/15/side-by-side-page-numbers-indesign/</id>
+        <id>https://www.shagunjhaver.com/blog/2013/03/15/side-by-side-page-numbers-indesign/</id>
         <summary type="html"><![CDATA[Automatically create side-by-side page numbers for parallel texts or spread numbers in InDesign.]]></summary>
         <content type="html"><![CDATA[<p>The books I make for the Middle East Texts Initiative contain side-by-side English-Arabic translations of old Arabic, Hebrew, and Latin texts. InDesign can generally handle the side-by-side parallel stories and text frames, but it cannot properly number the pages. After all the front matter and introductory text, the English translation starts on a verso page (left) with page 1, followed by a page of Arabic on the recto (right), also on page 1. The next verso is page 2.</p>
 <p>InDesign doesn&rsquo;t include a way to insert automatic spread numbers instead of page numbers, which means there&rsquo;s no easy way to have automatic parallel, same-numbered pages. For years users have come up with kludgy solutions, like:</p>
@@ -10181,13 +10181,13 @@ model.df <span style="color:#f92672">%&gt;%</span>
     </entry>
     <entry>
         <title type="html"><![CDATA[Gutenberg ipsum]]></title>
-        <link href="https://www.andrewheiss.com/blog/2012/07/02/gutenberg-ipsum/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2012/07/02/gutenberg-ipsum/" rel="alternate" />
         <published>2012-07-02T00:00:00+00:00</published>
         <updated>2012-07-02T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2012/07/02/gutenberg-ipsum/</id>
+        <id>https://www.shagunjhaver.com/blog/2012/07/02/gutenberg-ipsum/</id>
         <summary type="html"><![CDATA[Stop using boring, boilerplate Lorem ipsum filler text and build your own random, semi-coherent text from Project Gutenberg books.]]></summary>
         <content type="html"><![CDATA[<p>I&rsquo;ve decided to try to be more like <a href="http://bencrowder.net/">Ben Crowder</a>, <a href="http://www.todrobbins.com/">Tod Robbins</a>, and <a href="http://brettterpstra.com/">Brett Terpstra</a> and release my code tinkerings into the public more often.</p>
 <p>Since upgrading to <a href="http://smilesoftware.com/TextExpander/">TextExpander 4</a> a couple weeks ago, I&rsquo;ve decided to delve into it a lot more. I recently converted from <a href="http://www.ergonis.com/products/typinator/">Typinator</a>, where I only really used a few expansions for <a href="http://www.andrewheiss.com/blog/2009/04/26/typing-transliterated-arabic-quickly/">typing transliterated Arabic</a>. After belatedly stumbling upon a couple posts by <a href="http://brettterpstra.com/dammit-again-with-the-lipsum/">Brett</a> and <a href="http://www.leancrew.com/all-this/2011/02/dissociated-darwin/">Dr. Drang</a>, I found that TextExpander can be used for some pretty fun stuff. Like random Lorem Ipsum-like text based on <em>n</em>-gram algorithms!</p>
@@ -10264,13 +10264,13 @@ $dis <span style="color:#f92672">=~</span> <span style="color:#e6db74">s/[.);:?&
     </entry>
     <entry>
         <title type="html"><![CDATA[Install R, RStudio, and R Commander in Windows and OS X]]></title>
-        <link href="https://www.andrewheiss.com/blog/2012/04/17/install-r-rstudio-r-commander-windows-osx/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2012/04/17/install-r-rstudio-r-commander-windows-osx/" rel="alternate" />
         <published>2012-04-17T00:00:00+00:00</published>
         <updated>2012-04-17T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2012/04/17/install-r-rstudio-r-commander-windows-osx/</id>
+        <id>https://www.shagunjhaver.com/blog/2012/04/17/install-r-rstudio-r-commander-windows-osx/</id>
         <summary type="html"><![CDATA[R, RStudio, and R Commander are all powerful open source statistical tools, but they can be a little tricky to install. These instructions make it easy to get everything working right.]]></summary>
         <content type="html"><![CDATA[<p><a href="http://www.r-project.org/">R</a> is an incredibly powerful open source program for statistics and graphics. It can run on pretty much any computer and has a very active and friendly support community online. Graphics created by R are extremely extensible and are used in high level publications like the New York Times (as explained by <a href="http://book.flowingdata.com/">this former NYT infographic designer</a>).</p>
 <p><a href="http://rstudio.org/">RStudio</a> is an integrated development environment (IDE) for R. It&rsquo;s basically a nice front-end for R, giving you a console, a scripting window, a graphics window, and an R workspace, among other options.</p>
@@ -10321,13 +10321,13 @@ $dis <span style="color:#f92672">=~</span> <span style="color:#e6db74">s/[.);:?&
     </entry>
     <entry>
         <title type="html"><![CDATA[World-Ready Composer not Perfect]]></title>
-        <link href="https://www.andrewheiss.com/blog/2011/06/25/world-ready-composer-not-perfect/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2011/06/25/world-ready-composer-not-perfect/" rel="alternate" />
         <published>2011-06-25T00:00:00+00:00</published>
         <updated>2011-06-25T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2011/06/25/world-ready-composer-not-perfect/</id>
+        <id>https://www.shagunjhaver.com/blog/2011/06/25/world-ready-composer-not-perfect/</id>
         <summary type="html"><![CDATA[Even though InDesign’s new World-Ready Composer is awesome, it is still buggy and struggles with a few Arabic fonts.]]></summary>
         <content type="html"><![CDATA[<p>Although Adobe has included the world-ready composer in InDesign CS4 and 5, <a href="http://www.andrewheiss.com/blog/2011/06/24/using-arabic-in-indesign-cs5-without-indesign-me/">like I said in my previous post</a>, it&rsquo;s not documented or supported at all. It&rsquo;s still buggy and unfinished, unfortunately.</p>
 <p>Here&rsquo;s a little example of how buggy it really is. I typeset the same sentence in Arabic in different fonts I have installed on my computer. As you can see, most of the fonts work flawlessly (yay!), with two exceptions. Traditional Arabic can&rsquo;t display short vowels—they break up the connecting letters—and Geeza Pro is a sad, sad little font.</p>
@@ -10341,13 +10341,13 @@ $dis <span style="color:#f92672">=~</span> <span style="color:#e6db74">s/[.);:?&
     </entry>
     <entry>
         <title type="html"><![CDATA[Using Arabic in InDesign CS5 without InDesign ME]]></title>
-        <link href="https://www.andrewheiss.com/blog/2011/06/24/using-arabic-in-indesign-cs5-without-indesign-me/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2011/06/24/using-arabic-in-indesign-cs5-without-indesign-me/" rel="alternate" />
         <published>2011-06-24T00:00:00+00:00</published>
         <updated>2011-06-24T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2011/06/24/using-arabic-in-indesign-cs5-without-indesign-me/</id>
+        <id>https://www.shagunjhaver.com/blog/2011/06/24/using-arabic-in-indesign-cs5-without-indesign-me/</id>
         <summary type="html"><![CDATA[Use InDesign CS5‘s hidden World Ready Composer to typeset text in Arabic and other complex scripts.]]></summary>
         <content type="html"><![CDATA[<p>Nearly four years ago, <a href="/blog/2007/09/17/using-arabic-in-indesign-without-indesign-me/">I posted a workaround for InDesign CS3&rsquo;s lack of support for RTL support.</a> The only way to get proper Arabic or Hebrew text back then was to type backwards—something trivial (and scriptable) for Hebrew, but far more complicated for Arabic, with all its different letter forms that change depending on their position in the word. Rather than <em>type</em> backwards, you had to <em>manually</em> insert glyphs from the glyphs panel backwards. While this was extraordinarily tedious, it worked for times when you only needed to deal with a few words—maybe a short sentence.</p>
 <p>For my job I&rsquo;ve been using InDesign CS3 ME with Tasmeem and have fallen in love with the super advanced typographic tools that it provides. But, I&rsquo;m not planning on keeping that job forever (I&rsquo;m graduating in less than a year!), and I don&rsquo;t want to go back to hunting for glyphs. I&rsquo;ve been spoiled :)</p>
@@ -10372,13 +10372,13 @@ $dis <span style="color:#f92672">=~</span> <span style="color:#e6db74">s/[.);:?&
     </entry>
     <entry>
         <title type="html"><![CDATA[Fake CloudApp with Dropbox and Quicksilver]]></title>
-        <link href="https://www.andrewheiss.com/blog/2011/06/19/fake-cloud-app-dropbox/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2011/06/19/fake-cloud-app-dropbox/" rel="alternate" />
         <published>2011-06-19T00:00:00+00:00</published>
         <updated>2011-06-19T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2011/06/19/fake-cloud-app-dropbox/</id>
+        <id>https://www.shagunjhaver.com/blog/2011/06/19/fake-cloud-app-dropbox/</id>
         <summary type="html"><![CDATA[Move files to your Dropbox public folder and generate a shareable URL instantly, <em>à la</em> CloudApp, with a combination of a few services and Quicksilver triggers.]]></summary>
         <content type="html"><![CDATA[<p>Recently a friend showed me <a href="http://getcloudapp.com/">CloudApp</a>, a fantastic little app that sits in your menu bar and lets you share files almost instantly. With a quick keystroke you upload a file to their servers and get a public URL to share with anyone. Neato.</p>
 <p>However, with a basic (free) CloudApp account you are limited in the size and number of uploads you can make each month. I&rsquo;m also really picky about what goes in my menu bar, and I didn&rsquo;t really like having an extra app running just for when I need to upload something.</p>
@@ -10435,13 +10435,13 @@ $dis <span style="color:#f92672">=~</span> <span style="color:#e6db74">s/[.);:?&
     </entry>
     <entry>
         <title type="html"><![CDATA[In Tahrir Square]]></title>
-        <link href="https://www.andrewheiss.com/blog/2011/02/03/in-tahrir-square/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2011/02/03/in-tahrir-square/" rel="alternate" />
         <published>2011-02-03T00:00:00+00:00</published>
         <updated>2011-02-03T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2011/02/03/in-tahrir-square/</id>
+        <id>https://www.shagunjhaver.com/blog/2011/02/03/in-tahrir-square/</id>
         <summary type="html"><![CDATA[A poem in honor of the #Jan25 Tahrir protestors]]></summary>
         <content type="html"><![CDATA[<p>My awesome wife <a href="http://www.heissatopia.com/2011/02/in-tahrir-square.html">just wrote up a fantastic poem</a> dedicated to the #Jan25 Tahrir protestors. This past week has been riveting and emotional for us, even though we live far from Egypt now. Cairo was our home for two years—we drank from the Nile <span class="rtl">(شربنا من النيل)</span> and feel part of it. This horrific carnage is absolutely sickening.</p>
 <p>Ta7ya Masr!</p>
@@ -10472,13 +10472,13 @@ February 3, 2011</p>
     </entry>
     <entry>
         <title type="html"><![CDATA[Mona Prince on #jan25 Egyptian Protests ]]></title>
-        <link href="https://www.andrewheiss.com/blog/2011/01/27/mona-prince-on-egyptian-revolution/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2011/01/27/mona-prince-on-egyptian-revolution/" rel="alternate" />
         <published>2011-01-27T00:00:00+00:00</published>
         <updated>2011-01-27T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2011/01/27/mona-prince-on-egyptian-revolution/</id>
+        <id>https://www.shagunjhaver.com/blog/2011/01/27/mona-prince-on-egyptian-revolution/</id>
         <summary type="html"><![CDATA[Mona Prince's personal account of the #jan25 Egyptian protests]]></summary>
         <content type="html"><![CDATA[<p>Egyptian novelist and professor Mona Prince just sent me this personal report on her experience with the <a href="http://en.wikipedia.org/wiki/2011_Egyptian_protests">#jan25 protests</a>. I&rsquo;m reposting it here in its entirety.</p>
 <hr>
@@ -10503,13 +10503,13 @@ cairo january 27 2011</p>
     </entry>
     <entry>
         <title type="html"><![CDATA[iOS 4, Multitasking, and Battery Life]]></title>
-        <link href="https://www.andrewheiss.com/blog/2010/09/24/ios4-multitasking-battery-life/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2010/09/24/ios4-multitasking-battery-life/" rel="alternate" />
         <published>2010-09-24T00:00:00+00:00</published>
         <updated>2010-09-24T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2010/09/24/ios4-multitasking-battery-life/</id>
+        <id>https://www.shagunjhaver.com/blog/2010/09/24/ios4-multitasking-battery-life/</id>
         <summary type="html"><![CDATA[The multitasking capabilities of iOS 4 seem to be draining my battery. Help me figure out how to stop it!]]></summary>
         <content type="html"><![CDATA[<p>I recently got a brand new 4G iPod Touch for my initial foray into the amazing world of iOS. I&rsquo;ve been sitting on the sidelines far too long and I&rsquo;m <a href="http://twitter.com/#!/andrewheiss/status/25170167865">so excited</a> to finally have an almost-iPhone.</p>
 <p>However, I ran into my first hitch this morning and my Google skills have proven useless to solve it. I&rsquo;ve been using the iPod as an alarm clock for the past few days since its UI is superior to the ancient digital clock in our bedroom :). When I went to bed last night the battery was probably at 80% capacity. <a href="http://www.apple.com/ipodtouch/specs.html">Apple touts</a> that the new iPod has 40 hours of battery life when playing music—quite impressive. I had put the iPod in airplane mode, turning off the WiFi so that I wouldn&rsquo;t get any mail or Facebook notifications. With no internet, no music, and no apps (supposedly) running, the iPod&rsquo;s battery theoretically should have lasted for months—or even years :)</p>
@@ -10523,13 +10523,13 @@ cairo january 27 2011</p>
     </entry>
     <entry>
         <title type="html"><![CDATA[Queen Rania at AUC]]></title>
-        <link href="https://www.andrewheiss.com/blog/2010/02/28/queen-rania-at-auc/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2010/02/28/queen-rania-at-auc/" rel="alternate" />
         <published>2010-02-28T00:00:00+00:00</published>
         <updated>2010-02-28T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2010/02/28/queen-rania-at-auc/</id>
+        <id>https://www.shagunjhaver.com/blog/2010/02/28/queen-rania-at-auc/</id>
         <summary type="html"><![CDATA[On February 28, 2010 at the American University in Cairo, Jordan's Queen Rania gave a speech on the importance of civic engagement in the Arab world. While her idea that regular citizens need to be more involved in government, the hardhanded policies of Arab governments make it almost impossible for that to happen.]]></summary>
         <content type="html"><![CDATA[<p>This morning AUC&rsquo;s <a href="https://business.aucegypt.edu/research/centers/gerhart" title="Gerhart Center">John D. Gerhart Center for Civic Engagement</a> hosted a lecture by <a href="http://www.queenrania.jo/">Queen Rania al-Abdullah</a> of Jordan. Queen Rania is famous for being intensely involved in the public sphere and, according to the venerable <a href="http://en.wikipedia.org/wiki/Queen_Rania_of_Jordan">Wikipedia</a>, is considered one of the <a href="http://www.forbes.com/lists/2009/11/power-women-09_Queen-Rania_VZPS.html">world&rsquo;s most powerful women</a>. She&rsquo;s involved with a ton of foundations and NGOs that cover a wide range of goals, from advocating for improvement in girls' education and employment, promoting dialogue between the US and the Arab world, and calling for what became the buzzword of today&rsquo;s lecture: civic engagement. She uses technology to promote her agenda of social improvement and is active on <a href="http://www.youtube.com/user/QueenRania">YouTube</a>, <a href="http://twitter.com/QueenRania">Twitter</a>, and <a href="http://www.facebook.com/QueenRania">Facebook</a>. Basically a beautiful, famous, powerful world leader.</p>
 <p>Queen Rania focused primarily on the need for native grassroots movements in the Arab world, stating that civic engagement is an essential element of societal reform—changes so desperately needed in this region, where poverty and corruption are rampant. She stated that it is the responsibility of all citizens to take an interest in developing and improving their own country. Calling on Arabs to &ldquo;look up&rdquo; and think of others, she cited the example of one of AUC&rsquo;s homegrown NGOs, <a href="http://www.ayb-sd.org/#history">Alashanek Ya Balady</a>, which is heavily involved in promoting sustainable development in Egypt&rsquo;s poorest neighborhoods. The efforts of AYB and dozens of other organizations constitute a laudable homegrown effort to reform Egyptian society, and they have had lots of success so far.</p>
@@ -10555,13 +10555,13 @@ cairo january 27 2011</p>
     </entry>
     <entry>
         <title type="html"><![CDATA[flashbakectl released]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/09/23/flashbakectl-released/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/09/23/flashbakectl-released/" rel="alternate" />
         <published>2009-09-23T00:00:00+00:00</published>
         <updated>2009-09-23T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/09/23/flashbakectl-released/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/09/23/flashbakectl-released/</id>
         <summary type="html"><![CDATA[flashbakectl is a handy little script that starts and stops Flashbake by loading and unloading plist files.]]></summary>
         <content type="html"><![CDATA[<p>Adding to my apparent <a href="http://www.andrewheiss.com/blog/2009/08/18/itunes-plugin-for-flashbake/" title="iTunes plugin for Flashbake  –   AndrewHeiss.com">series of Flashbake addons</a>, I&rsquo;ve just released <a href="http://github.com/andrewheiss/flashbakectl" title="andrewheiss's flashbakectl at master - GitHub"><code>flashbakectl</code></a>.</p>
 <p>Normally to run <a href="https://github.com/cmdln/flashbake" title="Home - flashbake - GitHub">Flashbake</a> consistently you need to set up a cron job. While OS X is built on Unix and has cron, Apple recommends using <code>launchd</code> and property list (plist) files to run system agents and daemons. <code>flashbakectl</code> is a handy little script that loads and unloads a plist for you.</p>
@@ -10574,13 +10574,13 @@ cairo january 27 2011</p>
     </entry>
     <entry>
         <title type="html"><![CDATA[iTunes plugin for Flashbake]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/08/18/itunes-plugin-for-flashbake/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/08/18/itunes-plugin-for-flashbake/" rel="alternate" />
         <published>2009-08-18T00:00:00+00:00</published>
         <updated>2009-08-18T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/08/18/itunes-plugin-for-flashbake/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/08/18/itunes-plugin-for-flashbake/</id>
         <summary type="html"><![CDATA[Flashbake-iTunes is a plugin for Flashbake that allows you to include information for the current track in the periodic git commit message.]]></summary>
         <content type="html"><![CDATA[<p><a href="https://github.com/cmdln/flashbake" title="Home - flashbake - GitHub">Flashbake</a> is a fantastic script <a href="http://lifehacker.com/5232049/flashbake-automates-version-control-for-nerdy-writers" title="Flashbake Automates Version Control for (Nerdy) Writers - Downloads - Lifehacker">for nerdy writers</a> (like me) that periodically commits changes to a Git repository and can optionally append various metadata to the commit message, allowing you to <a href="http://www.boingboing.net/2009/02/13/flashbake-free-versi.html" title="Flashbake: Free version-control for writers using git - Boing Boing">annotate the entire creative process</a>.</p>
 <p>Flashbake includes several plugins for adding recent tweets, weather, the current time zone, and other random information. There&rsquo;s even a plugin for the Banshee music player for Linux. There&rsquo;s nothing for iTunes, however, which is unfortunate since I&rsquo;m always listening to something when I write or code.</p>
@@ -10593,13 +10593,13 @@ cairo january 27 2011</p>
     </entry>
     <entry>
         <title type="html"><![CDATA[Using Google Voice and Gizmo Project Together]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/08/01/using-google-voice-and-gizmo-project-together-internationally/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/08/01/using-google-voice-and-gizmo-project-together-internationally/" rel="alternate" />
         <published>2009-08-01T00:00:00+00:00</published>
         <updated>2009-08-01T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/08/01/using-google-voice-and-gizmo-project-together-internationally/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/08/01/using-google-voice-and-gizmo-project-together-internationally/</id>
         <summary type="html"><![CDATA[Description of how to make Google Voice and the Gizmo Project work together with an ATA so that you get a free phone number and almost free phone calls.]]></summary>
         <content type="html"><![CDATA[<div class="alert alert-info">See update below <a href="#update">(skip to update)</a></div>
 <p><a href="http://www.google.com/voice" title="Google Voice">Google Voice</a>, the Google-ized incarnation of GrandCentral, is a fantastic service that aims to become your virtual phone switchboard. It gives you a free phone number that can receive regular phone calls and route them to any other actual phones you have connected to your account. Powerful stuff.</p>
@@ -10638,13 +10638,13 @@ cairo january 27 2011</p>
     </entry>
     <entry>
         <title type="html"><![CDATA[Alexandria Train Crash]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/07/30/alexandria-train-crash/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/07/30/alexandria-train-crash/" rel="alternate" />
         <published>2009-07-30T00:00:00+00:00</published>
         <updated>2009-07-30T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/07/30/alexandria-train-crash/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/07/30/alexandria-train-crash/</id>
         <summary type="html"><![CDATA[Pictures and details of a minor train wreck in Alexandria, Egypt on July 30, 2009.]]></summary>
         <content type="html"><![CDATA[<div class="alert alert-info">See update below <a href="#update">(skip to update)</a></div>
 <p>After almost a year of being in Egypt, we finally decided to go up to Alexandria today. We took the 9:00 AM train from Cairo and the ride went smooth until we were just outside the final Mahatat Misr station, where we were delayed for over an hour until pulling up to a platform.</p>
@@ -10671,13 +10671,13 @@ cairo january 27 2011</p>
     </entry>
     <entry>
         <title type="html"><![CDATA[Installing pdftk-php]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/07/29/installing-pdftk-php/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/07/29/installing-pdftk-php/" rel="alternate" />
         <published>2009-07-29T00:00:00+00:00</published>
         <updated>2009-07-29T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/07/29/installing-pdftk-php/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/07/29/installing-pdftk-php/</id>
         <summary type="html"><![CDATA[A detailed, updated tutorial on how to install, use, and customize pdftk-php.php, which combines the power of pdftk and PHP, allowing you to serve dynamic PDF forms from the web.]]></summary>
         <content type="html"><![CDATA[<p>Upon popular request, I&rsquo;ve decided to update the original tutorial for populating a LiveCycle PDF with PHP to apply to the new release of pdftk-php. The installation instructions should be mostly clear in the readme and in the inline comments in the example included with the script; this post is merely supplemental.</p>
 <h2 id="basic-usage">Basic usage</h2>
@@ -10848,13 +10848,13 @@ FieldJustification: Left
     </entry>
     <entry>
         <title type="html"><![CDATA[On narrowing and redefining research]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/07/28/on-narrowing-and-redefining-research/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/07/28/on-narrowing-and-redefining-research/" rel="alternate" />
         <published>2009-07-28T00:00:00+00:00</published>
         <updated>2009-07-28T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/07/28/on-narrowing-and-redefining-research/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/07/28/on-narrowing-and-redefining-research/</id>
         <summary type="html"><![CDATA[After a year of deliberation, I may have finally decided what to write about for my thesis.]]></summary>
         <content type="html"><![CDATA[<p>I&rsquo;ve been in Egypt for almost a year now, studiously working towards my MA in Middle East Studies. The supposed capstone of my time here at AUC—my thesis—now looms ahead somewhat menacingly. I get to spend the next several months researching and writing what will end up being my largest research project to date. It&rsquo;ll also set the foundation for my (hopefully) future PhD plans.</p>
 <p>There&rsquo;s only one problem: I don&rsquo;t quite know what I&rsquo;m writing it on.</p>
@@ -10877,13 +10877,13 @@ FieldJustification: Left
     </entry>
     <entry>
         <title type="html"><![CDATA[Import a Blogger Blog to InDesign with Perl]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/07/19/converting-a-blogger-blog-to-indesign-tagged-text/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/07/19/converting-a-blogger-blog-to-indesign-tagged-text/" rel="alternate" />
         <published>2009-07-19T00:00:00+00:00</published>
         <updated>2009-07-19T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/07/19/converting-a-blogger-blog-to-indesign-tagged-text/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/07/19/converting-a-blogger-blog-to-indesign-tagged-text/</id>
         <summary type="html"><![CDATA[This Perl script lets you take a backed-up Blogger XML file and convert it to an InDesign Tagged Text file for book layout.]]></summary>
         <content type="html"><![CDATA[<p>Our family has a fairly sizable <a href="http://www.heissatopia.com" title="Heissatopia">blog</a> that we (actually, mostly my wife, Nancy) have kept updated for several years. Since it contains so much family history we wanted an easy way to preserve it in print form, just in case Blogger gets the boot from Google some day (not that that will ever really happen…).</p>
 <p>Since we&rsquo;re both hobbyist graphic designers—I taught a couple print layout and design classes as an undergrad at BYU and have made several books at <a href="http://www.lulu.com" title="Lulu.com">Lulu.com</a>—we decided to layout and print each year of our blog, to keep for posterity.</p>
@@ -10926,13 +10926,13 @@ FieldJustification: Left
     </entry>
     <entry>
         <title type="html"><![CDATA[pdftk-php Officially Released]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/06/19/pdftk-php-officially-released/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/06/19/pdftk-php-officially-released/" rel="alternate" />
         <published>2009-06-19T00:00:00+00:00</published>
         <updated>2009-06-19T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/06/19/pdftk-php-officially-released/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/06/19/pdftk-php-officially-released/</id>
         <summary type="html"><![CDATA[After almost two years, I've officially developed and released pdftk-php--a script that lets you inject form data into a PDF with PHP.]]></summary>
         <content type="html"><![CDATA[<p>Wow. It&rsquo;s been almost two years since I wrote <a href="/blog/2007/10/06/populating-a-livecycle-pdf-with-php-and-mysql/" title="Populating a LiveCycle PDF with PHP and MySQL">a little tutorial</a> on how to use LiveCycle, PHP, and MySQL together to make a web application that served dynamic PDF forms. Since then it has become the number one page on this site. I still get a substantial number of comments a week here on the blog and via e-mail—many of those comments are stuck in my inbox, sent to me before I rebuilt my site on WordPress and enabled commenting.</p>
 <p>Unfortunately, though, I wrote that tutorial as my first foray into the world of PHP/MySQL web development and had little idea of what I was really doing. Since then, however, I&rsquo;ve done a fair amount of real-world web design and development, and even implemented this pdftk form system into a live, public-facing <a href="http://mmlab.lib.byu.edu" title="HBLL Multimedia Lab">application</a>.</p>
@@ -10949,13 +10949,13 @@ FieldJustification: Left
     </entry>
     <entry>
         <title type="html"><![CDATA[A Tale of Three Taxis]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/05/14/a-tale-of-three-taxis/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/05/14/a-tale-of-three-taxis/" rel="alternate" />
         <published>2009-05-14T00:00:00+00:00</published>
         <updated>2009-05-14T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/05/14/a-tale-of-three-taxis/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/05/14/a-tale-of-three-taxis/</id>
         <summary type="html"><![CDATA[Traffic in Cairo is horrible, especially when all the taxi drivers, the ubiquitous life-blood of the Egyptian streets, have a deathwish for you.]]></summary>
         <content type="html"><![CDATA[<p>Traffic in Cairo is horrible, especially when all the taxi drivers, the ubiquitous life-blood of the Egyptian streets, have a deathwish for you.</p>
 <p>Read about my recent near misses at my post at our family blog, <a href="http://www.heissatopia.com/2009/05/tale-of-three-taxis.html" title="Heissatopia: A tale of three taxis">Heissatopia</a>.</p>
@@ -10968,13 +10968,13 @@ FieldJustification: Left
     </entry>
     <entry>
         <title type="html"><![CDATA[Google Profile Business Cards]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/05/01/google-profile-business-cards/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/05/01/google-profile-business-cards/" rel="alternate" />
         <published>2009-05-01T00:00:00+00:00</published>
         <updated>2009-05-01T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/05/01/google-profile-business-cards/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/05/01/google-profile-business-cards/</id>
         <summary type="html"><![CDATA[I got 25 Google Profile business cards for free. Woot!]]></summary>
         <content type="html"><![CDATA[<p>Look what I just ordered, for free:</p>
 <p><img src="google-profile-business-card.png" alt="Google Profile Business Card"></p>
@@ -10989,13 +10989,13 @@ FieldJustification: Left
     </entry>
     <entry>
         <title type="html"><![CDATA[Typing transliterated Arabic quickly]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/04/26/typing-transliterated-arabic-quickly/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/04/26/typing-transliterated-arabic-quickly/" rel="alternate" />
         <published>2009-04-26T00:00:00+00:00</published>
         <updated>2009-04-26T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/04/26/typing-transliterated-arabic-quickly/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/04/26/typing-transliterated-arabic-quickly/</id>
         <summary type="html"><![CDATA[Use text-replacement software to automate Arabic transliteration.]]></summary>
         <content type="html"><![CDATA[<p>Since Arabic doesn&rsquo;t use the Latin alphabet, and lots of the letters don&rsquo;t have Latin equivalents (خ, ع, ق, ط, for example), transliteration is necessary to show Arabic words and sounds in English writing. There is an easy way to type transliterated Arabic quickly, though, using macros to locate hidden Unicode characters used by many of the standard transliteration systems.</p>
 <p>Unfortunately, there is no universally standard system for transliteration, and most systems use letters that aren&rsquo;t found on normal keyboards. One of the rising systems in the Middle East, nicknamed <a href="http://en.wikipedia.org/wiki/Arabic_Chat_Alphabet">Franco Arab</a> in Egypt, is my least favorite. It only uses standard English letters, meaning it&rsquo;s useful for texting, e-mailing, and other things where it&rsquo;s difficult to write in real Arabic script. Biggest problem: it&rsquo;s ugly and hard to read.</p>
@@ -11034,13 +11034,13 @@ You will probably only want to use IJMES transliteration in print because of fon
     </entry>
     <entry>
         <title type="html"><![CDATA[Libya, obsolete paradigms, and Rip Van Winkle]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/03/18/libya-obsolete-paradigms-and-rip-van-winkle/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/03/18/libya-obsolete-paradigms-and-rip-van-winkle/" rel="alternate" />
         <published>2009-03-18T00:00:00+00:00</published>
         <updated>2009-03-18T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/03/18/libya-obsolete-paradigms-and-rip-van-winkle/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/03/18/libya-obsolete-paradigms-and-rip-van-winkle/</id>
         <summary type="html"><![CDATA[Lisa Anderson's research of political systems in Libya reveals that standard Middle East Studies paradigms don't fully apply.]]></summary>
         <content type="html"><![CDATA[<p>I’m still experimenting with what I’m going to blog about here. I’m thinking of sticking with an odd mixture of technology and academia, which might work out well since I’m considering doing my upcoming thesis on technology in the Middle East, specifically blogging. So, here’s a purely academic post to start things off.</p>
 <p>On Tuesday Dr. Lisa Anderson, AUC’s Provost and former professor at Columbia University, came to speak at a faculty seminar at the Middle East Studies Center. She’s a political scientist by training and started her academic career by studying Libya. Her talk focused on the role of traditional social studies disciplines in the study of the Middle East.</p>
@@ -11072,13 +11072,13 @@ You will probably only want to use IJMES transliteration in print because of fon
     </entry>
     <entry>
         <title type="html"><![CDATA[Do not succumb to economic stupidity]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/03/15/do-not-succumb-to-economic-stupidity/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/03/15/do-not-succumb-to-economic-stupidity/" rel="alternate" />
         <published>2009-03-15T00:00:00+00:00</published>
         <updated>2009-03-15T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/03/15/do-not-succumb-to-economic-stupidity/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/03/15/do-not-succumb-to-economic-stupidity/</id>
         <summary type="html"><![CDATA[Listening to NPR's Planet Money economics podcast really does help to understand the current economic crisis.]]></summary>
         <content type="html"><![CDATA[<p>Yikes. It’s been a week since I launched my new site and blog and I haven’t posted yet. I think this is partially because I don’t know what I’m going to be focusing on with this blog. Middle East Studies? Technology? Hmmm…</p>
 <p>I’ve had this blog post on my mind for a while, though, so I’d better post it. The best part is that it has nothing to do with MES or tech topics.</p>
@@ -11099,13 +11099,13 @@ You will probably only want to use IJMES transliteration in print because of fon
     </entry>
     <entry>
         <title type="html"><![CDATA[New site launched]]></title>
-        <link href="https://www.andrewheiss.com/blog/2009/03/08/new-site-launched/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2009/03/08/new-site-launched/" rel="alternate" />
         <published>2009-03-08T00:00:00+00:00</published>
         <updated>2009-03-08T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2009/03/08/new-site-launched/</id>
+        <id>https://www.shagunjhaver.com/blog/2009/03/08/new-site-launched/</id>
         <summary type="html"><![CDATA[I finally converted my ancient, inefficient PHP-ish website to a mean, lean, WordPresss running CMS.]]></summary>
         <content type="html"><![CDATA[<p>Two years ago I decided that it would be a good idea to start a personal website. I was always disappointed in <a href="http://www.google.com/search?q=Andrew+Heiss">the Google results for my name</a>, so I figured having my own web space and domain would help boost my ratings. Yes. I initially started this site for the sole purpose of <a href="http://en.wikipedia.org/wiki/Egosurfing">egogoogling</a>. So much has changed since then…</p>
 <p>My first website was ugly. I had just started my foray into web design and barely knew anything—my CSS was rudimentary at best and I used scattered PHP includes to make a pseudo dynamic site. It was a mess.</p>
@@ -11118,13 +11118,13 @@ You will probably only want to use IJMES transliteration in print because of fon
     </entry>
     <entry>
         <title type="html"><![CDATA[Populating a LiveCycle PDF with PHP and MySQL]]></title>
-        <link href="https://www.andrewheiss.com/blog/2007/10/06/populating-a-livecycle-pdf-with-php-and-mysql/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2007/10/06/populating-a-livecycle-pdf-with-php-and-mysql/" rel="alternate" />
         <published>2007-10-06T00:00:00+00:00</published>
         <updated>2007-10-06T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2007/10/06/populating-a-livecycle-pdf-with-php-and-mysql/</id>
+        <id>https://www.shagunjhaver.com/blog/2007/10/06/populating-a-livecycle-pdf-with-php-and-mysql/</id>
         <summary type="html"><![CDATA[Tutorial explaining how to populate a LiveCycle PDF form using PHP and MySQL.]]></summary>
         <content type="html"><![CDATA[<div class="alert alert-warning">This tutorial is officially defunct. It is only here for archival purposes. The main script has been consolidated into one PHP class—<a href="http://www.andrewheiss.com/blog/2009/06/19/pdftk-php-officially-released/">pdftk-php</a>. Please see <a href="http://www.andrewheiss.com/blog/2009/07/29/installing-pdftk-php/">the updated tutorial</a>.</div>
 <p>I work in the Harold B. Lee Library Multimedia Lab where we check out digital video and still cameras, tripods, external hard drives, digital voice recorders, and let people use $8,000 Quad Core Intel Macs. Expensive stuff…</p>
@@ -11206,13 +11206,13 @@ FieldJustification: Left
     </entry>
     <entry>
         <title type="html"><![CDATA[Using Arabic in InDesign without InDesign ME]]></title>
-        <link href="https://www.andrewheiss.com/blog/2007/09/17/using-arabic-in-indesign-without-indesign-me/" rel="alternate" />
+        <link href="https://www.shagunjhaver.com/blog/2007/09/17/using-arabic-in-indesign-without-indesign-me/" rel="alternate" />
         <published>2007-09-17T00:00:00+00:00</published>
         <updated>2007-09-17T00:00:00+00:00</updated>
         <author>
-            <name>Andrew Heiss</name>
+            <name>Shagun Jhaver</name>
         </author>
-        <id>https://www.andrewheiss.com/blog/2007/09/17/using-arabic-in-indesign-without-indesign-me/</id>
+        <id>https://www.shagunjhaver.com/blog/2007/09/17/using-arabic-in-indesign-without-indesign-me/</id>
         <summary type="html"><![CDATA[How to use the Glyphs panel in InDesign CS3 to insert Arabic text, despite the lack of support for Arabic.]]></summary>
         <content type="html"><![CDATA[<p>About a year ago I discovered to my dismay that using Arabic in InDesign was entirely impossible.</p>
 <p>I wanted to make a type of dictionary for my Arabic 101 students, using an Excel spreadsheet full of Arabic words. When I placed any Arabic text, though, this happened:</p>
