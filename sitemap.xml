@@ -182,21 +182,6 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/chaudhry-heiss-ngos-repression/</loc>
-    <lastmod>2021-04-12T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research_type/working-paper/</loc>
-    <lastmod>2021-04-12T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/chaudhry-heiss-derogations/</loc>
-    <lastmod>2021-03-26T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
     <loc>https://www.shagunjhaver.com/blog/tags/bayes/</loc>
     <lastmod>2021-01-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -364,6 +349,11 @@
   </url><url>
     <loc>https://www.shagunjhaver.com/research/articles/holikatti-2019-airbnb-lpp/</loc>
     <lastmod>2019-06-01T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research/articles/jhaver-2019-skill-searches/</loc>
+    <lastmod>2019-05-10T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
@@ -537,11 +527,6 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/heiss-kelley-2017/</loc>
-    <lastmod>2017-01-24T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
     <loc>https://www.shagunjhaver.com/blog/2016/</loc>
     <lastmod>2016-12-08T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -557,11 +542,6 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/heiss-kelley-2017a/</loc>
-    <lastmod>2016-06-01T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
     <loc>https://www.shagunjhaver.com/blog/2016/04/25/convert-logistic-regression-standard-errors-to-odds-ratios-with-r/</loc>
     <lastmod>2016-04-25T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -574,16 +554,6 @@
   </url><url>
     <loc>https://www.shagunjhaver.com/blog/tags/hrbrmstr-challenge/</loc>
     <lastmod>2016-04-03T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/chaudhry-heiss-ngos-aid/</loc>
-    <lastmod>2016-03-01T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/heiss-johnson-2016/</loc>
-    <lastmod>2016-03-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
@@ -627,23 +597,8 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/witesman-heiss-2016/</loc>
-    <lastmod>2016-02-01T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
     <loc>https://www.shagunjhaver.com/research/reviews/heiss-voluntas-review-2014/</loc>
     <lastmod>2015-04-01T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research_type/dormant-working-paper/</loc>
-    <lastmod>2014-08-20T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/heiss-rogerson-sources/</loc>
-    <lastmod>2014-08-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
@@ -654,11 +609,6 @@
   </url><url>
     <loc>https://www.shagunjhaver.com/research_type/selected-seminar-paper/</loc>
     <lastmod>2014-04-20T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/heiss-rogerson-discourse/</loc>
-    <lastmod>2014-03-20T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
@@ -729,11 +679,6 @@
   </url><url>
     <loc>https://www.shagunjhaver.com/blog/2012/04/17/install-r-rstudio-r-commander-windows-osx/</loc>
     <lastmod>2012-04-17T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/heiss-2012/</loc>
-    <lastmod>2012-04-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
