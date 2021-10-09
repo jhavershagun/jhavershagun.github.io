@@ -182,16 +182,6 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/chaudhry-dotson-heiss-2021/</loc>
-    <lastmod>2021-04-27T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/peck-heiss-2021/</loc>
-    <lastmod>2021-04-16T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
     <loc>https://www.shagunjhaver.com/research/articles/chaudhry-heiss-ngos-repression/</loc>
     <lastmod>2021-04-12T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -264,11 +254,6 @@
   </url><url>
     <loc>https://www.shagunjhaver.com/research/chapters/heiss-causal-inference-2021/</loc>
     <lastmod>2020-11-28T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/chaudhry-heiss-ngos-philanthropy/</loc>
-    <lastmod>2020-11-16T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
@@ -362,11 +347,6 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/heiss-2019-taking-control/</loc>
-    <lastmod>2019-09-17T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
     <loc>https://www.shagunjhaver.com/research/articles/jhaver-2019-transparency/</loc>
     <lastmod>2019-06-11T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -374,6 +354,16 @@
   </url><url>
     <loc>https://www.shagunjhaver.com/research/articles/jhaver-2019-survey/</loc>
     <lastmod>2019-06-10T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research/articles/jhaver-2019-automod/</loc>
+    <lastmod>2019-06-06T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research/articles/holikatti-2019-airbnb-lpp/</loc>
+    <lastmod>2019-06-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
