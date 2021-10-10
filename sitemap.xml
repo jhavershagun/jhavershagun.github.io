@@ -427,6 +427,11 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
+    <loc>https://www.shagunjhaver.com/research/articles/jhaver-2018-blocklists/</loc>
+    <lastmod>2018-12-06T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
     <loc>https://www.shagunjhaver.com/blog/2018/12/05/test-any-hypothesis/</loc>
     <lastmod>2018-12-05T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -439,6 +444,21 @@
   </url><url>
     <loc>https://www.shagunjhaver.com/blog/tags/infer/</loc>
     <lastmod>2018-12-05T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research/articles/jhaver-2018-airbnb/</loc>
+    <lastmod>2018-11-06T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research/articles/jhaver-2018-kia/</loc>
+    <lastmod>2018-10-06T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research/articles/chandrasekharan-2018-norms/</loc>
+    <lastmod>2018-09-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
