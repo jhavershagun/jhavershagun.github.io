@@ -2,6 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://www.shagunjhaver.com/news/</loc>
+    <lastmod>2021-10-09T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/now/</loc>
+    <lastmod>2021-10-09T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
     <loc>https://www.shagunjhaver.com/research/articles/jhaver-2021-deplatforming/</loc>
     <lastmod>2021-10-08T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -34,11 +44,6 @@
   </url><url>
     <loc>https://www.shagunjhaver.com/uses/</loc>
     <lastmod>2021-10-05T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/now/</loc>
-    <lastmod>2021-10-04T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
