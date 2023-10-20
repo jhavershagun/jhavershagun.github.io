@@ -2,27 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://www.shagunjhaver.com/research/workshops/jhaver-2023-data/</loc>
+    <lastmod>2023-10-16T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/</loc>
+    <lastmod>2023-10-16T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research/</loc>
+    <lastmod>2023-10-16T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research_type/</loc>
+    <lastmod>2023-10-16T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research_type/workshop-papers-and-panel/</loc>
+    <lastmod>2023-10-16T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
     <loc>https://www.shagunjhaver.com/research/articles/jhaver-2023-decentralizing/</loc>
     <lastmod>2023-09-04T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/</loc>
-    <lastmod>2023-09-04T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
     <loc>https://www.shagunjhaver.com/research_type/peer-reviewed-article/</loc>
-    <lastmod>2023-09-04T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research/</loc>
-    <lastmod>2023-09-04T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research_type/</loc>
     <lastmod>2023-09-04T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -47,12 +57,12 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/jhaver-2021-multi-level/</loc>
+    <loc>https://www.shagunjhaver.com/research/tech-reports/jhaver-2021-multi-level/</loc>
     <lastmod>2022-01-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research_type/working-paper/</loc>
+    <loc>https://www.shagunjhaver.com/research_type/technical_report/</loc>
     <lastmod>2022-01-26T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -172,11 +182,6 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research_type/workshop-paper/</loc>
-    <lastmod>2019-06-11T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
     <loc>https://www.shagunjhaver.com/research/articles/jhaver-2019-survey/</loc>
     <lastmod>2019-06-10T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -228,11 +233,6 @@
     <priority>0.5</priority>
   </url><url>
     <loc>https://www.shagunjhaver.com/research/tech-reports/jhaver-2017-cmv/</loc>
-    <lastmod>2017-07-10T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research_type/technical_report/</loc>
     <lastmod>2017-07-10T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
