@@ -122,61 +122,6 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/blog/2021/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/blog/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/blog/tags/causal-inference/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/blog/tags/dags/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/blog/tags/do-calculus/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/blog/tags/inverse-probability-weighting/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/blog/2021/01/15/msm-gee-multilevel/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/blog/tags/r/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/tags/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/blog/tags/tidyverse/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/year/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
     <loc>https://www.shagunjhaver.com/research/theses/jhaver-2020-phd-thesis/</loc>
     <lastmod>2020-05-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -272,7 +217,7 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/blog/2021/01/</loc>
+    <loc>https://www.shagunjhaver.com/blog/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
@@ -284,11 +229,15 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/blog/tags/</loc>
+    <loc>https://www.shagunjhaver.com/tags/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
     <loc>https://www.shagunjhaver.com/talks/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/year/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
