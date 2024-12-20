@@ -2,27 +2,32 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://www.shagunjhaver.com/research/articles/ribeiro-2024-deplatforming/</loc>
-    <lastmod>2024-09-22T00:00:00+00:00</lastmod>
+    <loc>https://www.shagunjhaver.com/research/articles/jhaver-2025-bans/</loc>
+    <lastmod>2025-01-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
     <loc>https://www.shagunjhaver.com/</loc>
-    <lastmod>2024-09-22T00:00:00+00:00</lastmod>
+    <lastmod>2025-01-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
     <loc>https://www.shagunjhaver.com/research_type/peer-reviewed-article/</loc>
-    <lastmod>2024-09-22T00:00:00+00:00</lastmod>
+    <lastmod>2025-01-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
     <loc>https://www.shagunjhaver.com/research/</loc>
-    <lastmod>2024-09-22T00:00:00+00:00</lastmod>
+    <lastmod>2025-01-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
     <loc>https://www.shagunjhaver.com/research_type/</loc>
+    <lastmod>2025-01-01T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research/articles/ribeiro-2024-deplatforming/</loc>
     <lastmod>2024-09-22T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
