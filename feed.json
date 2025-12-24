@@ -1,10 +1,10 @@
 {
     "version": "https://jsonfeed.org/version/1",
     "title": "Shagun Jhaver",
-    "home_page_url": "jhavershagun.github.io/",
-    "feed_url": "jhavershagun.github.io/feed.json",
+    "home_page_url": "https://www.shagunjhaver.com/",
+    "feed_url": "https://www.shagunjhaver.com/feed.json",
     "description": "Shagun Jhaver is an assistant professor at Rutgers University, researching user-algorithm interactions.",
-    "icon": "jhavershagun.github.io/profiles/square-bg.png",
+    "icon": "https://www.shagunjhaver.com/profiles/square-bg.png",
     "items": [
     ]
 }
