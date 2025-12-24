@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
     <title>Shagun Jhaver</title>
-    <link href="https://www.shagunjhaver.com/" rel="alternate" />
-    <link href="https://www.shagunjhaver.com/atom.xml" rel="self" />
-    <id>https://www.shagunjhaver.com/</id>
-    <updated>2025-12-24T15:33:56-05:00</updated>
+    <link href="jhavershagun.github.io/jhavershagun/" rel="alternate" />
+    <link href="jhavershagun.github.io/jhavershagun/atom.xml" rel="self" />
+    <id>jhavershagun.github.io/jhavershagun/</id>
+    <updated>2025-12-24T15:42:58-05:00</updated>
 </feed>
