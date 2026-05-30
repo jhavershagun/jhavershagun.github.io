@@ -87,12 +87,12 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research_type/technical_report/</loc>
+    <loc>https://www.shagunjhaver.com/research_type/policy-report/</loc>
     <lastmod>2024-07-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research/tech-reports/jhaver-2024-tools/</loc>
+    <loc>https://www.shagunjhaver.com/research/policy-reports/jhaver-2024-tools/</loc>
     <lastmod>2024-07-01T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -247,12 +247,22 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research/tech-reports/jhaver-2017-cmv/</loc>
+    <loc>https://www.shagunjhaver.com/research/non-refereed-articles/jhaver-2017-cmv/</loc>
     <lastmod>2017-07-10T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research/tech-reports/jhaver-2016-postscholar/</loc>
+    <loc>https://www.shagunjhaver.com/research_type/non-refereed-article/</loc>
+    <lastmod>2017-07-10T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research_type/conference-poster/</loc>
+    <lastmod>2016-07-10T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research/conference-posters/jhaver-2016-postscholar/</loc>
     <lastmod>2016-07-10T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -262,12 +272,17 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
-    <loc>https://www.shagunjhaver.com/research/articles/jhaver-2014-edit-distance.pdf/</loc>
+    <loc>https://www.shagunjhaver.com/research/lightly-peer-reviewed-articles/jhaver-2014-edit-distance.pdf/</loc>
     <lastmod>2014-07-10T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
     <loc>https://www.shagunjhaver.com/research/theses/jhaver-2014-masters-thesis/</loc>
+    <lastmod>2014-07-10T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research_type/lightly-peer-reviewed-article/</loc>
     <lastmod>2014-07-10T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
