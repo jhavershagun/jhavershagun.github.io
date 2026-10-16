@@ -27,6 +27,16 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
+    <loc>https://www.shagunjhaver.com/research/workshops/jhaver-2026-compass/</loc>
+    <lastmod>2026-06-11T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
+    <loc>https://www.shagunjhaver.com/research_type/workshop-papers-and-panel/</loc>
+    <lastmod>2026-06-11T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
     <loc>https://www.shagunjhaver.com/research/articles/jhaver-2026-autocomplete-moderation/</loc>
     <lastmod>2026-05-12T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -77,6 +87,11 @@
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url><url>
+    <loc>https://www.shagunjhaver.com/research/workshops/jhaver-2025-compass/</loc>
+    <lastmod>2025-06-11T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url><url>
     <loc>https://www.shagunjhaver.com/research/articles/ha-2025-youtube/</loc>
     <lastmod>2025-05-15T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -118,11 +133,6 @@
     <priority>0.5</priority>
   </url><url>
     <loc>https://www.shagunjhaver.com/research/workshops/jhaver-2023-data/</loc>
-    <lastmod>2023-10-16T00:00:00+00:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url><url>
-    <loc>https://www.shagunjhaver.com/research_type/workshop-papers-and-panel/</loc>
     <lastmod>2023-10-16T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
